@@ -1,0 +1,84 @@
+﻿Log file open, 01/26/15 14:38:59
+LogInit:Display: Running engine for game: Crystalline
+LogInit: Version: 4.6.1-2386410+++depot+UE4-Releases+4.6
+LogInit: API Version: 2369412
+LogInit: Compiled (64-bit): Dec 11 2014 21:31:39
+LogInit: Compiled with Visual C++: 18.00.21005.01
+LogInit: Build Configuration: Development
+LogInit: Branch Name: ++depot+UE4-Releases+4.6
+LogInit: Command line: 
+LogInit: Base directory: D:/Users/jd8060/Unreal Engine/4.6/Engine/Binaries/Win64/
+LogInit: Rocket: 1
+[2015.01.26-19.38.59:556][  0]LogTaskGraph: Started task graph with 3 named threads and 4 total threads.
+[2015.01.26-19.38.59:592][  0]LogOnline:Warning: No default platform service specified for OnlineSubsystem
+[2015.01.26-19.38.59:620][  0]LogInit: Presizing for 0 objects not considered by GC, pre-allocating 0 bytes.
+[2015.01.26-19.38.59:630][  0]LogInit: Object subsystem initialized
+[2015.01.26-19.38.59:637][  0]LogInit: Selected Device Profile: [Windows]
+[2015.01.26-19.38.59:637][  0]LogInit: Applying CVar settings loaded from the selected device profile: [Windows]
+[2015.01.26-19.38.59:642][  0]LogInit: Computer: IGMGRAD-03
+[2015.01.26-19.38.59:642][  0]LogInit: User: jd8060
+[2015.01.26-19.38.59:642][  0]LogInit: CPU Page size=4096, Cores=2
+[2015.01.26-19.38.59:642][  0]LogInit: High frequency timer resolution =3.515625 MHz
+[2015.01.26-19.38.59:642][  0]LogMemory: Memory total: Physical=15.9GB (16GB approx) Virtual=131072.0GB
+[2015.01.26-19.38.59:643][  0]LogMemory: Platform Memory Stats for Windows
+[2015.01.26-19.38.59:643][  0]LogMemory: Process Physical Memory: 46.41 MB used, 46.41 MB peak
+[2015.01.26-19.38.59:643][  0]LogMemory: Process Virtual Memory: 22.10 MB used, 24.38 MB peak
+[2015.01.26-19.38.59:643][  0]LogMemory: Physical Memory: 4612.98 MB used, 16302.15 MB total
+[2015.01.26-19.38.59:643][  0]LogMemory: Virtual Memory: 273.32 MB used, 134217728.00 MB total
+[2015.01.26-19.38.59:668][  0]LogD3D11RHI: Found D3D11 adapter 0: NVIDIA GeForce GTX 680 (Feature Level 11_0)
+[2015.01.26-19.38.59:668][  0]LogD3D11RHI: Adapter has 1985MB of dedicated video memory, 0MB of dedicated system memory, and 2048MB of shared system memory, 2 output[s]
+[2015.01.26-19.38.59:669][  0]LogD3D11RHI: Found D3D11 adapter 1: Microsoft Basic Render Driver (Feature Level 11_0)
+[2015.01.26-19.38.59:669][  0]LogD3D11RHI: Adapter has 0MB of dedicated video memory, 0MB of dedicated system memory, and 256MB of shared system memory, 0 output[s]
+[2015.01.26-19.38.59:669][  0]LogD3D11RHI: Chosen D3D11 Adapter Id = 0
+[2015.01.26-19.38.59:672][  0]LogRHI: Texture pool is 1361 MB (70% of 1945 MB)
+[2015.01.26-19.38.59:680][  0]LogD3D11RHI: Async texture creation enabled
+[2015.01.26-19.38.59:743][  0]LogTextLocalizationManager: The requested culture ('en_US') has no localization data; parent culture's ('en') localization data will be used.
+[2015.01.26-19.38.59:869][  0]LogContentStreaming: Texture pool size is 0.000000MB
+[2015.01.26-19.39.05:325][  0]LogTargetPlatformManager:Display: Building Assets For Windows
+[2015.01.26-19.39.06:052][  0]LogTargetPlatformManager:Display: Building Assets For Windows
+[2015.01.26-19.39.06:114][  0]LogDerivedDataCache:Display: Max Cache Size: 512 MB
+[2015.01.26-19.39.06:169][  0]LogDerivedDataCache: Loaded boot cache 0.06s 67MB D:/Users/jd8060/AppData/Local/UnrealEngine/4.6/DerivedDataCache/Boot.ddc.
+[2015.01.26-19.39.06:170][  0]LogDerivedDataCache:Display: Loaded Boot cache: D:/Users/jd8060/AppData/Local/UnrealEngine/4.6/DerivedDataCache/Boot.ddc
+[2015.01.26-19.39.06:170][  0]LogDerivedDataCache: FDerivedDataBackendGraph:  Pak pak cache file ../../../../../Capstone Unreal/Crystalline/DerivedDataCache/DDC.ddp not found, will not use a pak cache.
+[2015.01.26-19.39.06:170][  0]LogDerivedDataCache: Unable to find inner node Pak for hierarchical cache Hierarchy.
+[2015.01.26-19.39.06:229][  0]LogDerivedDataCache:Display: Pak cache opened for reading ../../../Engine/DerivedDataCache/DDC.ddp.
+[2015.01.26-19.39.06:241][  0]LogDerivedDataCache: Using Local data cache path D:/Users/jd8060/AppData/Local/UnrealEngine/Common/DerivedDataCache: Writable
+[2015.01.26-19.39.06:379][  0]LogCollisionProfile:Warning: Profile (UI) - Custom Channel Name = 'Weapon' hasn't been found
+[2015.01.26-19.39.06:527][  0]LogMeshUtilities: No automatic mesh reduction module available
+[2015.01.26-19.39.06:527][  0]LogMeshUtilities: No automatic mesh merging module available
+[2015.01.26-19.39.06:964][  0]LogInit: WinSock: version 1.1 (2.2), MaxSocks=32767, MaxUdp=65467
+[2015.01.26-19.39.07:038][  0]LogSlate:Warning: Failed to load font data from '../../../Engine/Content/Slate/Fonts/Roboto-Italic.ttf'
+[2015.01.26-19.39.08:332][  0]UdpMessaging: Initializing bridge on interface 0.0.0.0:0 to multicast group 230.0.0.1:6666.
+[2015.01.26-19.39.08:581][  0]LogDirectoryWatcher:Warning: Failed to begin reading directory changes for D:/Users/jd8060/Capstone Unreal/Crystalline/Binaries/Win64. Error: 0
+[2015.01.26-19.39.08:799][  0]SourceControl: Info Source control is disabled
+[2015.01.26-19.39.08:799][  0]SourceControl: Info Source control is disabled
+[2015.01.26-19.39.08:809][  0]SourceControl: Info Source control is disabled
+[2015.01.26-19.39.08:984][  0]LogObj: 23754 objects as part of root set at end of initial load.
+[2015.01.26-19.39.08:984][  0]LogUObjectAllocator: 5168128 out of 0 bytes used by permanent object pool.
+[2015.01.26-19.39.09:044][  0]LogEngine: Initializing Engine...
+[2015.01.26-19.39.09:193][  0]LogInit: XAudio2 using 'Speakers (Realtek High Definition Audio)' : 2 channels at 48 kHz using 32 bits per sample (channel mask 0x3)
+[2015.01.26-19.39.09:293][  0]LogInit: FAudioDevice initialized.
+[2015.01.26-19.39.09:321][  0]LogAIModule: Creating AISystem for world NewWorld
+[2015.01.26-19.39.09:353][  0]LogDerivedDataCache: Saved boot cache 0.03s 67MB D:/Users/jd8060/AppData/Local/UnrealEngine/4.6/DerivedDataCache/Boot.ddc.
+[2015.01.26-19.39.09:360][  0]LogInit: Texture streaming: Enabled
+[2015.01.26-19.39.09:399][  0]LogAnalytics: Creating configured Analytics provider AnalyticsET
+[2015.01.26-19.39.09:399][  0]LogAnalytics: ET APIKey = Rocket.Release. APIServer = http://et2.epicgames.com/ET2/. AppVersion = 4.6.1-2386410+++depot+UE4-Releases+4.6
+[2015.01.26-19.39.09:400][  0]LogAnalytics: SetUserId df0672c7172e7611ae5fdc024f44a6d1
+[2015.01.26-19.39.09:400][  0]LogAnalytics: AnalyticsET::StartSession [Rocket.Release]
+[2015.01.26-19.39.09:418][  0]LogInit: Transaction tracking system initialized
+[2015.01.26-19.39.09:551][  0]BlueprintLog: New page: Editor Load
+[2015.01.26-19.39.09:590][  0]LogAssetRegistry: FAssetRegistry took 0.0103 seconds to start up
+[2015.01.26-19.39.09:590][  0]LogDirectoryWatcher:Warning: Failed to begin reading directory changes for ../../../Engine/Plugins/Experimental/CharacterAI/Content/. Error: 0
+[2015.01.26-19.39.10:610][  0]LogTargetPlatformManager:Display: Building Assets For Windows
+[2015.01.26-19.39.11:299][  0]LogTargetPlatformManager:Display: Building Assets For Windows
+[2015.01.26-19.39.13:368][  0]LogConsoleResponse:Display: 
+[2015.01.26-19.39.13:421][  0]LogLinker:Warning: Asset '../../../Engine/Content/Functions/Engine_MaterialFunctions03/Procedurals/ComputeFilterWidth.uasset' has been saved with empty engine version. The asset will be loaded but may be incompatible.
+[2015.01.26-19.39.13:683][  0]SourceControl: Info Source control is disabled
+[2015.01.26-19.39.13:684][  0]Cmd: MAP LOAD FILE="../../../../../Capstone Unreal/Crystalline/Content/Maps/Example_Map.umap" TEMPLATE=0 SHOWPROGRESS=1
+[2015.01.26-19.39.13:684][  0]LightingResults: New page: Lighting Build
+[2015.01.26-19.39.13:698][  0]MapCheck: New page: Map Check
+[2015.01.26-19.39.13:698][  0]LightingResults: New page: Lighting Build
+[2015.01.26-19.39.13:715][  0]LogParticles: Destroying 0 GPU particle simulations for FXSystem 0x000000D1E51B3E20
+[2015.01.26-19.39.14:043][  0]LogStaticMesh: Building static mesh TemplateCube_Rounded...
+[2015.01.26-19.39.14:047][  0]LogStaticMesh: Built static mesh [4.357973ms] /Game/Meshes/TemplateCube_Rounded.TemplateCube_Rounded
+[2015.01.26-19.39.14:070][  0]LogTexture:Displa
