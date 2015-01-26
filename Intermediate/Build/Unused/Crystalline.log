@@ -1,0 +1,27 @@
+﻿Build started 1/26/2015 4:32:08 PM.
+     1>Project "D:\Users\jd8060\Capstone Unreal\Crystalline\Intermediate\ProjectFiles\Crystalline.vcxproj" on node 2 (Build target(s)).
+     1>Build:
+         "D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Build.bat" CrystallineEditor Win64 Development "D:\Users\jd8060\Capstone Unreal\Crystalline\Crystalline.uproject" -rocket
+         Parsing headers for CrystallineEditor
+         Reflection code generated for CrystallineEditor
+         Performing 11 actions (2 in parallel)
+         [2/11] Resource ModuleVersionResource.rc.inl
+         PCH.Crystalline.Crystalline.h.cpp
+         [3/11] Resource Crystalline.rc
+         Crystalline.generated.cpp
+         CrystallineHUD.cpp
+         CrystallineCharacter.cpp
+         CrystallineGameMode.cpp
+         CrystallineProjectile.cpp
+         AutoStartupModuleListGetter.generated.cpp
+         Crystalline.cpp
+         [11/11] Link UE4Editor-Crystalline.dll
+            Creating library D:\Users\jd8060\Capstone Unreal\Crystalline\Intermediate\Build\Win64\CrystallineEditor\Development\UE4Editor-Crystalline.lib and object D:\Users\jd8060\Capstone Unreal\Crystalline\Intermediate\Build\Win64\CrystallineEditor\Development\UE4Editor-Crystalline.exp
+         -------- End Detailed Actions Stats -----------------------------------------------------------
+         Cumulative action seconds (4 processors): 0.00 building projects, 19.05 compiling, 0.00 creating app bundles, 0.00 generating debug info, 0.55 linking, 0.00 other
+         UBT execution time: 29.38 seconds
+     1>Done Building Project "D:\Users\jd8060\Capstone Unreal\Crystalline\Intermediate\ProjectFiles\Crystalline.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:30.08
