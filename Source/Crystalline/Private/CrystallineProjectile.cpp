@@ -9,7 +9,7 @@ ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectI
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(5.0f);
+	CollisionComp->InitSphereRadius(50.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &ACrystallineProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
