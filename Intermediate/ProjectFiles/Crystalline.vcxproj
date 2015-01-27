@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="DebugGame_Game|x64">
+			<Configuration>DebugGame_Game</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="DebugGame_Game|Win32">
+			<Configuration>DebugGame_Game</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="DebugGame_Editor|x64">
+			<Configuration>DebugGame_Editor</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="DebugGame_Editor|Win32">
+			<Configuration>DebugGame_Editor</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Development_Game|x64">
+			<Configuration>Development_Game</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Development_Game|Win32">
+			<Configuration>Development_Game</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Development_Editor|x64">
+			<Configuration>Development_Editor</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Development_Editor|Win32">
+			<Configuration>Development_Editor</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Shipping_Game|x64">
+			<Configuration>Shipping_Game</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Shipping_Game|Win32">
+			<Configuration>Shipping_Game</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\Crystalline.uproject" />
+		<None Include="..\..\Source\Crystalline.Target.cs" />
+		<None Include="..\..\Source\CrystallineEditor.Target.cs" />
+		<None Include="..\..\Config\DefaultEditor.ini" />
+		<None Include="..\..\Config\DefaultEngine.ini" />
+		<None Include="..\..\Config\DefaultGame.ini" />
+		<None Include="..\..\Config\DefaultInput.ini" />
+		<None Include="..\..\Source\Crystalline\Crystalline.Build.cs" />
+		<ClCompile Include="..\..\Source\Crystalline\Private\Crystalline.cpp" />
+		<ClCompile Include="..\..\Source\Crystalline\Private\CrystallineCharacter.cpp" />
+		<ClCompile Include="..\..\Source\Crystalline\Private\CrystallineGameMode.cpp" />
+		<ClCompile Include="..\..\Source\Crystalline\Private\CrystallineHUD.cpp" />
+		<ClCompile Include="..\..\Source\Crystalline\Private\CrystallineProjectile.cpp" />
+		<ClInclude Include="..\..\Source\Crystalline\Public\Crystalline.h" />
+		<ClInclude Include="..\..\Source\Crystalline\Public\CrystallineCharacter.h" />
+		<ClInclude Include="..\..\Source\Crystalline\Public\CrystallineGameMode.h" />
+		<ClInclude Include="..\..\Source\Crystalline\Public\CrystallineHUD.h" />
+		<ClInclude Include="..\..\Source\Crystalline\Public\CrystallineProjectile.h" />
+		<ResourceCompile Include="..\..\Source\Crystalline\Resources\Windows\Crystalline.rc" />
+		<None Include="..\..\Source\Crystalline\Resources\Windows\RCa03140" />
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<ProjectGuid>{828BD4D6-FFA3-49E7-BBA3-C019562D4433}</ProjectGuid>
+		<Keyword>MakeFileProj</Keyword>
+		<RootNamespace>Crystalline</RootNamespace>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|x64'" Label="Configuration">
+		<ConfigurationType>Makefile</ConfigurationType>
+		<PlatformToolset>v120</PlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|x64'" Label="Configuration">
+		<ConfigurationType>Makefile</ConfigurationType>
+		<PlatformToolset>v120</PlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|x64'" Label="Configuration">
+		<ConfigurationType>Makefile</ConfigurationType>
+		<PlatformToolset>v120</PlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|x64'" Label="Configuration">
+		<ConfigurationType>Makefile</ConfigurationType>
+		<PlatformToolset>v120</PlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|Win32'" Label="Configuration">
+		<ConfigurationType>Makefile</ConfigurationType>
+		<PlatformToolset>v120</PlatformToolset>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings" />
+	<PropertyGroup Label="UserMacros" />
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|x64'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Game|x64'">
+		<IncludePath />
+		<ReferencePath />
+		<LibraryPath />
+		<LibraryWPath />
+		<SourcePath />
+		<ExcludePath />
+		<OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+		<IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+		<NMakeBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Build.bat" Crystalline Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeBuildCommandLine>
+		<NMakeReBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Rebuild.bat" Crystalline Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeReBuildCommandLine>
+		<NMakeCleanCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Clean.bat" Crystalline Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeCleanCommandLine>
+		<NMakeOutput>..\..\Binaries\Win64\Crystalline-Win64-DebugGame.exe</NMakeOutput>
+	</PropertyGroup>
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|x64'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame_Editor|x64'">
+		<IncludePath />
+		<ReferencePath />
+		<LibraryPath />
+		<LibraryWPath />
+		<SourcePath />
+		<ExcludePath />
+		<OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+		<IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+		<NMakeBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Build.bat" CrystallineEditor Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeBuildCommandLine>
+		<NMakeReBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Rebuild.bat" CrystallineEditor Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeReBuildCommandLine>
+		<NMakeCleanCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Clean.bat" CrystallineEditor Win64 DebugGame "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeCleanCommandLine>
+		<NMakeOutput>D:\Users\jd8060\Unreal Engine\4.6\Engine\Binaries\Win64\UE4Editor.exe</NMakeOutput>
+	</PropertyGroup>
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|x64'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Game|x64'">
+		<IncludePath />
+		<ReferencePath />
+		<LibraryPath />
+		<LibraryWPath />
+		<SourcePath />
+		<ExcludePath />
+		<OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+		<IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+		<NMakeBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Build.bat" Crystalline Win64 Development "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeBuildCommandLine>
+		<NMakeReBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Rebuild.bat" Crystalline Win64 Development "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeReBuildCommandLine>
+		<NMakeCleanCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Clean.bat" Crystalline Win64 Development "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeCleanCommandLine>
+		<NMakeOutput>..\..\Binaries\Win64\Crystalline.exe</NMakeOutput>
+	</PropertyGroup>
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|x64'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development_Editor|x64'">
+		<IncludePath />
+		<ReferencePath />
+		<LibraryPath />
+		<LibraryWPath />
+		<SourcePath />
+		<ExcludePath />
+		<OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+		<IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+		<NMakeBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Build.bat" CrystallineEditor Win64 Development "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeBuildCommandLine>
+		<NMakeReBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Rebuild.bat" CrystallineEditor Win64 Development "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeReBuildCommandLine>
+		<NMakeCleanCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Clean.bat" CrystallineEditor Win64 Development "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeCleanCommandLine>
+		<NMakeOutput>D:\Users\jd8060\Unreal Engine\4.6\Engine\Binaries\Win64\UE4Editor.exe</NMakeOutput>
+	</PropertyGroup>
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|Win32'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping_Game|Win32'">
+		<IncludePath />
+		<ReferencePath />
+		<LibraryPath />
+		<LibraryWPath />
+		<SourcePath />
+		<ExcludePath />
+		<OutDir>$(ProjectDir)..\Build\Unused\</OutDir>
+		<IntDir>$(ProjectDir)..\Build\Unused\</IntDir>
+		<NMakeBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Build.bat" Crystalline Win32 Shipping "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeBuildCommandLine>
+		<NMakeReBuildCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Rebuild.bat" Crystalline Win32 Shipping "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeReBuildCommandLine>
+		<NMakeCleanCommandLine>"D:\Users\jd8060\Unreal Engine\4.6\Engine\Build\BatchFiles\Clean.bat" Crystalline Win32 Shipping "$(SolutionDir)$(ProjectName).uproject" -rocket</NMakeCleanCommandLine>
+		<NMakeOutput>..\..\Binaries\Win32\Crystalline-Win32-Shipping.exe</NMakeOutput>
+	</PropertyGroup>
+	<PropertyGroup>
+		<NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);UE_GAME=1;IS_PROGRAM=0;UE_ROCKET=1;UNICODE;_UNICODE;__UNREAL__;IS_MONOLITHIC=1;WITH_ENGINE=1;WITH_UNREAL_DEVELOPER_TOOLS=0;WITH_COREUOBJECT=1;USE_STATS_WITHOUT_ENGINE=0;WITH_PLUGIN_SUPPORT=0;USE_LOGGING_IN_SHIPPING=0;UE_BUILD_MINIMAL=1;WITH_EDITOR=1;WITH_EDITORONLY_DATA=0;WITH_SERVER_CODE=1;UBT_COMPILED_PLATFORM=Win64;WIN32=1;_WIN32_WINNT=0x0600;WINVER=0x0600;PLATFORM_WINDOWS=1;NDEBUG=1;UE_BUILD_DEVELOPMENT=1;UE_ENGINE_DIRECTORY=../../../../Unreal Engine/4.6/Engine/;UE_PROJECT_NAME=Crystalline;ORIGINAL_FILE_NAME="Crystalline.exe";DEPRECATED_FORGAME=DEPRECATED;CRYSTALLINE_API=;UE_ENABLE_ICU=1;WITH_STEAMWORKS=1;WITH_VS_PERF_PROFILER=1;WITH_DIRECTXMATH=0;CORE_API=;COREUOBJECT_API=;WITH_PHYSX=1;WITH_APEX=1;WITH_RUNTIME_PHYSICS_COOKING;WITH_BOX2D=1;WITH_RECAST=1;ENGINE_API=;JSON_API=;WITH_FREETYPE=1;SLATE_API=;INPUTCORE_API=;SLATECORE_API=;MESSAGING_API=;RENDERCORE_API=;RHI_API=;SHADERCORE_API=;ASSETREGISTRY_API=;ENGINEMESSAGES_API=;ENGINESETTINGS_API=;SYNTHBENCHMARK_API=;RENDERER_API=;AIMODULE_API=;VECTORVM_API=;DATABASESUPPORT_API=;UE_EDITOR=1;UNREALED_API=;BSPMODE_API=;DOCUMENTATION_API=;PROJECTS_API=;SANDBOXFILE_API=;EDITORSTYLE_API=;SOURCECONTROL_API=;UNREALEDMESSAGES_API=;BLUEPRINTGRAPH_API=;XAUDIO2_API=;USERFEEDBACK_API=;COLLECTIONMANAGER_API=;NIAGARAEDITOR_API=;GRAPHEDITOR_API=;INTROTUTORIALS_API=;LEVELEDITOR_API=;SETTINGS_API=;KISMET_API=</NMakePreprocessorDefinitions>
+		<NMakeIncludeSearchPath>$(NMakeIncludeSearchPath);D:\Users\jd8060\Unreal Engine\4.6\Engine\Source;..\..\Source;..\Build\Win64\Crystalline\Inc\Crystalline;..\..\Source\Crystalline\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Internationalization;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Async;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Concurrency;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Containers;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Delegates;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\GenericPlatform;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\HAL;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Logging;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Math;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Misc;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Modules;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Modules\Boilerplate;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\ProfilingDebugging;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Serialization;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Serialization\Json;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Serialization\Csv;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Stats;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Templates;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\UObject;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core\Public\Windows;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Core;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\CoreUObject;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject\Public\Blueprint;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject\Public\Misc;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject\Public\Serialization;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject\Public\Templates;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject\Public\UObject;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\CoreUObject;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Engine;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\AI;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\EdGraph;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\Features;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\Net;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\Slate;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\Tests;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\VisualLogger;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine\Public\AI\Navigation;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Json;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Json\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Json\Public\Dom;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Json\Public\Policies;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Json\Public\Serialization;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Json;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Slate;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Application;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Commands;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Docking;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Layout;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\MultiBox;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Notifications;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Styling;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Text;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Views;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Text\Android;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Framework\Text\IOS;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Colors;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Docking;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Images;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Input;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Layout;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Navigation;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Notifications;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Text;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate\Public\Widgets\Views;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\InputCore\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\InputCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\InputCore\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\InputCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\SlateCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Animation;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Application;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Brushes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Fonts;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Input;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Layout;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Logging;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Rendering;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Sound;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Styling;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Textures;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Types;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore\Public\Widgets;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SlateCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Slate;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Messaging;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Messaging\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Messaging\Public\Deprecated;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Messaging\Public\Helpers;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Messaging;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\RenderCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\RenderCore\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\RenderCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\RHI;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\RHI\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\RHI;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\ShaderCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\ShaderCore\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\ShaderCore;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\AssetRegistry;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\AssetRegistry\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\AssetRegistry;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\EngineMessages\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\EngineMessages;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\EngineMessages\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\EngineMessages;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\EngineSettings\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\EngineSettings;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\EngineSettings\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\EngineSettings;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\SynthBenchmark;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\SynthBenchmark\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Renderer;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Renderer\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Renderer;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\SynthBenchmark;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\AIModule\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\AIModule\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\AIModule;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\AIModule;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\VectorVM;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\VectorVM\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\VectorVM;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\DatabaseSupport;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\DatabaseSupport\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\DatabaseSupport;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Engine;..\..\Source\Crystalline;..\Build\Win64\Inc\Crystalline;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Programs\UnrealLightmass\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\UnrealEd;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\Commandlets;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\Dialogs;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\DragAndDrop;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\Features;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\Kismet2;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\Layers;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\Tests;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd\Public\Toolkits;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\BspMode;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\BspMode\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\BspMode;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Documentation;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\Documentation\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\Documentation;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Projects;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Projects\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Projects\Public\Interfaces;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Projects;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\SandboxFile;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SandboxFile\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\SandboxFile;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\EditorStyle;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\EditorStyle\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\EditorStyle\Public\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\EditorStyle\Public\Interfaces;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\EditorStyle;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\SourceControl;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\SourceControl\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\SourceControl\Public\Tests;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\SourceControl;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEdMessages\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\UnrealEdMessages;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEdMessages\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEdMessages;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\BlueprintGraph\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\BlueprintGraph;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\BlueprintGraph\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\BlueprintGraph;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\XAudio2;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Windows\XAudio2\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Runtime\Windows\XAudio2;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\UserFeedback;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UserFeedback\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UserFeedback;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\CollectionManager;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\CollectionManager\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\CollectionManager;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\NiagaraEditor;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\NiagaraEditor\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\GraphEditor;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\GraphEditor\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\IntroTutorials;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\IntroTutorials\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\IntroTutorials;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\GraphEditor;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\LevelEditor;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\LevelEditor\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Settings;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\Settings\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Developer\Settings;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\LevelEditor;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\NiagaraEditor;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\UnrealEd;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\Kismet\Classes;D:\Users\jd8060\Unreal Engine\4.6\Engine\Intermediate\Build\Win64\Inc\Kismet;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\Kismet\Public;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\Kismet\Public\WorkflowOrientedApp;D:\Users\jd8060\Unreal Engine\4.6\Engine\Source\Editor\Kismet;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\INCLUDE;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\ATLMFC\INCLUDE;C:\Program Files (x86)\Windows Kits\8.1\include\shared;C:\Program Files (x86)\Windows Kits\8.1\include\um;C:\Program Files (x86)\Windows Kits\8.1\include\winrt;;</NMakeIncludeSearchPath>
+		<NMakeForcedIncludes>$(NMakeForcedIncludes)</NMakeForcedIncludes>
+		<NMakeAssemblySearchPath>$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+		<NMakeForcedUsingAssemblies>$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+	</PropertyGroup>
+	<ItemDefinitionGroup>
+	</ItemDefinitionGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets">
+	</ImportGroup>
+</Project>
