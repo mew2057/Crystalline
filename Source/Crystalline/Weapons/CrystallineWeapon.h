@@ -27,6 +27,4 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	GENERATED_BODY()
 	
 	
-	
-	
 };

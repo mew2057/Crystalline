@@ -3,7 +3,9 @@
 #include "Crystalline.h"
 #include "CrystallineGameMode.h"
 #include "CrystallineHUD.h"
-#include "CrystallineCharacter.h"
+#include "Player/CrystallinePlayerController.h"
+#include "Player/CrystallinePlayerMoveComponent.h"
+
 
 ACrystallineGameMode::ACrystallineGameMode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -11,6 +13,9 @@ ACrystallineGameMode::ACrystallineGameMode(const FObjectInitializer& ObjectIniti
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/CrystallinePlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
+
+
+	//PlayerControllerClass = ACrystallinePlayerController::StaticClass();
 
 	// use our custom HUD class
 	HUDClass = ACrystallineHUD::StaticClass();
