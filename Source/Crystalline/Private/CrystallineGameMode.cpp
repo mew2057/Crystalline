@@ -11,7 +11,7 @@ ACrystallineGameMode::ACrystallineGameMode(const FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/CrystallinePlayer"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CrystallinePlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 

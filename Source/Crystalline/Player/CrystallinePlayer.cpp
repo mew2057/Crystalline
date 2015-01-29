@@ -26,7 +26,16 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 	FirstPersonCameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-	// TODO Mesh Initializers
+	// Creates a mesh component to be used in the first person view. This is edited in the blueprint.
+	Mesh1P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("CharacterMesh1P"));
+	Mesh1P->SetOnlyOwnerSee(true);	// Only the owner of this mesh will see it.
+	Mesh1P->AttachParent = FirstPersonCameraComponent; // Sets the mesh as a child of the first person camera.
+	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -150.f); // Relative location of the mesh to the origin of the player.
+	Mesh1P->bCastDynamicShadow = false;
+	Mesh1P->CastShadow = false;
+
+
+
 
 }
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "CrystallinePlayerInventory.h"
 #include "CrystallinePlayer.generated.h"
 
 /**
@@ -13,19 +14,43 @@ class CRYSTALLINE_API ACrystallinePlayer : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+	/** Constuctor */
+	ACrystallinePlayer(const FObjectInitializer& ObjectInitializer);
+
+#pragma region Overriden_Functions
+
+protected:
+	// APawn Interface 
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	// End of Apawn Interface.
+
+#pragma endregion
+
+#pragma region Components
+
+public:
+	/** Returns Mesh1P subobject **/
+	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	/** Returns FirstPersonCameraComponent subobject **/
+	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
 private:
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class USkeletalMeshComponent* Mesh1P;	
+	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
+	class USkeletalMeshComponent* Mesh1P;
 	
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
 
+#pragma endregion
+	
+#pragma region Input_Control
+
+#pragma region Fields
+
 public:
-
-	ACrystallinePlayer(const FObjectInitializer& ObjectInitializer);
-
 	/** Get the running state. */
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	bool IsRunning() const;
@@ -33,13 +58,13 @@ public:
 	/** Get the Running Speed Modifier*/
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	float GetRunningSpeedModifier() const;
-	
 
 protected:
-
+	/** The State Variable for the */
 	UPROPERTY(VisibleAnywhere, Category = Movement)
 	uint8 bRunning : 1;
 
+	/** Defines the multiplicative increase of the running speed of the player. */
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
 	float RunningSpeedModifier;
 
@@ -51,6 +76,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	float BaseLookUpRate;
 
+#pragma endregion
+
+#pragma region Functions
+
+protected:
+
 	/** Main Fire for the currently equipped weapon*/
 	// TODO this needs to networked.
 	void OnFire();
@@ -61,14 +92,14 @@ protected:
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
 
-	/** 
-	 * Invoked for Controllers, the mouse uses the default yaw function. 
-	 * @param Rate the Normalized rate, -1.0 <-> 1.0
-	 */
+	/**
+	* Invoked for Controllers, the mouse uses the default yaw function.
+	* @param Rate the Normalized rate, -1.0 <-> 1.0
+	*/
 	void TurnAtRate(float Rate);
 
 	/**
-	* Invoked for Controllers, the mouse uses the default pitch function. 
+	* Invoked for Controllers, the mouse uses the default pitch function.
 	* @param Rate the Normalized rate, -1.0 <-> 1.0
 	*/
 	void LookUpAtRate(float Rate);
@@ -78,12 +109,25 @@ protected:
 	*/
 	void ToggleRunning();
 
+#pragma endregion
+	
+#pragma endregion
 
+#pragma region Inventory
+
+#pragma region Fields
 
 protected:
-	// APawn Interface 
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-	// End of Apawn Interface.
 
+	/** The name of the Socket/Bone on the skeleton the weapon attaches to. */
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FName WeaponAttachPoint;
+
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	ACrystallinePlayerInventory* Inventory;
+
+#pragma endregion
+
+#pragma endregion
 
 };
