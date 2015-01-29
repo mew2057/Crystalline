@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
-#include "CrystallinePlayerInventory.h"
+#include "Weapons/CrystallineWeapon.h"
 #include "CrystallinePlayer.generated.h"
 
 /**
@@ -113,6 +113,8 @@ protected:
 	
 #pragma endregion
 
+
+// I'm not a Fan of "God classes", but I'd rather not wrestle with the editor too much. -John
 #pragma region Inventory
 
 #pragma region Fields
@@ -123,8 +125,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName WeaponAttachPoint;
 
+	/** The Default list of weapons the player is carrying. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	ACrystallinePlayerInventory* Inventory;
+	TArray<TSubclassOf<class ACrystallineWeapon>> DefaultWeaponClasses;
+
+	UPROPERTY(Transient)//, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
+	TArray<class ACrystallineWeapon*> Weapons; // This list shouldn't change after spawn.
+
+	/** The currently equipped weapon for the player. */
+	UPROPERTY(Transient) // Todo this needs an on replicate.
+	ACrystallineWeapon* CurrentWeapon;
 
 #pragma endregion
 

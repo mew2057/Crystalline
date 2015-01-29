@@ -4,5 +4,8 @@
 #include "CrystallineWeapon.h"
 
 
-
+void ACrystallineWeapon::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
 

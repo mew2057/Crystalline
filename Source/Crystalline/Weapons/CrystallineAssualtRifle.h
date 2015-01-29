@@ -8,7 +8,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class CRYSTALLINE_API ACrystallineAssualtRifle : public ACrystallineWeapon
 {
 	GENERATED_BODY()
