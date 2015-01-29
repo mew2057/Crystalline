@@ -6,23 +6,22 @@
 #include "CrystallinePistol.generated.h"
 
 USTRUCT()
-struct PistolProjectileData
+struct FPistolProjectileData
 {
 	GENERATED_USTRUCT_BODY()
 	/** The class of the Projectile that will be shot by the weapon. */
-	UPROPERTY(EditDefaultsOnly, Category = ProjectileConfig)
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ACrystallineProjectile> ProjectileClass;
 
 	/** The life span of the projectile before despawning. */
-	UPROPERTY(EditDefaultsOnly, Category = ProjectileConfig)
+	UPROPERTY(EditDefaultsOnly)
 	float ProjectileLife;
 
 	/** Sets defaults */
-	PistolProjectileData()
+	FPistolProjectileData()
 	{
 		ProjectileClass = NULL;
 		ProjectileLife = 2.0f;
-
 	}
 };
 
@@ -33,10 +32,15 @@ UCLASS(Abstract)
 class CRYSTALLINE_API ACrystallinePistol : public ACrystallineWeapon
 {
 	GENERATED_BODY()
-	
-	/** The configuration for the pistol's projectile. */
-	UPROPERTY(EditDefaultsOnly, Category = ProjectileConfig)
-	PistolProjectileData ProjectileConfig
-	
+
+		/** The configuration for the pistol's projectile. */
+		UPROPERTY(EditDefaultsOnly, Category = ProjectileConfig)
+		FPistolProjectileData ProjectileConfig;
+
+protected:
+
+	/** Fires the pistol projectile. */
+	virtual void FireWeapon() override;
+
 	
 };

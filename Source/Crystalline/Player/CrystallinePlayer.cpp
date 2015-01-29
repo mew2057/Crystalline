@@ -64,6 +64,10 @@ void ACrystallinePlayer::SetupPlayerInputComponent(class UInputComponent* InputC
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	InputComponent->BindAction("Fire", IE_Pressed, this, &ACrystallinePlayer::StartFire);
+	InputComponent->BindAction("Fire", IE_Released, this, &ACrystallinePlayer::StopFire);
+
+
 	InputComponent->BindAction("ToggleRunning", IE_Pressed, this, &ACrystallinePlayer::ToggleRunning);
 
 	// Axis
@@ -83,6 +87,21 @@ void ACrystallinePlayer::SetupPlayerInputComponent(class UInputComponent* InputC
 
 	///////////////
 
+}
+
+void ACrystallinePlayer::StartFire()
+{
+	if (CurrentWeapon)
+	{
+		// TODO add more checks and networking stuff here.
+		CurrentWeapon->StartFire();
+	}
+}
+
+void ACrystallinePlayer::StopFire()
+{
+	 // TODO have a stop fire action.
+	 // Likey use Tick.
 }
 
 void ACrystallinePlayer::MoveForward(float Val)

@@ -82,9 +82,13 @@ protected:
 
 protected:
 
-	/** Main Fire for the currently equipped weapon*/
+	/** Start Main Fire for the currently equipped weapon*/
 	// TODO this needs to networked.
-	void OnFire();
+	void StartFire();
+
+	/** Stop Main Fire for the currently equipped weapon*/
+	// TODO this needs to networked.
+	void StopFire();
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);

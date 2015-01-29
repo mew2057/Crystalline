@@ -13,7 +13,9 @@ class CRYSTALLINE_API ACrystallineAssualtRifle : public ACrystallineWeapon
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+
+protected:
+
+	/** Fires the Assault Rifle projectile. */
+	virtual void FireWeapon() override;
 };

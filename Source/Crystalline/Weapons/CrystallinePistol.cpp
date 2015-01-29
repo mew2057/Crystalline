@@ -3,6 +3,7 @@
 #include "Crystalline.h"
 #include "CrystallinePistol.h"
 
+void ACrystallinePistol::FireWeapon()
+{
 
-
-
+}

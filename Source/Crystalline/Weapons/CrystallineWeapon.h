@@ -24,7 +24,7 @@ namespace CrystallineAmmo
 {
 	enum Type
 	{
-		Cooldown , // The gun doesn't use traditional ammo, but overheats over time.
+		Cooldown, // The gun doesn't use traditional ammo, but overheats over time.
 		Crystal    // The Crystal gun's ammo.
 	};
 }
@@ -35,9 +35,7 @@ namespace CrystallineAmmo
 UCLASS(Abstract, Blueprintable)
 class CRYSTALLINE_API ACrystallineWeapon : public AActor
 {
-	GENERATED_BODY()
-
-	
+	GENERATED_UCLASS_BODY()	
 
 #pragma region Overriden_Functions
 
@@ -45,6 +43,19 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 
 #pragma endregion
 
+#pragma region MeshData
+
+private:
+	/** weapon mesh: 1st person view */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* Mesh1P;
+
+protected:
+	/** Returns Mesh1P subobject **/
+	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+
+
+#pragma endregion
 
 #pragma region Fields
 
@@ -58,22 +69,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 	float ReloadTime;
 	
-	
-	////////////////////////////
-	////Accuracy - The weapon spread may be only necessary in sub classes - John
-	//
-	///** The maximum spread of the bullets in the horizontal dimension. TODO define what this translates to. */
-	//UPROPERTY(EditDefaultsOnly, Category = Accuracy)
-	//float HorizontalSpread;
-	//
-	///** The maximum spread of the bullets in the vertical dimension. TODO define what this translates to. */
-	//UPROPERTY(EditDefaultsOnly, Category = Accuracy)
-	//float VerticalSpread;
-	//
-	////TODO
-	//// Determine if a range increment is necessary.
-	//// It's necessary for hitscan guns - John
-	//
 	////////////////////////////
 	//// Ammo Details
 
@@ -87,7 +82,19 @@ protected:
 	/** The number of rounds in a single ammo clip */
 	int32 RoundsPerClip;
 
+
+	////////////////////////////
+	// Visual Effects
+
+	/** The socket on the gun model that corresponds to the muzzle of the gun. */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	FName MuzzleSocket; 
+
+	/** The Muzzle flash for the gun. */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* MuzzleFlash;
 	
+	// NOTE: Impact needs to be defined in the child classes.
 
 
 #pragma endregion
@@ -95,6 +102,18 @@ protected:
 
 
 #pragma region Functions
+
+public:
+	/** Starts the firing of a weapon if possible. */
+	virtual void StartFire();
+
+	/** Ends the firing of the weapon, stop in StartFire for non automatic weapons. */
+	virtual void StopFire();
+
+protected:
+	
+	/** Fires the weapon, Implementation is weapon specific. */
+	virtual void FireWeapon() PURE_VIRTUAL(ACrystallineWeapon::FireWeapon,);
 
 #pragma endregion
 
