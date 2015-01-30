@@ -37,4 +37,73 @@ void ACrystallineWeapon::StopFire()
 
 }
 
+#pragma region Inventory_Related
+
+void ACrystallineWeapon::OnEnterInventory()
+{
+
+}
+
+void ACrystallineWeapon::OnExitInventory()
+{
+
+}
+
+void ACrystallineWeapon::OnEquip()
+{
+	AttachMeshToPawn();
+	// TODO add switch animation id appropriate.
+
+}
+
+void ACrystallineWeapon::OnUnEquip()
+{
+	DetachMeshFromPawn();
+}
+
+void ACrystallineWeapon::Destroy()
+{
+}
+
+void ACrystallineWeapon::SetOwningPawn(ACrystallinePlayer* Owner)
+{
+	OwningPawn = Owner;
+}
+
+
+#pragma endregion
+
+#pragma  region MeshOperations
+void ACrystallineWeapon::AttachMeshToPawn()
+{
+	if (OwningPawn)
+	{
+		// Clear the current mesh.
+		DetachMeshFromPawn();
+
+		FName ConnectionPoint = OwningPawn->GetWeaponAttachPoint();
+		
+	//	USkeletalMeshComponent * PawnMesh = OwningPawn->GetSpecificPawnMesh
+		Mesh1P->SetHiddenInGame(false);
+//		Mesh1P->AttachTo(PawnMesh1p, AttachPoint);
+
+		//TODO something different for local and remote.
+	}
+
+	
+	//Mesh1P->AttachTo(PawnMesh1p, AttachPoint);
+}
+
+void ACrystallineWeapon::DetachMeshFromPawn()
+{
+	// Remove mesh from the parent.
+	Mesh1P->DetachFromParent();
+	// Hide the mesh in the scene.
+	Mesh1P->SetHiddenInGame(false);
+
+}
+
+#pragma endregion
+
+
 

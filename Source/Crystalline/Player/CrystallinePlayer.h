@@ -3,7 +3,6 @@
 #pragma once
 
 #include "GameFramework/Character.h"
-#include "Weapons/CrystallineWeapon.h"
 #include "CrystallinePlayer.generated.h"
 
 /**
@@ -156,11 +155,15 @@ protected:
 
 	/** The currently equipped weapon for the player. */
 	UPROPERTY(Transient) // Todo this needs an on replicate.
-	ACrystallineWeapon* CurrentWeapon;
+	class ACrystallineWeapon* CurrentWeapon;
 
 #pragma endregion
 
 #pragma region Functions
+public:
+	/** Retrieve the FName of the weapon attach point. */
+	FName GetWeaponAttachPoint() const;
+
 protected:
 	/** Spawns the inventory of the player, used on respawn/construction. */
 	void SpawnInventory();
@@ -173,6 +176,15 @@ protected:
 
 	/** Removes a weapon from the inventory in a standardized manner. */
 	void RemoveWeapon(ACrystallineWeapon* Weapon);
+
+	/** Equips a new weapon, unequiping the previous if present. 
+	  *
+	  * @param NewWeapon The Weapon to be equipped by the player.
+	  */
+	void EquipWeapon(ACrystallineWeapon* NewWeapon);
+
+	
+
 
 #pragma endregion
 

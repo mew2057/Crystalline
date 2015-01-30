@@ -96,6 +96,9 @@ protected:
 	
 	// NOTE: Impact needs to be defined in the child classes.
 
+	/** The pawn holding the weapon. */
+	UPROPERTY(Transient)
+	class ACrystallinePlayer* OwningPawn; // Class is needed (forward declaration).
 
 #pragma endregion
 
@@ -110,10 +113,36 @@ public:
 	/** Ends the firing of the weapon, stop in StartFire for non automatic weapons. */
 	virtual void StopFire();
 
+	/** Invoked when a weapon enters the inventory of a player or bot. */
+	virtual void OnEnterInventory();
+
+	/** Invoked when a weapon exits the inventory of a player or bot. */
+	virtual void OnExitInventory();
+
+	/** Invoked when the weapon is equipped by a player or bot. */
+	virtual void OnEquip();
+
+	/** Invoked when the weapon is unequipped by a player or bot. */
+	virtual void OnUnEquip();
+
+	/** Destroys the weapon. */
+	virtual void Destroy();
+
+	/** Sets the owner of the Weapon. */
+	void SetOwningPawn(ACrystallinePlayer* Owner);
+
+
+
 protected:
 	
 	/** Fires the weapon, Implementation is weapon specific. */
 	virtual void FireWeapon() PURE_VIRTUAL(ACrystallineWeapon::FireWeapon,);
+
+	/** Attach the mesh to the owning pawn. */
+	void ACrystallineWeapon::AttachMeshToPawn();
+
+	/** Detach the mesh from the owning pawn. */
+	void ACrystallineWeapon::DetachMeshFromPawn();
 
 #pragma endregion
 

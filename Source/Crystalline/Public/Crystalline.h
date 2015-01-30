@@ -4,6 +4,7 @@
 #define __CRYSTALLINE_H__
 
 #include "EngineMinimal.h"
-
+#include "Player/CrystallinePlayer.h"
+#include "Weapons/CrystallineWeapon.h"
 
 #endif

@@ -236,6 +236,11 @@ void ACrystallinePlayer::SpawnInventory()
 
 	// TODO actually equip the weapon.
 
+	if (NumWeapons > 0 && DefaultWeaponClasses[0])
+	{
+		EquipWeapon(Weapons[0]);
+	}
+
 }
 
 void ACrystallinePlayer::DestroyInventory()
@@ -247,6 +252,8 @@ void ACrystallinePlayer::DestroyInventory()
 		{
 			RemoveWeapon(Weapon);
 			// Invoke the weapon's destroy command.
+
+			Weapon->Destroy();
 		}
 	}
 
@@ -259,8 +266,7 @@ void ACrystallinePlayer::AddWeapon(ACrystallineWeapon* NewWeapon)
 	if (NewWeapon)
 	{
 		Weapons.AddUnique(NewWeapon);
-		// Weapon needs to react to being added to inventory.
-
+		NewWeapon->OnEnterInventory();
 	}
 }
 
@@ -269,10 +275,38 @@ void ACrystallinePlayer::RemoveWeapon(ACrystallineWeapon* Weapon)
 {
 	if (Weapon)
 	{
-		// Weapon needs to react to being removed from inventory.
+		Weapon->OnExitInventory();
 		Weapons.RemoveSingle(Weapon);
 	}
 }
+
+void ACrystallinePlayer::EquipWeapon(ACrystallineWeapon* NewWeapon)
+{
+	// EARLY RETURN! If there will be no change in weapon or the new weapon is null.
+	if (NewWeapon == CurrentWeapon || NewWeapon == NULL)
+	{
+		return;
+	}
+	
+	// If the current weapon is valid unequip it.
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->OnUnEquip();
+	}
+
+	CurrentWeapon = NewWeapon;
+	
+	CurrentWeapon->SetOwningPawn(this);
+	CurrentWeapon->OnEquip();
+	
+
+}
+
+FName ACrystallinePlayer::GetWeaponAttachPoint() const
+{
+	return WeaponAttachPoint;
+}
+
 
 #pragma endregion
 
