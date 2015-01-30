@@ -39,6 +39,12 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 
 }
 
+void ACrystallinePlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 #pragma region Gettors
 bool ACrystallinePlayer::IsRunning() const
@@ -67,7 +73,17 @@ void ACrystallinePlayer::SetupPlayerInputComponent(class UInputComponent* InputC
 	InputComponent->BindAction("Fire", IE_Pressed, this, &ACrystallinePlayer::StartFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &ACrystallinePlayer::StopFire);
 
+	InputComponent->BindAction("Reload", IE_Pressed, this, &ACrystallinePlayer::OnReload);
 
+	// This is either ADS or something else, weapon dependant.
+	InputComponent->BindAction("AltFire", IE_Pressed, this, &ACrystallinePlayer::StartAltFire);
+	InputComponent->BindAction("AltFire", IE_Released, this, &ACrystallinePlayer::StopAltFire);
+
+
+	InputComponent->BindAction("NextWeapon", IE_Pressed, this, &ACrystallinePlayer::NextWeapon);
+	InputComponent->BindAction("PreviousWeapon", IE_Pressed, this, &ACrystallinePlayer::PreviousWeapon);
+
+	
 	InputComponent->BindAction("ToggleRunning", IE_Pressed, this, &ACrystallinePlayer::ToggleRunning);
 
 	// Axis
@@ -89,8 +105,12 @@ void ACrystallinePlayer::SetupPlayerInputComponent(class UInputComponent* InputC
 
 }
 
+//////////////////////////////
+// Weapon Functions
 void ACrystallinePlayer::StartFire()
 {
+	UE_LOG(LogTemp, Log, TEXT("start fire"));
+
 	if (CurrentWeapon)
 	{
 		// TODO add more checks and networking stuff here.
@@ -100,10 +120,54 @@ void ACrystallinePlayer::StartFire()
 
 void ACrystallinePlayer::StopFire()
 {
+	UE_LOG(LogTemp, Log, TEXT("stop fire"));
+
 	 // TODO have a stop fire action.
 	 // Likey use Tick.
 }
 
+void ACrystallinePlayer::OnReload()
+{
+	// Check if the gun can reload.
+		// Reload.
+	UE_LOG(LogTemp, Log, TEXT("reload"));
+
+}
+
+void ACrystallinePlayer::StartAltFire()
+{
+	UE_LOG(LogTemp, Log, TEXT("start alt fire"));
+
+	if (CurrentWeapon)
+	{
+		// TODO add more checks and networking stuff here.
+		CurrentWeapon->StartFire();
+	}
+}
+
+void ACrystallinePlayer::StopAltFire()
+{
+	UE_LOG(LogTemp, Log, TEXT("stop alt fire"));
+
+	// TODO have a stop fire action.
+	// Likey use Tick.
+}
+
+void ACrystallinePlayer::NextWeapon()
+{
+	UE_LOG(LogTemp, Log, TEXT("NextWeapon"));
+	// Check for overflow.
+}
+
+void ACrystallinePlayer::PreviousWeapon()
+{
+	UE_LOG(LogTemp, Log, TEXT("PreviousWeapon"));
+	// Check for undeflow.
+}
+
+
+//////////////////////////////
+// Movement Functions
 void ACrystallinePlayer::MoveForward(float Val)
 {
 	// TODO check for controller.
@@ -142,6 +206,72 @@ void ACrystallinePlayer::LookUpAtRate(float Rate)
 void ACrystallinePlayer::ToggleRunning()
 {
 	bRunning = !bRunning;
+}
+
+#pragma endregion
+
+//////////////////////////////////////////////////////////////////////////
+
+#pragma region Inventory
+
+void ACrystallinePlayer::SpawnInventory()
+{
+	// TODO make sure the invokee owns the inventory in question.
+	
+	int32 NumWeapons = DefaultWeaponClasses.Num();
+
+	for (int32 i = 0; i < NumWeapons; ++i)
+	{
+		// If it exists spawn the weapon.
+		if (DefaultWeaponClasses[i])
+		{
+			FActorSpawnParameters spawnInfo;
+			// Spawn the weapon even if it is collinding with an object.
+			spawnInfo.bNoCollisionFail = true;
+
+			// Spawn an actor of type ACrystallineWeapon with the DefaultWeaponClasses[i] as the archetype, and the spawnInfo settings.
+			ACrystallineWeapon* NewWeapon = GetWorld()->SpawnActor<ACrystallineWeapon>(DefaultWeaponClasses[i], spawnInfo);
+		}
+	}
+
+	// TODO actually equip the weapon.
+
+}
+
+void ACrystallinePlayer::DestroyInventory()
+{
+	for (int32 i = Weapons.Num() - 1; i > 0; --i)
+	{
+		ACrystallineWeapon* Weapon = Weapons[i];
+		if (Weapon)
+		{
+			RemoveWeapon(Weapon);
+			// Invoke the weapon's destroy command.
+		}
+	}
+
+	// Eject ammunition as appropriate.
+
+}
+
+void ACrystallinePlayer::AddWeapon(ACrystallineWeapon* NewWeapon)
+{
+	if (NewWeapon)
+	{
+		Weapons.AddUnique(NewWeapon);
+		// Weapon needs to react to being added to inventory.
+
+	}
+}
+
+
+void ACrystallinePlayer::RemoveWeapon(ACrystallineWeapon* Weapon)
+{
+	if (Weapon)
+	{
+		// Weapon needs to react to being removed from inventory.
+		Weapons.RemoveSingle(Weapon);
+	}
 }
 
 #pragma endregion

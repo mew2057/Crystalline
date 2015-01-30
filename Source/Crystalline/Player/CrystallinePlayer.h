@@ -25,6 +25,9 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of Apawn Interface.
 
+	virtual void PostInitializeComponents() override;
+
+
 #pragma endregion
 
 #pragma region Components
@@ -90,6 +93,21 @@ protected:
 	// TODO this needs to networked.
 	void StopFire();
 
+	/** Reload the weapon. */
+	void OnReload();
+
+	/** Start the alternate fire. */
+	void StartAltFire ();
+
+	/** Stop the alternate fire (if appropriate). */
+	void StopAltFire ();
+
+	/** Changes the equipped weapon to the next one in the Inventory Weapon array. */
+	void NextWeapon();
+
+	/** Changes the equipped weapon to the previous one in the Inventory Weapon array. */
+	void PreviousWeapon();
+	
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 
@@ -139,6 +157,22 @@ protected:
 	/** The currently equipped weapon for the player. */
 	UPROPERTY(Transient) // Todo this needs an on replicate.
 	ACrystallineWeapon* CurrentWeapon;
+
+#pragma endregion
+
+#pragma region Functions
+protected:
+	/** Spawns the inventory of the player, used on respawn/construction. */
+	void SpawnInventory();
+
+	/** Despawns the inventory of the player, used on death. */
+	void DestroyInventory();
+
+	/** Adds a weapon to the inventory in a standardized manner. */
+	void AddWeapon(ACrystallineWeapon* NewWeapon);
+
+	/** Removes a weapon from the inventory in a standardized manner. */
+	void RemoveWeapon(ACrystallineWeapon* Weapon);
 
 #pragma endregion
 
