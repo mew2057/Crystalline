@@ -125,8 +125,7 @@ public:
 	/** Invoked when the weapon is unequipped by a player or bot. */
 	virtual void OnUnEquip();
 
-	/** Destroys the weapon. */
-	virtual void Destroy();
+
 
 	/** Sets the owner of the Weapon. */
 	void SetOwningPawn(ACrystallinePlayer* Owner);
