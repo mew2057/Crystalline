@@ -114,7 +114,7 @@ public:
 	virtual void StopFire();
 
 	/** Invoked when a weapon enters the inventory of a player or bot. */
-	virtual void OnEnterInventory();
+	virtual void OnEnterInventory(class ACrystallinePlayer* NewOwner);
 
 	/** Invoked when a weapon exits the inventory of a player or bot. */
 	virtual void OnExitInventory();

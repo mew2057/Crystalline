@@ -157,6 +157,9 @@ protected:
 	UPROPERTY(Transient) // Todo this needs an on replicate.
 	class ACrystallineWeapon* CurrentWeapon;
 
+	/** The index of the currently equipped weapon. */
+	uint32 WeaponIndex;
+
 #pragma endregion
 
 #pragma region Functions
@@ -172,7 +175,7 @@ protected:
 	void DestroyInventory();
 
 	/** Adds a weapon to the inventory in a standardized manner. */
-	void AddWeapon(ACrystallineWeapon* NewWeapon);
+	void AddWeapon(ACrystallineWeapon* Weapon);
 
 	/** Removes a weapon from the inventory in a standardized manner. */
 	void RemoveWeapon(ACrystallineWeapon* Weapon);

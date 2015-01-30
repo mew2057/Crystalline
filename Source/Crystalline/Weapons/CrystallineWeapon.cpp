@@ -39,9 +39,9 @@ void ACrystallineWeapon::StopFire()
 
 #pragma region Inventory_Related
 
-void ACrystallineWeapon::OnEnterInventory()
+void ACrystallineWeapon::OnEnterInventory(ACrystallinePlayer* NewOwner)
 {
-
+	SetOwningPawn(NewOwner);
 }
 
 void ACrystallineWeapon::OnExitInventory()
@@ -51,9 +51,9 @@ void ACrystallineWeapon::OnExitInventory()
 
 void ACrystallineWeapon::OnEquip()
 {
+	// Timer and reload.
 	AttachMeshToPawn();
 	// TODO add switch animation id appropriate.
-
 }
 
 void ACrystallineWeapon::OnUnEquip()
@@ -61,9 +61,6 @@ void ACrystallineWeapon::OnUnEquip()
 	DetachMeshFromPawn();
 }
 
-void ACrystallineWeapon::Destroy()
-{
-}
 
 void ACrystallineWeapon::SetOwningPawn(ACrystallinePlayer* Owner)
 {
@@ -78,16 +75,19 @@ void ACrystallineWeapon::AttachMeshToPawn()
 {
 	if (OwningPawn)
 	{
-		// Clear the current mesh.
+		// Make sure the mesh isn't parented.
 		DetachMeshFromPawn();
 
 		FName ConnectionPoint = OwningPawn->GetWeaponAttachPoint();
 		
-	//	USkeletalMeshComponent * PawnMesh = OwningPawn->GetSpecificPawnMesh
+		USkeletalMeshComponent * PawnMesh1P = OwningPawn->GetMesh1P();
 		Mesh1P->SetHiddenInGame(false);
-//		Mesh1P->AttachTo(PawnMesh1p, AttachPoint);
+		Mesh1P->AttachTo(PawnMesh1P, ConnectionPoint);
 
 		//TODO something different for local and remote.
+
+		UE_LOG(LogTemp, Log, TEXT("attach happened."));
+
 	}
 
 	

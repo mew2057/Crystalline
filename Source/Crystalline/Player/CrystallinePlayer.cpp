@@ -42,6 +42,8 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 void ACrystallinePlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	SpawnInventory();
 }
 
 
@@ -155,14 +157,25 @@ void ACrystallinePlayer::StopAltFire()
 
 void ACrystallinePlayer::NextWeapon()
 {
-	UE_LOG(LogTemp, Log, TEXT("NextWeapon"));
-	// Check for overflow.
+	if (Weapons.Num() > 0)
+	{
+		// TODO Add animation call.
+		WeaponIndex = (WeaponIndex + 1) % Weapons.Num();
+		EquipWeapon(Weapons[WeaponIndex]);
+	}
+
 }
 
 void ACrystallinePlayer::PreviousWeapon()
 {
-	UE_LOG(LogTemp, Log, TEXT("PreviousWeapon"));
 	// Check for undeflow.
+	if (Weapons.Num() > 0)
+	{
+		// TODO Add animation call.
+		WeaponIndex = WeaponIndex - 1;
+		WeaponIndex = WeaponIndex < 0 ? Weapons.Num() - 1 : WeaponIndex;
+		EquipWeapon(Weapons[WeaponIndex]);
+	}
 }
 
 
@@ -218,7 +231,10 @@ void ACrystallinePlayer::SpawnInventory()
 {
 	// TODO make sure the invokee owns the inventory in question.
 	
-	int32 NumWeapons = DefaultWeaponClasses.Num();
+	const int32 NumWeapons = DefaultWeaponClasses.Num();
+
+	UE_LOG(LogTemp, Log, TEXT("PreviousWeapon %d"), NumWeapons);
+
 
 	for (int32 i = 0; i < NumWeapons; ++i)
 	{
@@ -231,13 +247,16 @@ void ACrystallinePlayer::SpawnInventory()
 
 			// Spawn an actor of type ACrystallineWeapon with the DefaultWeaponClasses[i] as the archetype, and the spawnInfo settings.
 			ACrystallineWeapon* NewWeapon = GetWorld()->SpawnActor<ACrystallineWeapon>(DefaultWeaponClasses[i], spawnInfo);
+
+			AddWeapon(NewWeapon);
 		}
 	}
 
 	// TODO actually equip the weapon.
 
-	if (NumWeapons > 0 && DefaultWeaponClasses[0])
+	if (NumWeapons > 0 && Weapons[0])
 	{
+		WeaponIndex = 0;
 		EquipWeapon(Weapons[0]);
 	}
 
@@ -261,12 +280,12 @@ void ACrystallinePlayer::DestroyInventory()
 
 }
 
-void ACrystallinePlayer::AddWeapon(ACrystallineWeapon* NewWeapon)
+void ACrystallinePlayer::AddWeapon(ACrystallineWeapon* Weapon)
 {
-	if (NewWeapon)
+	if (Weapon)
 	{
-		Weapons.AddUnique(NewWeapon);
-		NewWeapon->OnEnterInventory();
+		Weapons.AddUnique(Weapon);
+		Weapon->OnEnterInventory(this);
 	}
 }
 
