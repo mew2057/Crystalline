@@ -2,7 +2,7 @@
 
 #include "Crystalline.h"
 #include "CrystallineCharacter.h"
-#include "CrystallineProjectile.h"
+#include "Projectiles/CrystallineProjectile.h"
 #include "Animation/AnimInstance.h"
 
 

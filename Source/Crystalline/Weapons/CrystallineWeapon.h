@@ -99,6 +99,11 @@ protected:
 	/** The pawn holding the weapon. */
 	UPROPERTY(Transient)
 	class ACrystallinePlayer* OwningPawn; // Class is needed (forward declaration).
+	
+	////////////////////////////
+	// Sound Effects
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	class USoundBase* FireSound;
 
 #pragma endregion
 

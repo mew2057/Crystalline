@@ -5,5 +5,9 @@
 
 void ACrystallinePistol::FireWeapon()
 {
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySoundAttached(FireSound, GetRootComponent());
+	}
 
 }

@@ -28,7 +28,7 @@ void ACrystallineWeapon::PostInitializeComponents()
 
 void ACrystallineWeapon::StartFire()
 {
-
+	FireWeapon();
 
 }
 
