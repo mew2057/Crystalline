@@ -168,12 +168,16 @@ void ACrystallinePlayer::NextWeapon()
 
 void ACrystallinePlayer::PreviousWeapon()
 {
+	// Cache the number of weapons.
+	const int32 NumberOfWeapons = Weapons.Num();
+
 	// Check for undeflow.
-	if (Weapons.Num() > 0)
+	if (NumberOfWeapons > 1)
 	{
 		// TODO Add animation call.
-		WeaponIndex = WeaponIndex - 1;
-		WeaponIndex = WeaponIndex < 0 ? Weapons.Num() - 1 : WeaponIndex;
+		// This removes the need for a branch.
+		WeaponIndex = (WeaponIndex - 1 + NumberOfWeapons) % NumberOfWeapons;
+
 		EquipWeapon(Weapons[WeaponIndex]);
 	}
 }
