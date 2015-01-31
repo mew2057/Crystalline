@@ -26,6 +26,9 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+	/** Updates the character on tick. */
+	virtual void Tick(float DeltaSeconds) override;
+
 
 #pragma endregion
 
@@ -166,6 +169,8 @@ protected:
 public:
 	/** Retrieve the FName of the weapon attach point. */
 	FName GetWeaponAttachPoint() const;
+
+	class ACrystallineWeapon* GetCurrentWeapon() const;
 
 protected:
 	/** Spawns the inventory of the player, used on respawn/construction. */

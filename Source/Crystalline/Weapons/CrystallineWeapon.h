@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Engine/Canvas.h"			/** Needed to include the canvas to get FCanvasIcon accessible in the weapon configuration. */
 #include "CrystallineWeapon.generated.h"
 
 UENUM()
@@ -45,12 +46,11 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 
 #pragma region MeshData
 
-private:
 	/** weapon mesh: 1st person view */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Mesh1P;
 
-protected:
+
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 
@@ -59,7 +59,14 @@ protected:
 
 #pragma region Fields
 
-protected:
+
+	////////////////////////////
+	// HUD Elements
+
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon Crosshair;
+
+
 	//////////////////////////
 	// Timing
 	
@@ -102,8 +109,11 @@ protected:
 	
 	////////////////////////////
 	// Sound Effects
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
 	class USoundBase* FireSound;
+
+	
+
 
 #pragma endregion
 
@@ -129,8 +139,6 @@ public:
 
 	/** Invoked when the weapon is unequipped by a player or bot. */
 	virtual void OnUnEquip();
-
-
 
 	/** Sets the owner of the Weapon. */
 	void SetOwningPawn(ACrystallinePlayer* Owner);

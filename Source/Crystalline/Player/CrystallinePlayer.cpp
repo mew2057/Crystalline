@@ -33,10 +33,6 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -150.f); // Relative location of the mesh to the origin of the player.
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-
-
-
-
 }
 
 void ACrystallinePlayer::PostInitializeComponents()
@@ -44,6 +40,11 @@ void ACrystallinePlayer::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	SpawnInventory();
+}
+
+void ACrystallinePlayer::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
 }
 
 
@@ -58,6 +59,13 @@ float ACrystallinePlayer::GetRunningSpeedModifier() const
 {
 	return RunningSpeedModifier;
 }
+
+
+ACrystallineWeapon* ACrystallinePlayer::GetCurrentWeapon() const
+{
+	return CurrentWeapon;
+}
+
 #pragma endregion
 
 
@@ -143,7 +151,7 @@ void ACrystallinePlayer::StartAltFire()
 	if (CurrentWeapon)
 	{
 		// TODO add more checks and networking stuff here.
-		CurrentWeapon->StartFire();
+		//CurrentWeapon->StartFire();
 	}
 }
 
