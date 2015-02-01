@@ -64,8 +64,7 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	// HUD Elements
 
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	UTexture2D* Crosshair;
-
+	FCanvasIcon CrosshairIcon;
 
 	//////////////////////////
 	// Timing

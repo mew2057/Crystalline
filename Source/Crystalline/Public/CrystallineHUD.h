@@ -21,10 +21,10 @@ public:
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
-	uint32 ScaleUIY;
+	float ScaleUIY;
 
 	/** The horizontal scale factor of the UI Relative to 1920.*/
-	//uint32 ScaleUIX; Commented for potential future usage. -John
+	//float ScaleUIX; Commented for potential future usage. -John
 
 };
 
