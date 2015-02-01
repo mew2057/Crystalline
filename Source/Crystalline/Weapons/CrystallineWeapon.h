@@ -99,7 +99,15 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	/** The Muzzle flash for the gun. */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UParticleSystem* MuzzleFlash;
-	
+
+	/** Used to manage the flash particle system. */
+	UPROPERTY(Transient)
+	UParticleSystemComponent* MuzzleFlashComp;
+
+	/** The Weapon trail for the bullet. */
+	//UPROPERTY(EditDefaultsOnly, Category = Effects)
+	//UParticleSystem* WeaponTrail;
+
 	// NOTE: Impact needs to be defined in the child classes.
 
 	/** The pawn holding the weapon. */

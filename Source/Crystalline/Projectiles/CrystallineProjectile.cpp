@@ -9,7 +9,9 @@ ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectI
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(50.0f);
+	CollisionComp->InitSphereRadius(5.0f);
+	CollisionComp->AlwaysLoadOnClient = true;
+	CollisionComp->AlwaysLoadOnServer = true;
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &ACrystallineProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
@@ -20,17 +22,25 @@ ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectI
 	// Set as root component
 	RootComponent = CollisionComp;
 
-	// Use a ProjectileMovementComponent to govern this projectile's movement
-	ProjectileMovement = ObjectInitializer.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
-	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
+	// Use a MovementCompComponent to govern this projectile's movement
+	MovementComp = ObjectInitializer.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileComp"));
+	MovementComp->UpdatedComponent = CollisionComp;
+	MovementComp->InitialSpeed = 3000.f;
+	MovementComp->MaxSpeed = 3000.f;
+	MovementComp->bRotationFollowsVelocity = true;
+	MovementComp->ProjectileGravityScale = 0.f;
+
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 }
+void ACrystallineProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	CollisionComp->MoveIgnoreActors.Add(Instigator);
+	
+}
+
 
 void ACrystallineProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -40,5 +50,13 @@ void ACrystallineProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* Othe
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
 		Destroy();
+	}
+}
+
+void ACrystallineProjectile::SetVelocity(FVector Direction)
+{
+	if (MovementComp)
+	{
+		MovementComp->Velocity = Direction * MovementComp->InitialSpeed;
 	}
 }

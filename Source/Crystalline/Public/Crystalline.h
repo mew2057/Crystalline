@@ -5,6 +5,7 @@
 
 #include "EngineMinimal.h"
 #include "Player/CrystallinePlayer.h"
+#include "Projectiles/CrystallineProjectile.h"
 #include "Weapons/CrystallineWeapon.h"
 
 

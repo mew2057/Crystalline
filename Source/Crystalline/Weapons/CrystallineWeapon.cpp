@@ -30,6 +30,25 @@ void ACrystallineWeapon::PostInitializeComponents()
 
 void ACrystallineWeapon::StartFire()
 {
+	// The sound effect.
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySoundAttached(FireSound, GetRootComponent());
+	}
+	/*
+	// Muzzle Flash
+	if (MuzzleFlash)
+	{
+		const FVector FlashPoint = Mesh1P->GetSocketLocation(MuzzleSocket);
+
+		MuzzleFlashComp = UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh1P, MuzzleSocket);
+		//// TODO CONFIGURE THIS!
+		//
+		//MuzzleFlashComp->bOwnerNoSee = false;
+		//MuzzleFlashComp->bOnlyOwnerSee = true;
+		//
+	}*/
+
 	FireWeapon();
 
 }
