@@ -19,6 +19,8 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	
 	/** The default name of the Muzzle socket. */
 	MuzzleSocket = TEXT("MuzzleFlashSocket");
+
+//	UE_LOG(LogTemp, Log, TEXT("%d %d"), Crosshair[0].UL, Crosshair[0].VL);
 }
 
 void ACrystallineWeapon::PostInitializeComponents()
