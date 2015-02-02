@@ -10,8 +10,6 @@ ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectI
 	// Use a sphere as a simple collision representation
 	CollisionComp = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
-	CollisionComp->AlwaysLoadOnClient = true;
-	CollisionComp->AlwaysLoadOnServer = true;
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &ACrystallineProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
@@ -25,10 +23,12 @@ ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectI
 	// Use a MovementCompComponent to govern this projectile's movement
 	MovementComp = ObjectInitializer.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileComp"));
 	MovementComp->UpdatedComponent = CollisionComp;
-	MovementComp->InitialSpeed = 3000.f;
-	MovementComp->MaxSpeed = 3000.f;
+	MovementComp->InitialSpeed = 50000.f;
+	MovementComp->MaxSpeed = 50000.f;
 	MovementComp->bRotationFollowsVelocity = true;
+	MovementComp->bShouldBounce = true;
 	MovementComp->ProjectileGravityScale = 0.f;
+	MovementComp->bInitialVelocityInLocalSpace = false; // If this isn't set there isn't a guarantee on certain assumptions employed by Weapons.
 
 
 	// Die after 3 seconds by default

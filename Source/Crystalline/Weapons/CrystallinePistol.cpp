@@ -5,7 +5,7 @@
 
 void ACrystallinePistol::FireWeapon()
 {
-
+	// XXX THIS CODE IS DIIIIRTY!
 	// TODO clean this and compartmentalize it to functions.
 	// Not sure if this will work.
 	ACrystallinePlayer* Pawn = Cast<ACrystallinePlayer>(OwningPawn);
@@ -14,7 +14,7 @@ void ACrystallinePistol::FireWeapon()
 	FRotator CamRot;
 	Pawn->Controller->GetPlayerViewPoint(StartTrace, CamRot);
 
-
+	//FVector StartTrace2 = StartTrace + CamRot.Vector() * ((OwningPawn->GetActorLocation() - StartTrace) | CamRot.Vector());
 	// TODO remove magic number.
 	FVector EndTrace = StartTrace + CamRot.Vector() * 10000.0f;
 
@@ -22,7 +22,7 @@ void ACrystallinePistol::FireWeapon()
 
 	const FName TraceTag("MyTraceTag");
 
-	FCollisionQueryParams TraceParams = FCollisionQueryParams(TraceTag, true, this);
+	FCollisionQueryParams TraceParams = FCollisionQueryParams(TraceTag, true, OwningPawn);
 	TraceParams.bTraceAsyncScene = true;
 	TraceParams.bReturnPhysicalMaterial = true;
 
@@ -39,11 +39,9 @@ void ACrystallinePistol::FireWeapon()
 	FVector Direction = CamRot.Vector();
 
 	if (Hit.bBlockingHit)
-	{
+	{		
 		Direction = (Hit.ImpactPoint - Origin).SafeNormal();
-
-	} 
-	
+	} 	
 
 	// Determine the spawn point and create a bullet to fire.
 	FTransform BulletSpawn(Direction.Rotation(), Origin);
@@ -53,19 +51,11 @@ void ACrystallinePistol::FireWeapon()
 		
 	if (Bullet)
 	{
-		Bullet->SetVelocity(Direction);
 		Bullet->Instigator = Instigator;
-
+		Bullet->SetVelocity(Direction); // This ensures the behavior matches it's intended use case.
 		UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);
 	}
 
 #pragma endregion
-
-
-
-
-
-
-
 
 }

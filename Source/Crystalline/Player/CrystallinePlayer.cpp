@@ -47,31 +47,6 @@ void ACrystallinePlayer::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	const FName TraceTag("MyTraceTag");
-
-
-	FCollisionQueryParams TraceParams = FCollisionQueryParams(TraceTag, true, this);
-	TraceParams.bTraceAsyncScene = true;
-	TraceParams.bReturnPhysicalMaterial = true;
-
-	FHitResult Hit(ForceInit);
-	// This is to get a feel for tracing.
-	FVector CamLoc;
-	FRotator CamRot;
-	Controller->GetPlayerViewPoint(CamLoc, CamRot);
-
-	GetWorld()->DebugDrawTraceTag = TraceTag;
-	FVector StartTrace = CamLoc ;
-	FVector EndTrace = CamLoc + CamRot.Vector() * 1000.0f;
-	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, ECC_GameTraceChannel1, TraceParams);
-
-	FVector Origin = CurrentWeapon->Mesh1P->GetSocketLocation(CurrentWeapon->MuzzleSocket);
-
-	if (Hit.bBlockingHit)
-	{
-		GetWorld()->LineTraceSingle(Hit, Origin, Hit.ImpactPoint, ECC_GameTraceChannel1, TraceParams);
-	}
-
-
 }
 
 

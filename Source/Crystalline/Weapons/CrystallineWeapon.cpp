@@ -35,7 +35,7 @@ void ACrystallineWeapon::StartFire()
 	{
 		UGameplayStatics::PlaySoundAttached(FireSound, GetRootComponent());
 	}
-	/*
+	
 	// Muzzle Flash
 	if (MuzzleFlash)
 	{
@@ -47,7 +47,7 @@ void ACrystallineWeapon::StartFire()
 		//MuzzleFlashComp->bOwnerNoSee = false;
 		//MuzzleFlashComp->bOnlyOwnerSee = true;
 		//
-	}*/
+	}
 
 	FireWeapon();
 
