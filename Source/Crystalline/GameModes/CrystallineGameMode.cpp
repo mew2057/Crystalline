@@ -2,7 +2,7 @@
 
 #include "Crystalline.h"
 #include "CrystallineGameMode.h"
-#include "CrystallineHUD.h"
+#include "GUI/CrystallineHUD.h"
 #include "Player/CrystallinePlayerController.h"
 #include "Player/CrystallinePlayerMoveComponent.h"
 

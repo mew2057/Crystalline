@@ -26,6 +26,8 @@ void ACrystallineHUD::DrawHUD()
 	ACrystallinePlayer* Pawn = Cast<ACrystallinePlayer>(PlayerOwner->GetPawn());
 	ACrystallineWeapon* Weapon = Pawn->GetCurrentWeapon();
 	
+
+
 	//////////////////////////
 	// Crosshair	
 	FCanvasIcon CrosshairIcon = Weapon->CrosshairIcon;
@@ -34,4 +36,31 @@ void ACrystallineHUD::DrawHUD()
 	Canvas->DrawIcon(CrosshairIcon,
 		(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
 		(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY); 
+}
+
+
+void ACrystallineHUD::DrawWeaponHUD(const ACrystallinePlayer& Pawn)
+{
+	ACrystallineWeapon* CurrentWeapon = Pawn.GetCurrentWeapon();
+
+	if (CurrentWeapon)
+	{
+		/*
+		FCanvasIcon CrosshairIcon = CurrentWeapon->CrosshairIcon;
+
+		Canvas->DrawIcon(CrosshairIcon,
+			(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f) ),
+			(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f) +  200), ScaleUIY);*/
+	}
+
+}
+
+void ACrystallineHUD::DrawHealth(const ACrystallinePlayer& Pawn)
+{
+
+}
+
+void ACrystallineHUD::DrawGameInfo(const ACrystallinePlayer& Pawn)
+{
+
 }

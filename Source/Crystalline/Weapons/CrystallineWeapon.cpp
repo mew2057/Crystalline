@@ -30,6 +30,11 @@ void ACrystallineWeapon::PostInitializeComponents()
 
 void ACrystallineWeapon::StartFire()
 {
+	if (!CurrentWeapon->CanFire())
+	{
+		return;
+	}
+
 	// The sound effect.
 	if (FireSound)
 	{
@@ -50,8 +55,14 @@ void ACrystallineWeapon::StartFire()
 	}
 
 	FireWeapon();
-
+	UseAmmo();
 }
+
+bool ACrystallineWeapon::CanFire()
+{
+	return true;
+}
+
 
 void ACrystallineWeapon::StopFire()
 {

@@ -3,6 +3,11 @@
 #include "Crystalline.h"
 #include "CrystallinePistol.h"
 
+ACrystallinePistol::ACrystallinePistol(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	bIsOverheated = false;
+}
+
 void ACrystallinePistol::FireWeapon()
 {
 	// XXX THIS CODE IS DIIIIRTY!
@@ -59,3 +64,45 @@ void ACrystallinePistol::FireWeapon()
 #pragma endregion
 
 }
+
+void ACrystallinePistol::UseAmmo()
+{
+	WeaponHeat = FMath::Min(WeaponHeat + ProjectileConfig.HeatPerShot, ProjectileConfig.MaxHeat);
+
+	// May not need the overheated thing, but this is me trying to be sure we don't get too many timers running.
+	if (WeaponHeat == ProjectileConfig.MaxHeat && !bIsOverheated)
+	{
+		UE_LOG(LogTemp, Log, TEXT("OverHeat!"));
+
+		bIsOverheated     = true;
+
+		GetWorldTimerManager().SetTimer(this, 
+			&ACrystallinePistol::HandleOverheatCooldown, 
+			ProjectileConfig.OverheatTime, false);
+	}
+}
+
+void ACrystallinePistol::HandleOverheatCooldown()
+{
+	// TODO: Auto resets, make ti go overtime.
+	bIsOverheated = false; 
+	WeaponHeat = 0;
+
+	UE_LOG(LogTemp, Log, TEXT("OverHeat CLeared!"));
+
+}
+
+
+
+void ACrystallinePistol::UpdateWeapon(float DeltaSeconds)
+{
+	WeaponHeat -= ProjectileConfig.CooldownPerSecond;
+}
+
+
+bool ACrystallinePistol::CanFire()
+{
+	return !(bIsOverheated );
+}
+
+

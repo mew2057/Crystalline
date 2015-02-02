@@ -17,7 +17,15 @@ public:
 	/** Primary draw call for the HUD */
 	virtual void DrawHUD() override;
 
-	
+	/** Draws the ammo, overheat gauge, and other relavant information. */
+	void DrawWeaponHUD(const ACrystallinePlayer& Pawn);
+
+	/** Draws the player's current health on the screen.*/
+	void DrawHealth(const ACrystallinePlayer& Pawn);
+
+	/** Draws Information regarding the current game type.*/
+	void DrawGameInfo(const ACrystallinePlayer& Pawn);
+
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/

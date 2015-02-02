@@ -66,6 +66,10 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	FCanvasIcon CrosshairIcon;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon AmmoGuageIcon;
+
+
 	//////////////////////////
 	// Timing
 	
@@ -77,7 +81,7 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	
 	////////////////////////////
 	//// Ammo Details
-
+	// XXX This might be better in a case by case basis.
 	/** The type of ammo used in the gun. */
 	UPROPERTY(EditDefaultsOnly, Category = Ammunition)
 	TEnumAsByte <CrystallineAmmo::Type> AmmoType; // NOTE: TEnumAsByte is needed for blueprint exposed enumerated types.
@@ -150,12 +154,22 @@ public:
 	/** Sets the owner of the Weapon. */
 	void SetOwningPawn(ACrystallinePlayer* Owner);
 
+	/** Performs tick updates on the weapon, weapon specific. */
+	virtual void UpdateWeapon(float DeltaSeconds) PURE_VIRTUAL(ACrystallineWeapon::UpdateWeapon, );;
 
+
+	/* @return True if the weapon is able to be used, Base Class defaults to true.**/
+	virtual bool CanFire();
 
 protected:
 	
 	/** Fires the weapon, Implementation is weapon specific. */
 	virtual void FireWeapon() PURE_VIRTUAL(ACrystallineWeapon::FireWeapon,);
+
+	/** Uses the Weapon Ammo. */
+	virtual void UseAmmo() PURE_VIRTUAL(ACrystallineWeapon::UseAmmo, );
+
+
 
 	/** Attach the mesh to the owning pawn. */
 	void ACrystallineWeapon::AttachMeshToPawn();

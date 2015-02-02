@@ -32,36 +32,6 @@
     <None Include="..\..\Source\Crystalline\Crystalline.Build.cs">
       <Filter>Source\Crystalline</Filter>
     </None>
-    <Filter Include="Source\Crystalline\Private">
-      <UniqueIdentifier>{78B8EA7A-DEF2-423F-8952-60BA3EC7EF53}</UniqueIdentifier>
-    </Filter>
-    <ClCompile Include="..\..\Source\Crystalline\Private\Crystalline.cpp">
-      <Filter>Source\Crystalline\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineCharacter.cpp">
-      <Filter>Source\Crystalline\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineGameMode.cpp">
-      <Filter>Source\Crystalline\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineHUD.cpp">
-      <Filter>Source\Crystalline\Private</Filter>
-    </ClCompile>
-    <Filter Include="Source\Crystalline\Public">
-      <UniqueIdentifier>{A92B032E-277F-4694-B895-57B72071BED3}</UniqueIdentifier>
-    </Filter>
-    <ClInclude Include="..\..\Source\Crystalline\Public\Crystalline.h">
-      <Filter>Source\Crystalline\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineCharacter.h">
-      <Filter>Source\Crystalline\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineGameMode.h">
-      <Filter>Source\Crystalline\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineHUD.h">
-      <Filter>Source\Crystalline\Public</Filter>
-    </ClInclude>
     <Filter Include="Source\Crystalline\Resources">
       <UniqueIdentifier>{35856AFD-8DA0-4E7B-8693-7B72378FD1BD}</UniqueIdentifier>
     </Filter>
@@ -71,9 +41,6 @@
     <ResourceCompile Include="..\..\Source\Crystalline\Resources\Windows\Crystalline.rc">
       <Filter>Source\Crystalline\Resources\Windows</Filter>
     </ResourceCompile>
-    <Filter Include="Source\Crystalline\Weapons">
-      <UniqueIdentifier>{A449DE99-C114-4C13-946E-2593007A7A3D}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source\Crystalline\h">
@@ -99,6 +66,18 @@
     </Filter>
     <Filter Include="Source\Crystalline\h\Projectiles">
       <UniqueIdentifier>{727a6e3c-edc9-40d8-b72e-872f9eade518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Crystalline\cpp\GameModes">
+      <UniqueIdentifier>{b8603c1d-16bb-4fb4-9be8-5f7ed55892c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Crystalline\h\GameModes">
+      <UniqueIdentifier>{6861ff49-6e01-4d81-aa37-06d7db1f9ce4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Crystalline\h\GUI">
+      <UniqueIdentifier>{ea93e929-a812-402d-82bf-c2b68c3e7854}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Crystalline\cpp\GUI">
+      <UniqueIdentifier>{ebe88cea-9d40-4f38-bfd5-c0f9c0def622}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +105,15 @@
     <ClCompile Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.cpp">
       <Filter>Source\Crystalline\cpp\Projectiles</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.cpp">
+      <Filter>Source\Crystalline\cpp\GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Crystalline\GUI\CrystallineHUD.cpp">
+      <Filter>Source\Crystalline\cpp\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Crystalline\Crystalline.cpp">
+      <Filter>Source\Crystalline\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Crystalline\Player\CrystallinePlayer.h">
@@ -151,6 +139,15 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.h">
       <Filter>Source\Crystalline\h\Projectiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.h">
+      <Filter>Source\Crystalline\h\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Crystalline\GUI\CrystallineHUD.h">
+      <Filter>Source\Crystalline\h\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Crystalline\Crystalline.h">
+      <Filter>Source\Crystalline\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
