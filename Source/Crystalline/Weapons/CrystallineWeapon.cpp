@@ -30,7 +30,7 @@ void ACrystallineWeapon::PostInitializeComponents()
 
 void ACrystallineWeapon::StartFire()
 {
-	if (!CurrentWeapon->CanFire())
+	if (!CanFire())
 	{
 		return;
 	}

@@ -41,8 +41,11 @@ void ACrystallineHUD::DrawHUD()
 
 void ACrystallineHUD::DrawWeaponHUD(const ACrystallinePlayer& Pawn)
 {
+	// XXX Crystals should be present on the weapon sprites for the crystal gun.
+	
 	ACrystallineWeapon* CurrentWeapon = Pawn.GetCurrentWeapon();
 
+	/** Get Primary weapon for the player. */
 	if (CurrentWeapon)
 	{
 		/*
@@ -53,6 +56,16 @@ void ACrystallineHUD::DrawWeaponHUD(const ACrystallinePlayer& Pawn)
 			(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f) +  200), ScaleUIY);*/
 	}
 
+
+	/** Get the Secondary weapon for the player. */
+	ACrystallineWeapon* SecondaryWeapon = Pawn.GetSecondaryWeapon();
+
+	if (SecondaryWeapon)
+	{
+		// Output the icon.
+		// NOTE: Don't include ammunition on this one.
+		
+	}
 }
 
 void ACrystallineHUD::DrawHealth(const ACrystallinePlayer& Pawn)

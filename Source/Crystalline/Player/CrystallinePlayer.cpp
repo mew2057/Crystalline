@@ -68,6 +68,18 @@ ACrystallineWeapon* ACrystallinePlayer::GetCurrentWeapon() const
 	return CurrentWeapon;
 }
 
+ACrystallineWeapon* ACrystallinePlayer::GetSecondaryWeapon() const
+{
+	// XXX Might be room for improvement here, adding a weapon counter may remove some overhead. -John
+	if (Weapons.Num() > 1)
+	{
+		return Weapons[(WeaponIndex + 1) % Weapons.Num()];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
 #pragma endregion
 
 
@@ -244,7 +256,7 @@ void ACrystallinePlayer::ToggleRunning()
 void ACrystallinePlayer::SpawnInventory()
 {
 	// TODO make sure the invokee owns the inventory in question.
-	
+
 	const int32 NumWeapons = DefaultWeaponClasses.Num();
 
 	UE_LOG(LogTemp, Log, TEXT("PreviousWeapon %d"), NumWeapons);
@@ -291,7 +303,6 @@ void ACrystallinePlayer::DestroyInventory()
 	}
 
 	// Eject ammunition as appropriate.
-
 }
 
 void ACrystallinePlayer::AddWeapon(ACrystallineWeapon* Weapon)
@@ -310,6 +321,7 @@ void ACrystallinePlayer::RemoveWeapon(ACrystallineWeapon* Weapon)
 	{
 		Weapon->OnExitInventory();
 		Weapons.RemoveSingle(Weapon);
+
 	}
 }
 

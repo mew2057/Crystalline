@@ -162,7 +162,7 @@ protected:
 
 	/** The index of the currently equipped weapon. */
 	uint32 WeaponIndex;
-
+	
 #pragma endregion
 
 #pragma region Functions
@@ -170,7 +170,19 @@ public:
 	/** Retrieve the FName of the weapon attach point. */
 	FName GetWeaponAttachPoint() const;
 
+	/**
+	 * Gets the currently equpped weapon.
+	 * @return A reference to the weapon held by the player.
+	 */
 	class ACrystallineWeapon* GetCurrentWeapon() const;
+
+
+	/**
+	* Gets the weapon in reserve for the player.
+	* @return A reference to the off hand weapon for the player.
+	*/
+	class ACrystallineWeapon* GetSecondaryWeapon() const;
+
 
 protected:
 	/** Spawns the inventory of the player, used on respawn/construction. */
