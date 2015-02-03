@@ -78,6 +78,7 @@ class CRYSTALLINE_API ACrystallinePistol : public ACrystallineWeapon
 	UPROPERTY(Transient)
 	float WeaponHeat;
 
+	virtual void UpdateWeapon(float DeltaSeconds) override;
 
 protected:
 
@@ -88,7 +89,6 @@ protected:
 	
 	virtual bool CanFire() override;
 
-	virtual void UpdateWeapon(float DeltaSeconds) override;
 
 	/////////////////////////////////////
 	// Overheat Mechanic

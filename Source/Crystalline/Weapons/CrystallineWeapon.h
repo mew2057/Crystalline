@@ -67,7 +67,10 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	FCanvasIcon CrosshairIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FCanvasIcon AmmoGuageIcon;
+	FCanvasIcon AmmoIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon WeaponIcon;
 
 
 	//////////////////////////

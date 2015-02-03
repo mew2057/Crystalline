@@ -46,7 +46,12 @@ void ACrystallinePlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	const FName TraceTag("MyTraceTag");
+	// Weapons.Num overhead?
+	for (int32 i = 0; i < Weapons.Num(); ++i)
+	{
+		// TODO a check?
+		Weapons[i]->UpdateWeapon(DeltaSeconds);
+	}
 }
 
 
