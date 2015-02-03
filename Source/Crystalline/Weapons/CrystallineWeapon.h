@@ -126,6 +126,11 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
 	class USoundBase* FireSound;
 
+
+	////////////////////////////
+	// Firing
+	UPROPERTY(Transient)
+	uint32 bWantsToFire : 1;
 	
 
 
@@ -136,8 +141,37 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 #pragma region Functions
 
 public:
+	////////////////////////////
+	// Server Input handling
+
+	/** [server] */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartFire();
+
+	/** [server] */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopFire();
+
+
+	/** [server] */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartReload();
+
+	/** [server] */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopReload();
+
+	////////////////////////////
+
 	/** Starts the firing of a weapon if possible. */
 	virtual void StartFire();
+
+	/** [server] handles the weapon fire and ammo update.*/
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerHandleFire();
+
+	/** [server] & [local]: Performs the actual weapon fire */
+	virtual void HandleFire();
 
 	/** Ends the firing of the weapon, stop in StartFire for non automatic weapons. */
 	virtual void StopFire();

@@ -21,13 +21,13 @@ public:
 	 * Draws the ammo, overheat gauge, and other relavant information.
 	 * Note this assumes that the player only has two weapons, more weapons require modifications.
 	 */
-	void DrawWeaponHUD(const ACrystallinePlayer* Pawn);
+	void DrawWeaponHUD();
 
 	/** Draws the player's current health on the screen.*/
-	void DrawHealth(const ACrystallinePlayer* Pawn);
+	void DrawHealth();
 
 	/** Draws Information regarding the current game type.*/
-	void DrawGameInfo(const ACrystallinePlayer* Pawn);
+	void DrawGameInfo();
 
 
 private:

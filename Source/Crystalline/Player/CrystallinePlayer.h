@@ -157,13 +157,12 @@ protected:
 	TArray<class ACrystallineWeapon*> Weapons; // This list shouldn't change after spawn.
 
 	/** The currently equipped weapon for the player. */
-	UPROPERTY(Transient) // Todo this needs an on replicate.
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
 	class ACrystallineWeapon* CurrentWeapon;
 
 	/** The index of the currently equipped weapon. */
 	uint32 WeaponIndex;
 	
-#pragma endregion
 
 #pragma region Functions
 public:
@@ -201,13 +200,16 @@ protected:
 	  *
 	  * @param NewWeapon The Weapon to be equipped by the player.
 	  */
-	void EquipWeapon(ACrystallineWeapon* NewWeapon);
+	void EquipWeapon(class ACrystallineWeapon* NewWeapon, class ACrystallineWeapon* LastWeapon = NULL);
+
+	/** current weapon rep handler */
+	UFUNCTION()
+		void OnRep_CurrentWeapon(class ACrystallineWeapon* LastWeapon);
 
 	
 
 
 #pragma endregion
 
-#pragma endregion
 
 };

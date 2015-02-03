@@ -330,25 +330,32 @@ void ACrystallinePlayer::RemoveWeapon(ACrystallineWeapon* Weapon)
 	}
 }
 
-void ACrystallinePlayer::EquipWeapon(ACrystallineWeapon* NewWeapon)
+void ACrystallinePlayer::EquipWeapon(ACrystallineWeapon* NewWeapon, ACrystallineWeapon* LastWeapon)
 {
-	// EARLY RETURN! If there will be no change in weapon or the new weapon is null.
-	if (NewWeapon == CurrentWeapon || NewWeapon == NULL)
+
+	ACrystallineWeapon* LocalLastWeapon = NULL;
+
+	if (LastWeapon != NULL)
 	{
-		return;
+		LocalLastWeapon = LastWeapon;
 	}
-	
-	// If the current weapon is valid unequip it.
-	if (CurrentWeapon)
+	else if (NewWeapon != CurrentWeapon)
 	{
-		CurrentWeapon->OnUnEquip();
+		LocalLastWeapon = CurrentWeapon;
 	}
 
-	CurrentWeapon = NewWeapon;
+	if (LocalLastWeapon)
+	{
+		LastWeapon->OnUnEquip();
+	}
 	
-	CurrentWeapon->SetOwningPawn(this);
-	CurrentWeapon->OnEquip();
-	
+	if (NewWeapon)
+	{
+		CurrentWeapon = NewWeapon;
+
+		CurrentWeapon->SetOwningPawn(this);
+		CurrentWeapon->OnEquip();
+	}
 
 }
 
@@ -359,5 +366,24 @@ FName ACrystallinePlayer::GetWeaponAttachPoint() const
 
 
 #pragma endregion
+
+//////////////////////////////////////////////////////////////////////////
+// Replication
+
+// XXX There is something here that I'm not sure of.
+void ACrystallinePlayer::OnRep_CurrentWeapon(ACrystallineWeapon* LastWeapon)
+{
+
+	EquipWeapon(CurrentWeapon, LastWeapon);
+}
+
+void ACrystallinePlayer::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACrystallinePlayer, CurrentWeapon);
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////

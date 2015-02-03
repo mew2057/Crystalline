@@ -30,6 +30,20 @@ void ACrystallineWeapon::PostInitializeComponents()
 
 void ACrystallineWeapon::StartFire()
 {
+	
+	if (Role < ROLE_Authority)
+	{
+		ServerStartFire();
+	}
+
+
+	// Firing is set to be true.
+	bWantsToFire = true;
+
+}
+
+void ACrystallineWeapon::HandleFire()
+{
 	if (!CanFire())
 	{
 		return;
@@ -66,7 +80,7 @@ bool ACrystallineWeapon::CanFire()
 
 void ACrystallineWeapon::StopFire()
 {
-
+	bWantsToFire = false;
 }
 
 #pragma region Inventory_Related
@@ -99,6 +113,65 @@ void ACrystallineWeapon::SetOwningPawn(ACrystallinePlayer* Owner)
 	OwningPawn = Owner;
 }
 
+
+#pragma region ServerFunctions
+
+/////////////////////////
+// Fire Operations
+void ACrystallineWeapon::ServerStartFire_Implementation()
+{
+
+}
+
+bool ACrystallineWeapon::ServerStartFire_Validate()
+{
+	return true;
+}
+
+void ACrystallineWeapon::ServerStopFire_Implementation()
+{
+
+}
+
+bool ACrystallineWeapon::ServerStopFire_Validate()
+{
+	return true;
+}
+
+
+
+void ACrystallineWeapon::ServerHandleFire_Implementation()
+{
+	HandleFire();
+}
+
+bool ACrystallineWeapon::ServerHandleFire_Validate()
+{
+	return true;
+}
+
+/////////////////////////
+// Reload Operations
+void ACrystallineWeapon::ServerStartReload_Implementation()
+{
+
+}
+bool ACrystallineWeapon::ServerStartReload_Validate()
+{
+	return true;
+}
+
+
+void ACrystallineWeapon::ServerStopReload_Implementation()
+{
+
+}
+
+
+bool ACrystallineWeapon::ServerStopReload_Validate()
+{
+	return true;
+}
 
 #pragma endregion
 

@@ -3,12 +3,11 @@
 #ifndef __CRYSTALLINE_H__
 #define __CRYSTALLINE_H__
 
-#include "EngineMinimal.h"
+#include "Engine.h"
 #include "TimerManager.h"
+#include "UnrealNetwork.h"
 #include "Player/CrystallinePlayer.h"
 #include "Projectiles/CrystallineProjectile.h"
 #include "Weapons/CrystallineWeapon.h"
-
-
 
 #endif
