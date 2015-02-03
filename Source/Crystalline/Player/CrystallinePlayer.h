@@ -153,7 +153,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TArray<TSubclassOf<class ACrystallineWeapon>> DefaultWeaponClasses;
 
-	UPROPERTY(Transient)//, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
+	UPROPERTY(Transient, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
 	TArray<class ACrystallineWeapon*> Weapons; // This list shouldn't change after spawn.
 
 	/** The currently equipped weapon for the player. */
@@ -196,15 +196,17 @@ protected:
 	/** Removes a weapon from the inventory in a standardized manner. */
 	void RemoveWeapon(ACrystallineWeapon* Weapon);
 
-	/** Equips a new weapon, unequiping the previous if present. 
-	  *
-	  * @param NewWeapon The Weapon to be equipped by the player.
-	  */
-	void EquipWeapon(class ACrystallineWeapon* NewWeapon, class ACrystallineWeapon* LastWeapon = NULL);
+
+	void EquipWeapon(class ACrystallineWeapon* NewWeapon);
+
+	void SetCurrentWeapon(class ACrystallineWeapon* NewWeapon, class ACrystallineWeapon* LastWeapon = NULL);
 
 	/** current weapon rep handler */
 	UFUNCTION()
-		void OnRep_CurrentWeapon(class ACrystallineWeapon* LastWeapon);
+	void OnRep_CurrentWeapon(class ACrystallineWeapon* LastWeapon);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerEquipWeapon(class ACrystallineWeapon* NewWeapon);
 
 	
 

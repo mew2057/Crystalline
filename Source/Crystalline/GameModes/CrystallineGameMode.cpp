@@ -10,13 +10,9 @@
 ACrystallineGameMode::ACrystallineGameMode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CrystallinePlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
-
-	//PlayerControllerClass = ACrystallinePlayerController::StaticClass();
-
-	// use our custom HUD class
+	PlayerControllerClass = ACrystallinePlayerController::StaticClass();
 	HUDClass = ACrystallineHUD::StaticClass();
 }

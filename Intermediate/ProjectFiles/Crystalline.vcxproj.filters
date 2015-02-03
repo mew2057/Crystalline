@@ -90,9 +90,6 @@
     <ClCompile Include="..\..\Source\Crystalline\Player\CrystallinePlayerMoveComponent.cpp">
       <Filter>Source\Crystalline\cpp\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystalGun.cpp">
-      <Filter>Source\Crystalline\cpp\Weapons</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallineAssualtRifle.cpp">
       <Filter>Source\Crystalline\cpp\Weapons</Filter>
     </ClCompile>
@@ -102,17 +99,13 @@
     <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallineWeapon.cpp">
       <Filter>Source\Crystalline\cpp\Weapons</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Crystalline.cpp">
-      <Filter>Source\Crystalline\cpp</Filter>
-    </ClCompile>
+    <ClCompile Include="..\..\Source\Crystalline\Private\Crystalline.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineCharacter.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineGameMode.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineHUD.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineProjectile.cpp" />
     <ClCompile Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.cpp">
       <Filter>Source\Crystalline\cpp\GameModes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\GUI\CrystallineHUD.cpp">
-      <Filter>Source\Crystalline\cpp\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.cpp">
-      <Filter>Source\Crystalline\cpp\Projectiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,26 +121,19 @@
     <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallineWeapon.h">
       <Filter>Source\Crystalline\h\Weapons</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystalGun.h">
-      <Filter>Source\Crystalline\h\Weapons</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallineAssualtRifle.h">
       <Filter>Source\Crystalline\h\Weapons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallinePistol.h">
       <Filter>Source\Crystalline\h\Weapons</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Crystalline.h">
-      <Filter>Source\Crystalline\h</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\Source\Crystalline\Public\Crystalline.h" />
+    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineCharacter.h" />
+    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineGameMode.h" />
+    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineHUD.h" />
+    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineProjectile.h" />
     <ClInclude Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.h">
       <Filter>Source\Crystalline\h\GameModes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\GUI\CrystallineHUD.h">
-      <Filter>Source\Crystalline\h\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.h">
-      <Filter>Source\Crystalline\h\Projectiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

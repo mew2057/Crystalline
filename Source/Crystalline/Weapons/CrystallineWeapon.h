@@ -118,7 +118,7 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	// NOTE: Impact needs to be defined in the child classes.
 
 	/** The pawn holding the weapon. */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_OwningPawn)
 	class ACrystallinePlayer* OwningPawn; // Class is needed (forward declaration).
 	
 	////////////////////////////
@@ -161,6 +161,10 @@ public:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopReload();
 
+
+
+	UFUNCTION()
+	void OnRep_OwningPawn();
 	////////////////////////////
 
 	/** Starts the firing of a weapon if possible. */
@@ -172,6 +176,8 @@ public:
 
 	/** [server] & [local]: Performs the actual weapon fire */
 	virtual void HandleFire();
+
+
 
 	/** Ends the firing of the weapon, stop in StartFire for non automatic weapons. */
 	virtual void StopFire();

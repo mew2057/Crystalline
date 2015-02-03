@@ -8,9 +8,9 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	// Initializes the weapon mesh.
 	Mesh1P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh1P"));
 	Mesh1P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
-	Mesh1P->bChartDistanceFactor = false; // prevents the mesh from being added to the gloabal chart
-	Mesh1P->bReceivesDecals = false;      // Prevents decals from spawning on the gun.
-	Mesh1P->CastShadow = false;           // Hides the shadow.
+	Mesh1P->bChartDistanceFactor = false;                        // prevents the mesh from being added to the gloabal chart
+	Mesh1P->bReceivesDecals = false;                             // Prevents decals from spawning on the gun.
+	Mesh1P->CastShadow = false;                                  // Hides the shadow.
 	Mesh1P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
@@ -20,7 +20,12 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	/** The default name of the Muzzle socket. */
 	MuzzleSocket = TEXT("MuzzleFlashSocket");
 
-//	UE_LOG(LogTemp, Log, TEXT("%d %d"), Crosshair[0].UL, Crosshair[0].VL);
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+	bReplicateInstigator = true;
+	bNetUseOwnerRelevancy = true;
 }
 
 void ACrystallineWeapon::PostInitializeComponents()
@@ -39,6 +44,7 @@ void ACrystallineWeapon::StartFire()
 
 	// Firing is set to be true.
 	bWantsToFire = true;
+	HandleFire();
 
 }
 
@@ -92,7 +98,12 @@ void ACrystallineWeapon::OnEnterInventory(ACrystallinePlayer* NewOwner)
 
 void ACrystallineWeapon::OnExitInventory()
 {
-
+	// If this has authorative control, remove null the pawn.
+	if (Role == ROLE_Authority)
+	{
+		SetOwningPawn(NULL);
+	}
+	//TODO Remove attachment.
 }
 
 void ACrystallineWeapon::OnEquip()
@@ -120,7 +131,7 @@ void ACrystallineWeapon::SetOwningPawn(ACrystallinePlayer* Owner)
 // Fire Operations
 void ACrystallineWeapon::ServerStartFire_Implementation()
 {
-
+	StartFire();
 }
 
 bool ACrystallineWeapon::ServerStartFire_Validate()
@@ -149,6 +160,8 @@ bool ACrystallineWeapon::ServerHandleFire_Validate()
 {
 	return true;
 }
+
+
 
 /////////////////////////
 // Reload Operations
@@ -210,5 +223,27 @@ void ACrystallineWeapon::DetachMeshFromPawn()
 
 #pragma endregion
 
+
+
+void ACrystallineWeapon::OnRep_OwningPawn()
+{
+	if (OwningPawn)
+	{
+		OnEnterInventory(OwningPawn);
+	}
+	else
+	{
+		OnExitInventory();
+	}
+}
+
+void ACrystallineWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicated across all players.
+	DOREPLIFETIME(ACrystallineWeapon, OwningPawn);
+
+}
 
 

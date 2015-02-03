@@ -38,19 +38,24 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 void ACrystallinePlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	
 
-	SpawnInventory();
+	if (Role == ROLE_Authority)
+	{
+		SpawnInventory();
+	}
+	
 }
 
 void ACrystallinePlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	
 	// Weapons.Num overhead?
 	for (int32 i = 0; i < Weapons.Num(); ++i)
 	{
 		// TODO a check?
-		Weapons[i]->UpdateWeapon(DeltaSeconds);
+		//Weapons[i]->UpdateWeapon(DeltaSeconds);
 	}
 }
 
@@ -262,6 +267,11 @@ void ACrystallinePlayer::SpawnInventory()
 {
 	// TODO make sure the invokee owns the inventory in question.
 
+	if (Role < ROLE_Authority)
+	{
+		return;
+	}
+
 	const int32 NumWeapons = DefaultWeaponClasses.Num();
 
 	UE_LOG(LogTemp, Log, TEXT("PreviousWeapon %d"), NumWeapons);
@@ -330,9 +340,34 @@ void ACrystallinePlayer::RemoveWeapon(ACrystallineWeapon* Weapon)
 	}
 }
 
-void ACrystallinePlayer::EquipWeapon(ACrystallineWeapon* NewWeapon, ACrystallineWeapon* LastWeapon)
+void ACrystallinePlayer::EquipWeapon(ACrystallineWeapon* NewWeapon)
 {
+	if (NewWeapon)
+	{
+		if (Role == ROLE_Authority)
+		{
+			SetCurrentWeapon(NewWeapon);
+		}
+		else
+		{
+			ServerEquipWeapon(NewWeapon);
+		}
+	}
+}
 
+bool ACrystallinePlayer::ServerEquipWeapon_Validate(ACrystallineWeapon* NewWeapon)
+{
+	return true;
+}
+
+
+void ACrystallinePlayer::ServerEquipWeapon_Implementation(ACrystallineWeapon* NewWeapon)
+{
+	SetCurrentWeapon(NewWeapon);
+}
+
+void ACrystallinePlayer::SetCurrentWeapon(ACrystallineWeapon* NewWeapon, ACrystallineWeapon* LastWeapon)
+{
 	ACrystallineWeapon* LocalLastWeapon = NULL;
 
 	if (LastWeapon != NULL)
@@ -346,9 +381,9 @@ void ACrystallinePlayer::EquipWeapon(ACrystallineWeapon* NewWeapon, ACrystalline
 
 	if (LocalLastWeapon)
 	{
-		LastWeapon->OnUnEquip();
+		LocalLastWeapon->OnUnEquip();
 	}
-	
+
 	if (NewWeapon)
 	{
 		CurrentWeapon = NewWeapon;
@@ -356,7 +391,6 @@ void ACrystallinePlayer::EquipWeapon(ACrystallineWeapon* NewWeapon, ACrystalline
 		CurrentWeapon->SetOwningPawn(this);
 		CurrentWeapon->OnEquip();
 	}
-
 }
 
 FName ACrystallinePlayer::GetWeaponAttachPoint() const
@@ -374,13 +408,18 @@ FName ACrystallinePlayer::GetWeaponAttachPoint() const
 void ACrystallinePlayer::OnRep_CurrentWeapon(ACrystallineWeapon* LastWeapon)
 {
 
-	EquipWeapon(CurrentWeapon, LastWeapon);
+	SetCurrentWeapon(CurrentWeapon, LastWeapon);
 }
 
 void ACrystallinePlayer::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	// Only local owner.
+	DOREPLIFETIME_CONDITION(ACrystallinePlayer, Weapons, COND_OwnerOnly);
 
+
+	// Everyone.
 	DOREPLIFETIME(ACrystallinePlayer, CurrentWeapon);
 }
 

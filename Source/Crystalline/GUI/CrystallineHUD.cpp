@@ -28,19 +28,20 @@ void ACrystallineHUD::DrawHUD()
 	{
 
 		ACrystallineWeapon* Weapon = Pawn->GetCurrentWeapon();
+		if (Weapon)
+		{
 
+			//////////////////////////
+			// Crosshair	
+			FCanvasIcon CrosshairIcon = Weapon->CrosshairIcon;
+			// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
+			// The UL and VL values indicate the width and length of the texture respectively.
+			Canvas->DrawIcon(CrosshairIcon,
+				(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
+				(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 
-
-		//////////////////////////
-		// Crosshair	
-		FCanvasIcon CrosshairIcon = Weapon->CrosshairIcon;
-		// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
-		// The UL and VL values indicate the width and length of the texture respectively.
-		Canvas->DrawIcon(CrosshairIcon,
-			(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
-			(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
-
-		DrawWeaponHUD();
+			DrawWeaponHUD();
+		}
 	}
 	
 }
