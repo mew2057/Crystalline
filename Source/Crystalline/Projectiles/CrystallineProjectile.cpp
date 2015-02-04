@@ -7,22 +7,18 @@
 ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
 {
-	// Use a sphere as a simple collision representation
+	// Use a sphere as a simple collision representation. TODO collision object type.
 	CollisionComp = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->AlwaysLoadOnClient = true;
 	CollisionComp->AlwaysLoadOnServer = true;
 	CollisionComp->bTraceComplexOnMove = true;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
-	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &ACrystallineProjectile::OnHit);		// set up a notification for when this component hits something blocking
-
-	// Players can't walk on it
-	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-	CollisionComp->CanCharacterStepUpOn = ECB_No;
-
-	// Set as root component
+	CollisionComp->SetCollisionObjectType(COLLISION_PROJECTILE);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	RootComponent = CollisionComp;
 
 	// Use a MovementCompComponent to govern this projectile's movement
@@ -31,17 +27,12 @@ ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectI
 	MovementComp->InitialSpeed = 5000.f;
 	MovementComp->MaxSpeed = 5000.f;
 	MovementComp->bRotationFollowsVelocity = true;
-	MovementComp->bShouldBounce = true;
 	MovementComp->ProjectileGravityScale = 0.f;
 	MovementComp->bInitialVelocityInLocalSpace = false; // If this isn't set there isn't a guarantee on certain assumptions employed by Weapons.
 
 	// Allows for a tick to be registered.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
-
-	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
-
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	bReplicateInstigator = true;
@@ -52,20 +43,28 @@ ACrystallineProjectile::ACrystallineProjectile(const FObjectInitializer& ObjectI
 void ACrystallineProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	MovementComp->OnProjectileStop.AddDynamic(this, &ACrystallineProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 	
+	SetLifeSpan(3.f);
 }
 
 
-void ACrystallineProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ACrystallineProjectile::OnImpact(const FHitResult& Hit)
 {
+	if (Role == ROLE_Authority)
+	{
+		Destroy();
+		MovementComp->StopMovementImmediately();
+	}
 	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+	/*if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
-		Destroy();
-	}
+		
+	}*/
 }
 
 void ACrystallineProjectile::SetVelocity(FVector Direction)
@@ -75,3 +74,16 @@ void ACrystallineProjectile::SetVelocity(FVector Direction)
 		MovementComp->Velocity = Direction * MovementComp->InitialSpeed;
 	}
 }
+
+void ACrystallineProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
+{
+	if (MovementComp)
+	{
+		MovementComp->Velocity = NewVelocity;
+	}
+}
+/*
+void ACrystallineProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}*/

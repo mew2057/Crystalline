@@ -10,11 +10,11 @@ class ACrystallineProjectile : public AActor
 
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	class USphereComponent* CollisionComp;
-	
+	USphereComponent* CollisionComp;
+
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	class UProjectileMovementComponent* MovementComp;
+	UProjectileMovementComponent* MovementComp;
 
 public:
 	ACrystallineProjectile(const FObjectInitializer& ObjectInitializer);
@@ -23,7 +23,7 @@ public:
 
 	/** called when projectile hits something */
 	UFUNCTION()
-	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnImpact(const FHitResult& Hit);
 
 	/** Sets the velocity of the projectile*/
 	UFUNCTION()
@@ -33,5 +33,8 @@ public:
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return MovementComp; }
+
+	/** update velocity on client */
+	virtual void PostNetReceiveVelocity(const FVector& NewVelocity) override;
 };
 

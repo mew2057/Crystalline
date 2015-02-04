@@ -10,4 +10,8 @@
 #include "Projectiles/CrystallineProjectile.h"
 #include "Weapons/CrystallineWeapon.h"
 
+
+#define COLLISION_PROJECTILE ECC_GameTraceChannel1
+#define COLLISION_WEAPON     ECC_GameTraceChannel2
+
 #endif

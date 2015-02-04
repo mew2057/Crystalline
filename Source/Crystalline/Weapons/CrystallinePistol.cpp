@@ -53,7 +53,6 @@ void ACrystallinePistol::FireWeapon()
 void ACrystallinePistol::UseAmmo()
 {
 	WeaponHeat = FMath::Min(WeaponHeat + ProjectileConfig.HeatPerShot, ProjectileConfig.MaxHeat);
-	UE_LOG(LogTemp, Log, TEXT("OverHeat! %d"), WeaponHeat);
 
 	// May not need the overheated thing, but this is me trying to be sure we don't get too many timers running.
 	if (WeaponHeat == ProjectileConfig.MaxHeat && !bIsOverheated)
@@ -71,7 +70,6 @@ void ACrystallinePistol::UseAmmo()
 
 void ACrystallinePistol::HandleOverheatCooldown()
 {
-	// TODO: Auto resets, make ti go overtime.
 	bIsOverheated = false; 
 	bIsCoolingDown = true;
 
