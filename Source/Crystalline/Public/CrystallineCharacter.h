@@ -42,13 +42,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* FireAnimation;
 
+	UFUNCTION(BlueprintNativeEvent, Category = "ProjectileSpawn")
+		void AttemptSpawnProjectile();
+
+	/** Fires a projectile. */
+	void OnFire();
+
 protected:
 
 	/** Handler for a touch input beginning. */
 	void TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location);
 
-	/** Fires a projectile. */
-	void OnFire();
+	
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
