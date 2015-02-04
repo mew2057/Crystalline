@@ -15,9 +15,7 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
 	RootComponent = Mesh1P;										 // Makes the first player mesh the root component.
-
-	
-	LastFireTime = 0.0f;
+	LastFireTime  = 0.0f;
 
 	/** The default name of the Muzzle socket. */
 	MuzzleSocket = TEXT("MuzzleFlashSocket");
@@ -38,6 +36,12 @@ void ACrystallineWeapon::PostInitializeComponents()
 	
 	// Remove the pawn when everything is set up (hides the mesh);
 	DetachMeshFromPawn();
+
+	// If the ammo guage width is not set, then set it to the width of the gauge icon.
+	if (AmmoGuageWidth == 0.f)
+	{
+		AmmoGuageWidth = AmmoGuageFGIcon.UL;
+	}
 }
 
 void ACrystallineWeapon::StartFire()
@@ -317,6 +321,11 @@ void ACrystallineWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	// Replicated across all players.
 	DOREPLIFETIME(ACrystallineWeapon, OwningPawn);
 
+}
+
+float ACrystallineWeapon::GetClipPercent()
+{
+	return 0.0f;
 }
 
 

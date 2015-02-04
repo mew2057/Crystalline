@@ -112,7 +112,7 @@
       <Filter>Source\Crystalline\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystalGun.cpp">
-      <Filter>Source\Crystalline\h\Weapons</Filter>
+      <Filter>Source\Crystalline\cpp\Weapons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -147,7 +147,7 @@
       <Filter>Source\Crystalline\h</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystalGun.h">
-      <Filter>Source\Crystalline\cpp\Weapons</Filter>
+      <Filter>Source\Crystalline\h\Weapons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

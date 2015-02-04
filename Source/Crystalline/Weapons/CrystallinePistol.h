@@ -48,9 +48,9 @@ struct FPistolProjectileData
 
 		// Heat settings.
 		MaxHeat           = 100.f;
-		HeatPerShot       = 10.f;
+		HeatPerShot       = 15.f;
 		CooldownPerSecond = 30.f;
-		OverheatTime      = 3.f;
+		OverheatTime      = 0.5f;
 	}
 };
 
@@ -84,6 +84,9 @@ class CRYSTALLINE_API ACrystallinePistol : public ACrystallineWeapon
 
 	/** Updates the weapon on tick. Used for the heat mechanic.*/
 	virtual void Tick(float DeltaSeconds) override;
+
+	virtual float GetClipPercent() override;
+
 protected:
 
 	/** Fires the pistol projectile. */

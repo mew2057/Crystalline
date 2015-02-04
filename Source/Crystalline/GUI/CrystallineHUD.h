@@ -6,6 +6,8 @@
 #define TARGET_Y_RESOLUTION 1080.0f
 #define TARGET_X_RESOLUTION 1920.0f
 
+/** A fudge factor for icons with 0 width */
+#define ICON_FUDGE .0001f
 UCLASS()
 class ACrystallineHUD : public AHUD
 {

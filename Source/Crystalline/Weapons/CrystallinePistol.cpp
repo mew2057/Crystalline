@@ -120,4 +120,9 @@ void ACrystallinePistol::ServerFireProjectile_Implementation(FVector Origin, FVe
 }
 
 
+float ACrystallinePistol::GetClipPercent()
+{
+	return WeaponHeat / ProjectileConfig.MaxHeat;
+}
+
 

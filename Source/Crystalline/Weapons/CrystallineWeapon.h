@@ -67,11 +67,17 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	FCanvasIcon CrosshairIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FCanvasIcon AmmoIcon;
+	FCanvasIcon AmmoGuageBGIcon;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon AmmoGuageFGIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	FCanvasIcon WeaponIcon;
-
+	
+	/** The width of the ammo clip in pixels*/
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	float AmmoGuageWidth;
 
 	//////////////////////////
 	// Timing
@@ -92,13 +98,16 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = Ammunition)
 	TEnumAsByte <CrystallineAmmo::Type> AmmoType; // NOTE: TEnumAsByte is needed for blueprint exposed enumerated types.
 	
-	/** The number of rounds available to the gun. */
-	int32 Rounds;
-
-	/** The number of rounds in a single ammo clip */
-	int32 RoundsPerClip;
-
-
+	///** The number of rounds available to the gun. */
+	//float Shots;
+	//
+	///** The number of rounds in a single ammo clip */
+	//UPROPERTY(EditDefaultsOnly, Category = Ammunition)
+	//float ShotsPerClip;
+	//
+	//
+	//float Clips;	 
+	
 	////////////////////////////
 	// Visual Effects
 
@@ -206,6 +215,13 @@ public:
 
 	/* @return True if the weapon is able to be used, Base Class defaults to true.**/
 	virtual bool CanFire();
+
+
+	////////////////////////////
+	// HUD Helper
+
+	/** Returns a number 0..1 representing how much of the clip has been used. (0 is none, 1 is everything).*/
+	virtual float GetClipPercent();
 
 protected:
 	

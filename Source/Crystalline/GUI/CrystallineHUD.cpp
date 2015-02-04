@@ -30,6 +30,7 @@ void ACrystallineHUD::DrawHUD()
 		ACrystallineWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
 		{
+			Canvas->SetDrawColor(FColor::White);
 
 			//////////////////////////
 			// Crosshair	
@@ -60,11 +61,49 @@ void ACrystallineHUD::DrawWeaponHUD()
 	/** Get Primary weapon for the player. */
 	if (CurrentWeapon)
 	{
-		AmmoIcon = CurrentWeapon->AmmoIcon;
+		// TODO team modifications.
+		Canvas->SetDrawColor(FColor::White);
+
+		AmmoIcon = CurrentWeapon->AmmoGuageBGIcon;
 		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
+
+		AmmoIcon = CurrentWeapon->AmmoGuageFGIcon;
+
+		// If the weapon uses cooldown ammo, then the way the icon is drawn varies.
+		if (CurrentWeapon->AmmoType == CrystallineAmmo::Cooldown)
+		{
+			Canvas->SetDrawColor(FColor::Red);	
+			AmmoIcon.UL = CurrentWeapon->AmmoGuageWidth * CurrentWeapon->GetClipPercent() + ICON_FUDGE;
+			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
+		}
+		else
+		{
+			Canvas->SetDrawColor(FColor::Blue);
+			// TODO this is going to need to do some offsetting I think.
+
+		}
+		
+
+		Canvas->SetDrawColor(FColor::White);
 
 		WeaponIcon = CurrentWeapon->WeaponIcon;
 		Canvas->DrawIcon(WeaponIcon, 40, 20, ScaleUIY);
+
+
+		// Apparently tileItem will work
+		/*
+		FCanvasTileItem TileItem(
+			WeaponIcon-
+			
+			FLinearColor::White);
+			*/	
+		/*
+		UPROPERTY(EditDefaultsOnly, Category = HUD)
+			FCanvasIcon AmmoGuageBGIcon;
+
+		UPROPERTY(EditDefaultsOnly, Category = HUD)
+			FCanvasIcon AmmoGuageFGIcon;
+		*/
 
 		/*
 		
@@ -80,9 +119,6 @@ void ACrystallineHUD::DrawWeaponHUD()
 
 	if (SecondaryWeapon)
 	{
-		AmmoIcon = SecondaryWeapon->AmmoIcon;
-		Canvas->DrawIcon(AmmoIcon, 20, 60, ScaleUIY);
-
 		WeaponIcon = SecondaryWeapon->WeaponIcon;
 		Canvas->DrawIcon(WeaponIcon, 40, 60, ScaleUIY);
 
