@@ -8,11 +8,6 @@ void ACrystallineAssualtRifle::FireWeapon()
 
 }
 
-void ACrystallineAssualtRifle::UpdateWeapon(float DeltaSeconds)
-{
-
-}
-
 void ACrystallineAssualtRifle::UseAmmo()
 {
 

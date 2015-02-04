@@ -76,6 +76,9 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	//////////////////////////
 	// Timing
 	
+	/** The time when the gun last fired. */
+	float LastFireTime;
+
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 	float TimeBetweenShots;
 
@@ -170,14 +173,18 @@ public:
 	/** Starts the firing of a weapon if possible. */
 	virtual void StartFire();
 
+	virtual void StartBurst();
+
+	virtual void StopBurst();
+
+	virtual void SimulateWeaponFire();
+
 	/** [server] handles the weapon fire and ammo update.*/
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerHandleFire();
 
 	/** [server] & [local]: Performs the actual weapon fire */
 	virtual void HandleFire();
-
-
 
 	/** Ends the firing of the weapon, stop in StartFire for non automatic weapons. */
 	virtual void StopFire();
@@ -197,10 +204,6 @@ public:
 	/** Sets the owner of the Weapon. */
 	void SetOwningPawn(ACrystallinePlayer* Owner);
 
-	/** Performs tick updates on the weapon, weapon specific. */
-	virtual void UpdateWeapon(float DeltaSeconds) PURE_VIRTUAL(ACrystallineWeapon::UpdateWeapon, );;
-
-
 	/* @return True if the weapon is able to be used, Base Class defaults to true.**/
 	virtual bool CanFire();
 
@@ -211,8 +214,6 @@ protected:
 
 	/** Uses the Weapon Ammo. */
 	virtual void UseAmmo() PURE_VIRTUAL(ACrystallineWeapon::UseAmmo, );
-
-
 
 	/** Attach the mesh to the owning pawn. */
 	void ACrystallineWeapon::AttachMeshToPawn();

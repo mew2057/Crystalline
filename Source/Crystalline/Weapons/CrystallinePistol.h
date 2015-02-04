@@ -72,14 +72,18 @@ class CRYSTALLINE_API ACrystallinePistol : public ACrystallineWeapon
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health)
 	uint32 bIsOverheated : 1;
 
+	/** Identifies if the pistol is in the overheated state, no shots are allowed. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Health)
+	uint32 bIsCoolingDown : 1;
+
 	////////////////////////////////////
 	// Overheat Mechanic
 	/** The current heat of the weapon, Zero at start.*/
 	UPROPERTY(Transient)
 	float WeaponHeat;
 
-	virtual void UpdateWeapon(float DeltaSeconds) override;
-
+	/** Updates the weapon on tick. Used for the heat mechanic.*/
+	virtual void Tick(float DeltaSeconds) override;
 protected:
 
 	/** Fires the pistol projectile. */
@@ -89,10 +93,17 @@ protected:
 	
 	virtual bool CanFire() override;
 
+	/** Fires a projectile on the server. */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerFireProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
+
+	
 
 	/////////////////////////////////////
 	// Overheat Mechanic
 	void HandleOverheatCooldown();
+
+	void FinishCooldown();
 
 	
 };

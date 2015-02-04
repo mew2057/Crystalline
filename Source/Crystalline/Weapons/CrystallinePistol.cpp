@@ -6,6 +6,7 @@
 ACrystallinePistol::ACrystallinePistol(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bIsOverheated = false;
+	bIsCoolingDown = false;
 	WeaponHeat    = 0.f;
 }
 
@@ -37,33 +38,16 @@ void ACrystallinePistol::FireWeapon()
 	// ECC_GameTraceChannel1 needs to be replaced with something that fits.
 	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, ECC_GameTraceChannel1, TraceParams);
 
-	// XXX this is blocking out how the projectile code will work.
-#pragma region Projectile
-
 	// This needs to be more robust for multi mesh solutions.
 	FVector Origin = Mesh1P->GetSocketLocation(MuzzleSocket);
 	FVector Direction = CamRot.Vector();
 
 	if (Hit.bBlockingHit)
-	{		
-		Direction = (Hit.ImpactPoint - Origin).SafeNormal();
-	} 	
-
-	// Determine the spawn point and create a bullet to fire.
-	FTransform BulletSpawn(Direction.Rotation(), Origin);
-
-	ACrystallineProjectile* Bullet = Cast<ACrystallineProjectile>(
-		UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn));
-		
-	if (Bullet)
 	{
-		Bullet->Instigator = Instigator;
-		Bullet->SetVelocity(Direction); // This ensures the behavior matches it's intended use case.
-		UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);
+		Direction = (Hit.ImpactPoint - Origin).SafeNormal();
 	}
 
-#pragma endregion
-
+	ServerFireProjectile(Origin, Direction);
 }
 
 void ACrystallinePistol::UseAmmo()
@@ -75,7 +59,9 @@ void ACrystallinePistol::UseAmmo()
 	if (WeaponHeat == ProjectileConfig.MaxHeat && !bIsOverheated)
 	{
 
-		bIsOverheated     = true;
+		bIsOverheated  = true;
+		bIsCoolingDown = false;
+
 
 		GetWorldTimerManager().SetTimer(this, 
 			&ACrystallinePistol::HandleOverheatCooldown, 
@@ -87,15 +73,21 @@ void ACrystallinePistol::HandleOverheatCooldown()
 {
 	// TODO: Auto resets, make ti go overtime.
 	bIsOverheated = false; 
-	WeaponHeat = 0.f;
+	bIsCoolingDown = true;
 
-	UE_LOG(LogTemp, Log, TEXT("OverHeat CLeared!"));
-
+	GetWorldTimerManager().SetTimer(this,
+		&ACrystallinePistol::FinishCooldown,
+		ProjectileConfig.MaxHeat/ProjectileConfig.CooldownPerSecond, false);
 }
 
 
+void ACrystallinePistol::FinishCooldown()
+{
+	bIsCoolingDown = false;
+}
 
-void ACrystallinePistol::UpdateWeapon(float DeltaSeconds)
+
+void ACrystallinePistol::Tick(float DeltaSeconds)
 {
 	if (!bIsOverheated)
 		WeaponHeat = FMath::Max(0.f,WeaponHeat - (ProjectileConfig.CooldownPerSecond * DeltaSeconds));
@@ -104,7 +96,30 @@ void ACrystallinePistol::UpdateWeapon(float DeltaSeconds)
 
 bool ACrystallinePistol::CanFire()
 {
-	return !(bIsOverheated );
+	return !(bIsOverheated || bIsCoolingDown);
 }
+
+bool ACrystallinePistol::ServerFireProjectile_Validate(FVector Origin, FVector_NetQuantizeNormal ShootDir)
+{
+	return true;
+}
+
+
+void ACrystallinePistol::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal ShootDir)
+{
+	// Determine the spawn point and create a bullet to fire.
+	FTransform BulletSpawn(ShootDir.Rotation(), Origin);
+	ACrystallineProjectile* Bullet = Cast<ACrystallineProjectile>(
+		UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn));
+
+	if (Bullet)
+	{
+		Bullet->Instigator = Instigator;		
+		Bullet->SetOwner(this);
+		Bullet->SetVelocity(ShootDir); // This ensures the behavior matches it's intended use case.
+		UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);
+	}
+}
+
 
 

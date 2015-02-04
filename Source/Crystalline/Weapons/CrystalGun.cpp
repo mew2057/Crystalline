@@ -17,8 +17,3 @@ bool ACrystalGun::CanFire()
 {
 	return false;
 }
-
-void ACrystalGun::UpdateWeapon(float DeltaSeconds)
-{
-
-}

@@ -16,8 +16,6 @@ class CRYSTALLINE_API ACrystallineAssualtRifle : public ACrystallineWeapon
 
 protected:
 
-	virtual void UpdateWeapon(float DeltaSeconds) override;
-
 	virtual bool CanFire() override;
 
 	/** Fires the Assault Rifle projectile. */

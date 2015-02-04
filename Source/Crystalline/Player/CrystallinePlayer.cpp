@@ -8,6 +8,25 @@
 ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrystallinePlayerMoveComponent>(ACharacter::CharacterMovementComponentName))
 {
+	// Create a CameraComponent	
+	FirstPersonCameraComponent = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FirstPersonCamera"));
+	FirstPersonCameraComponent->AttachParent = GetCapsuleComponent();
+	FirstPersonCameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
+	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+
+	// Creates a mesh component to be used in the first person view. This is edited in the blueprint.
+	Mesh1P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("CharacterMesh1P"));
+	Mesh1P->AttachParent = FirstPersonCameraComponent;
+	Mesh1P->bOnlyOwnerSee = false; // NOTE this should be true.
+	Mesh1P->bOwnerNoSee = false;
+	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -90); // Relative location of the mesh to the origin of the player.
+	Mesh1P->bCastDynamicShadow = false;
+	Mesh1P->CastShadow = false;
+	Mesh1P->bReceivesDecals = false;
+	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);
+
 	// Set the Collision Capsule Size (TODO hitbox!)
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -20,19 +39,6 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 
 	RunningSpeedModifier = 2.2f;
 
-	// Create a CameraComponent	
-	FirstPersonCameraComponent = ObjectInitializer.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->AttachParent = GetCapsuleComponent();
-	FirstPersonCameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
-
-	// Creates a mesh component to be used in the first person view. This is edited in the blueprint.
-	Mesh1P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(true);	// Only the owner of this mesh will see it.
-	Mesh1P->AttachParent = FirstPersonCameraComponent; // Sets the mesh as a child of the first person camera.
-	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -150.f); // Relative location of the mesh to the origin of the player.
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
 }
 
 void ACrystallinePlayer::PostInitializeComponents()
@@ -44,19 +50,11 @@ void ACrystallinePlayer::PostInitializeComponents()
 	{
 		SpawnInventory();
 	}
-	
 }
 
 void ACrystallinePlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
-	// Weapons.Num overhead?
-	for (int32 i = 0; i < Weapons.Num(); ++i)
-	{
-		// TODO a check?
-		//Weapons[i]->UpdateWeapon(DeltaSeconds);
-	}
 }
 
 
@@ -143,8 +141,6 @@ void ACrystallinePlayer::SetupPlayerInputComponent(class UInputComponent* InputC
 // Weapon Functions
 void ACrystallinePlayer::StartFire()
 {
-	UE_LOG(LogTemp, Log, TEXT("start fire"));
-
 	if (CurrentWeapon)
 	{
 		// TODO add more checks and networking stuff here.
@@ -154,8 +150,11 @@ void ACrystallinePlayer::StartFire()
 
 void ACrystallinePlayer::StopFire()
 {
-	UE_LOG(LogTemp, Log, TEXT("stop fire"));
-
+	if (CurrentWeapon)
+	{
+		// TODO add more checks and networking stuff here.
+		CurrentWeapon->StopFire();
+	}
 	 // TODO have a stop fire action.
 	 // Likey use Tick.
 }
@@ -274,9 +273,6 @@ void ACrystallinePlayer::SpawnInventory()
 
 	const int32 NumWeapons = DefaultWeaponClasses.Num();
 
-	UE_LOG(LogTemp, Log, TEXT("PreviousWeapon %d"), NumWeapons);
-
-
 	for (int32 i = 0; i < NumWeapons; ++i)
 	{
 		// If it exists spawn the weapon.
@@ -322,7 +318,8 @@ void ACrystallinePlayer::DestroyInventory()
 
 void ACrystallinePlayer::AddWeapon(ACrystallineWeapon* Weapon)
 {
-	if (Weapon)
+	// Only the Serever can add a weapon!
+	if (Weapon && Role == ROLE_Authority)
 	{
 		Weapons.AddUnique(Weapon);
 		Weapon->OnEnterInventory(this);
@@ -332,7 +329,8 @@ void ACrystallinePlayer::AddWeapon(ACrystallineWeapon* Weapon)
 
 void ACrystallinePlayer::RemoveWeapon(ACrystallineWeapon* Weapon)
 {
-	if (Weapon)
+	// Only the server can remove a weapon.
+	if (Weapon && Role == ROLE_Authority)
 	{
 		Weapon->OnExitInventory();
 		Weapons.RemoveSingle(Weapon);
@@ -363,7 +361,7 @@ bool ACrystallinePlayer::ServerEquipWeapon_Validate(ACrystallineWeapon* NewWeapo
 
 void ACrystallinePlayer::ServerEquipWeapon_Implementation(ACrystallineWeapon* NewWeapon)
 {
-	SetCurrentWeapon(NewWeapon);
+	EquipWeapon(NewWeapon);
 }
 
 void ACrystallinePlayer::SetCurrentWeapon(ACrystallineWeapon* NewWeapon, ACrystallineWeapon* LastWeapon)
@@ -384,10 +382,10 @@ void ACrystallinePlayer::SetCurrentWeapon(ACrystallineWeapon* NewWeapon, ACrysta
 		LocalLastWeapon->OnUnEquip();
 	}
 
+	CurrentWeapon = NewWeapon;
+
 	if (NewWeapon)
 	{
-		CurrentWeapon = NewWeapon;
-
 		CurrentWeapon->SetOwningPawn(this);
 		CurrentWeapon->OnEquip();
 	}

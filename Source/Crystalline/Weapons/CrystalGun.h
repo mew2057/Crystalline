@@ -13,9 +13,6 @@ class CRYSTALLINE_API ACrystalGun : public ACrystallineWeapon
 {
 	GENERATED_BODY()
 	
-	
-	virtual void UpdateWeapon(float DeltaSeconds) override;
-
 	virtual bool CanFire() override;
 
 	virtual void FireWeapon() override;
