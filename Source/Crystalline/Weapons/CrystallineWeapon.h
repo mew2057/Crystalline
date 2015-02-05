@@ -75,6 +75,14 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	FCanvasIcon WeaponIcon;
 	
+	/** Color for when the player has expended all of their available ammo for a clip.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FLinearColor  LowAmmoColor;
+
+	/** Color for when the player has expended none of their available ammo for a clip.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FLinearColor  FullAmmoColor;
+
 	/** The width of the ammo clip in pixels*/
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	float AmmoGuageWidth;

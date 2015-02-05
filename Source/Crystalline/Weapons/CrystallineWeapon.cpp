@@ -15,7 +15,7 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
 	RootComponent = Mesh1P;										 // Makes the first player mesh the root component.
-	LastFireTime  = 0.0f;
+	LastFireTime = 0.0f;
 
 	/** The default name of the Muzzle socket. */
 	MuzzleSocket = TEXT("MuzzleFlashSocket");
@@ -28,7 +28,12 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	bReplicates = true;
 	bReplicateInstigator = true;
 	bNetUseOwnerRelevancy = true;
+
+	// Default colors for the ammo readout.
+	LowAmmoColor = FLinearColor(1, 0, 0, 1);
+	FullAmmoColor = FLinearColor(0, 1, 0, 1);
 }
+
 
 void ACrystallineWeapon::PostInitializeComponents()
 {

@@ -20,13 +20,11 @@ void ACrystallineHUD::DrawHUD()
 	ScaleUIY = Canvas->ClipY / TARGET_Y_RESOLUTION;
 	//ScaleUIX = Canvas->ClipX / TARGET_X_RESOLUTION; XXX This may be needed in the future, we'll see how using only the Y for scaling works. -John
 
-
 	// Find center of the Canvas. XXX Does this need to be a vector? -John
 	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
 	ACrystallinePlayer* Pawn = Cast<ACrystallinePlayer>(GetOwningPawn());
 	if (Pawn)
 	{
-
 		ACrystallineWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
 		{
@@ -43,8 +41,7 @@ void ACrystallineHUD::DrawHUD()
 
 			DrawWeaponHUD();
 		}
-	}
-	
+	}	
 }
 
 
@@ -72,14 +69,26 @@ void ACrystallineHUD::DrawWeaponHUD()
 		// If the weapon uses cooldown ammo, then the way the icon is drawn varies.
 		if (CurrentWeapon->AmmoType == CrystallineAmmo::Cooldown)
 		{
-			Canvas->SetDrawColor(FColor::Red);	
-			AmmoIcon.UL = CurrentWeapon->AmmoGuageWidth * CurrentWeapon->GetClipPercent() + ICON_FUDGE;
+			const float Percent = CurrentWeapon->GetClipPercent();
+
+			// Determine the appropriate color for the guage.
+			Canvas->SetDrawColor(FMath::Lerp(CurrentWeapon->FullAmmoColor, CurrentWeapon->LowAmmoColor, Percent));
+
+			AmmoIcon.UL = CurrentWeapon->AmmoGuageWidth * Percent + ICON_FUDGE;
 			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 		}
 		else
 		{
-			Canvas->SetDrawColor(FColor::Blue);
 			// TODO this is going to need to do some offsetting I think.
+			const float Percent = CurrentWeapon->GetClipPercent();
+
+			// Determine the appropriate color for the guage.
+			Canvas->SetDrawColor(FMath::Lerp(CurrentWeapon->FullAmmoColor, CurrentWeapon->LowAmmoColor, Percent));
+
+			AmmoIcon.UL = -CurrentWeapon->AmmoGuageWidth * Percent + ICON_FUDGE;
+
+			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
+
 
 		}
 		

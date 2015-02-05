@@ -35,7 +35,7 @@ public:
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
 	float ScaleUIY;
-
+	
 	/** The horizontal scale factor of the UI Relative to 1920.*/
 	//float ScaleUIX; Commented for potential future usage. -John
 
