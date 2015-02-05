@@ -31,6 +31,8 @@ public:
 	/** Draws Information regarding the current game type.*/
 	void DrawGameInfo();
 
+	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
+	UFont* BigFont;
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/

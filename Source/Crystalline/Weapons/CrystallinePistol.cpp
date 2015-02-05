@@ -13,20 +13,55 @@ ACrystallinePistol::ACrystallinePistol(const FObjectInitializer& ObjectInitializ
 void ACrystallinePistol::FireWeapon()
 {
 	FVector StartTrace;
-	FRotator CamRot;
-	OwningPawn->Controller->GetPlayerViewPoint(StartTrace, CamRot);
+	FVector AimDir;
+	GetCameraDetails(StartTrace, AimDir);
 
-	FVector EndTrace = StartTrace + CamRot.Vector() * WeaponRange;
+	FVector EndTrace = StartTrace + AimDir * WeaponRange;
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 
 
 	// This needs to be more robust for multi mesh solutions.
-	FVector Origin = Mesh1P->GetSocketLocation(MuzzleSocket);
-	FVector Direction = CamRot.Vector();
+	FVector Origin = GetMuzzleLocation();
+	FVector Direction = AimDir;
 
 	if (Impact.bBlockingHit)
 	{
-		Direction = (Impact.ImpactPoint - Origin).SafeNormal();
+		FVector MuzzleDir = (Impact.ImpactPoint - Origin).SafeNormal();
+
+		bool bIntersecting = false;
+		float GunDot = FVector::DotProduct(MuzzleDir, Direction);
+
+		// If it's less than zero we're penetrating.
+		if (GunDot < 0.0f)
+		{
+			bIntersecting = true;
+		}
+		else if (GunDot < 0.5f) // If there's an angle there's a chance of penetration
+		{
+			// TOOD can shoot through walls in doorways.
+			// XXX the 150 may change.
+			FVector WeaponTraceStart = Origin - GetMuzzleRotation() * 200.f;
+
+			bIntersecting = WeaponTrace(WeaponTraceStart, Origin).bBlockingHit;
+
+			// Basically the check finds the gun intersection.
+			//				____________	
+			//				|/
+			//			    / (Gun)
+			//	(Gun Inter)*|
+			//				|
+			//				|
+		}
+
+		if (bIntersecting)
+		{
+			Origin = Impact.ImpactPoint;
+		}
+		else 
+		{
+			Direction = MuzzleDir;
+		}
+
 	}
 
 	ServerFireProjectile(Origin, Direction);

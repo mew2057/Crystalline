@@ -40,8 +40,9 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 	RunningSpeedModifier = 2.2f;
 
 
-	BaseHealth = 100;
-	MaxHealth = 100;
+	BaseHealth = 100.0f;
+	MaxHealth = 100.0f;
+	Health = BaseHealth;
 	bAlive = true;
 
 }
@@ -187,7 +188,6 @@ void ACrystallinePlayer::OnReload()
 {
 	// Check if the gun can reload.
 		// Reload.
-	UE_LOG(LogTemp, Log, TEXT("reload"));
 
 }
 
@@ -449,3 +449,14 @@ void ACrystallinePlayer::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 
 
 //////////////////////////////////////////////////////////////////////////
+
+
+float ACrystallinePlayer::GetHealth() const
+{
+	return Health;
+}
+
+float ACrystallinePlayer::GetMaxHealth() const
+{
+	return MaxHealth;
+}

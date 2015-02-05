@@ -391,3 +391,33 @@ FHitResult ACrystallineWeapon::WeaponTrace(const FVector& TraceFrom, const FVect
 	return Hit;
 }
 
+
+FVector ACrystallineWeapon::GetMuzzleLocation() const
+{
+	// TODO Mesh for not locally controlled.
+
+	return Mesh1P->GetSocketLocation(MuzzleSocket);
+}
+
+FVector ACrystallineWeapon::GetMuzzleRotation() const
+{
+	// TODO Mesh for not locally controlled.
+		return Mesh1P->GetSocketRotation(MuzzleSocket).Vector();
+}
+
+//FIXME for AI.
+void ACrystallineWeapon::GetCameraDetails(FVector& Origin, FVector& Aim) const
+{
+	// Zero the origin and aim  in case of failure.
+	Origin = FVector::ZeroVector;
+	Aim    = FVector::ZeroVector;
+	AController* Controller = Instigator ? Instigator->Controller : NULL;
+
+	if (Controller)
+	{
+		FRotator TempRot;
+		Controller->GetPlayerViewPoint(Origin, TempRot);
+
+		Aim = TempRot.Vector();
+	}
+}

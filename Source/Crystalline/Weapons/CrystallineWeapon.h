@@ -267,6 +267,9 @@ public:
 	/** Sets the owner of the Weapon. */
 	void SetOwningPawn(ACrystallinePlayer* Owner);
 
+	/**Returns camera information through the parameters. */
+	void GetCameraDetails(FVector& Origin, FVector& Aim) const;
+
 	/* @return True if the weapon is able to be used, Base Class defaults to true.**/
 	virtual bool CanFire();
 
@@ -276,6 +279,12 @@ public:
 
 	/** Returns a number 0..1 representing how much of the clip has been used. (0 is none, 1 is everything).*/
 	virtual float GetClipPercent() const;
+
+
+	FVector GetMuzzleLocation() const; 
+
+	FVector GetMuzzleRotation() const;
+
 
 protected:
 	

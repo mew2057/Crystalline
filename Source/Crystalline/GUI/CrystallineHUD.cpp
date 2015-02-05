@@ -8,6 +8,9 @@
 
 ACrystallineHUD::ACrystallineHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	// TODO REPLACE THIS FONT!
+	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
+	BigFont = BigFontOb.Object;
 }
 
 
@@ -25,6 +28,8 @@ void ACrystallineHUD::DrawHUD()
 	ACrystallinePlayer* Pawn = Cast<ACrystallinePlayer>(GetOwningPawn());
 	if (Pawn)
 	{
+		DrawHealth();
+
 		ACrystallineWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
 		{
@@ -96,29 +101,6 @@ void ACrystallineHUD::DrawWeaponHUD()
 
 		WeaponIcon = CurrentWeapon->WeaponIcon;
 		Canvas->DrawIcon(WeaponIcon, 40, 20, ScaleUIY);
-
-
-		// Apparently tileItem will work
-		/*
-		FCanvasTileItem TileItem(
-			WeaponIcon-
-			
-			FLinearColor::White);
-			*/	
-		/*
-		UPROPERTY(EditDefaultsOnly, Category = HUD)
-			FCanvasIcon AmmoGuageBGIcon;
-
-		UPROPERTY(EditDefaultsOnly, Category = HUD)
-			FCanvasIcon AmmoGuageFGIcon;
-		*/
-
-		/*
-		
-
-		Canvas->DrawIcon(CrosshairIcon,
-			(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f) ),
-			(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f) +  200), ScaleUIY);*/
 	}
 
 
@@ -138,6 +120,25 @@ void ACrystallineHUD::DrawWeaponHUD()
 
 void ACrystallineHUD::DrawHealth()
 {
+	ACrystallinePlayer* Pawn = Cast<ACrystallinePlayer>(GetOwningPawn());
+
+	// TODO replace this!
+	// Write a text function.
+	float SizeX, SizeY;
+	FString Text = FString::SanitizeFloat(Pawn->GetHealth());
+	
+	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);	
+	TextItem.EnableShadow(FLinearColor::Black);
+	Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+
+	const float TopTextScale = 0.73f; // of 51pt font
+
+	TextItem.Text = FText::FromString(Text);
+	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
+	//TextItem.FontRenderInfo = ShadowedFont;
+
+	Canvas->DrawItem(TextItem, 100,100);
+
 
 }
 

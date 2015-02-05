@@ -17,19 +17,20 @@ void ACrystallineAssualtRifle::FireWeapon()
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
 	FVector StartTrace;
-	FRotator CamRot;
-	OwningPawn->Controller->GetPlayerViewPoint(StartTrace, CamRot);
+	FVector AimDir;
+	GetCameraDetails(StartTrace, AimDir);
 
 	// Adds variation to the bullet.
-	FVector ShootDir = WeaponRandomStream.VRandCone(CamRot.Vector(), HSpreadCurrent, VSpreadCurrent);
+	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpreadCurrent, VSpreadCurrent);
 
 	// Specify the end point for the weapon's fire.
-	FVector EndTrace = StartTrace + CamRot.Vector() * WeaponRange;
+	FVector EndTrace = StartTrace + AimDir * WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 
 	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, VSpreadCurrent, HSpreadCurrent);
+	UE_LOG(LogTemp, Log, TEXT("FIRE"));
 
 	// Update the spread for the weapon.
 	HSpreadCurrent = FMath::Min(HSpreadMax, HSpreadCurrent + HSpreadIncrement);
@@ -43,7 +44,7 @@ void ACrystallineAssualtRifle::UseAmmo()
 
 bool ACrystallineAssualtRifle::CanFire()
 {
-	return false;
+	return true;
 }
 
 
@@ -57,6 +58,13 @@ void ACrystallineAssualtRifle::ServerNotifyHit_Implementation(const FHitResult I
 	// Do Stuff in here
 	// TODO read and re-read the example in ShooterWeapon_Instant.
 
+	// If the weapon has an instigator and we hit.
+	if (Instigator && Impact.bBlockingHit)
+	{
+		ProcessHitScan_Confirmed(Impact, GetMuzzleLocation(), ShootDir, RandomSeed, VSpread, HSpread);
+		// TODO add cheat checking
+	}
+
 }
 
 bool ACrystallineAssualtRifle::ServerNotifyMiss_Validate(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float VSpread, float HSpread)
@@ -66,9 +74,21 @@ bool ACrystallineAssualtRifle::ServerNotifyMiss_Validate(FVector_NetQuantizeNorm
 
 void ACrystallineAssualtRifle::ServerNotifyMiss_Implementation(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float VSpread, float HSpread)
 {
-	// TODO Implement
+	const FVector Origin = GetMuzzleLocation();
 
-	// TODO make a hit notify and play the trail effect.
+	// play FX on remote clients
+	HitNotify.Origin = Origin;
+	HitNotify.RandSeed = RandomSeed;
+	HitNotify.VSpread = VSpread;
+	HitNotify.HSpread = HSpread;
+
+	// play FX locally
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		const FVector EndTrace = Origin + ShootDir * WeaponRange;
+		SpawnTrailEffect(EndTrace);
+	}
+	
 }
 
 void ACrystallineAssualtRifle::ProcessHitScan(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float VSpread, float HSpread)
@@ -96,5 +116,151 @@ void ACrystallineAssualtRifle::ProcessHitScan(const FHitResult& Impact, const FV
 
 	// Locally handle hit confirmation.
 	// This will deal damage and ouput the FX.
+	ProcessHitScan_Confirmed(Impact, Origin, ShootDir, RandSeed, VSpread, HSpread);
+
+}
+
+void ACrystallineAssualtRifle::ProcessHitScan_Confirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float VSpread, float HSpread)
+{
+	UE_LOG(LogTemp, Log, TEXT("HITCONFIRMED"));
+
+	// Deal Damage.
+	if (ShouldDealDamage(Impact.GetActor()))
+	{
+		DealDamage(Impact, ShootDir);
+	}
+	// Play FX
+
+	// This will trigger an OnRep that will prop to remote clients
+	if (Role == ROLE_Authority)
+	{
+		HitNotify.Origin = Origin;
+		HitNotify.RandSeed = RandSeed;
+		HitNotify.VSpread = VSpread;
+		HitNotify.HSpread = HSpread;
+	}
+
+
+	// Plays the local FX.
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		FVector EndPoint = Impact.GetActor() ? Impact.ImpactPoint : Origin + ShootDir * WeaponRange;
+
+		// Do spawning here.
+		SpawnTrailEffect(EndPoint);
+		SpawnImpactEffects(Impact);
+	}
+}
+
+
+void ACrystallineAssualtRifle::SpawnTrailEffect(const FVector& EndPoint)
+{
+	if (TrailFX)
+	{
+		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(this, TrailFX, GetMuzzleLocation());
+
+		if (TrailPSC)
+		{
+			// Set the vector for the particle.
+			TrailPSC->SetVectorParameter(TrailTargetParam, EndPoint);
+		}
+	}
+}
+
+void ACrystallineAssualtRifle::SpawnImpactEffects(const FHitResult& Impact)
+{
+	// TODO.
+	// Check for valid impact.
+	if (Impact.bBlockingHit)
+	{
+		FHitResult ValidImpact = Impact;
+
+		// If the impact is invalid, we need to refire.
+		if (!Impact.Component.IsValid())
+		{
+			// Recomputes the impact with a small trace.
+			const FVector StartTrace = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
+			const FVector EndTrace = Impact.ImpactPoint - Impact.ImpactNormal * 10.0f;
+			FHitResult Hit = WeaponTrace(StartTrace, EndTrace);
+			ValidImpact = Hit;
+		}
+
+		// Spawn the impact effect.
+		// TODO Implement the impact effect system.
+
+	}
+}
+
+void ACrystallineAssualtRifle::SimulateHitScan(const FVector& Origin, int32 RandomSeed, float VSpread, float HSpread)
+{
+	FRandomStream WeaponRandomStream(RandomSeed);
+	
+	FVector StartTrace;
+	FVector AimDir;
+	GetCameraDetails(StartTrace, AimDir);
+
+	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpread, VSpread);
+	const FVector EndTrace = StartTrace + AimDir * WeaponRange;
+
+	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
+	FHitResult Impact = WeaponTrace(Origin, EndTrace);
+
+	if (Impact.bBlockingHit)
+	{
+		SpawnTrailEffect(EndTrace);
+		SpawnImpactEffects(Impact);
+	}
+	else
+	{
+		SpawnTrailEffect(EndTrace);
+	}
+}
+
+void ACrystallineAssualtRifle::DealDamage(const FHitResult& Impact, const FVector& ShootDir)
+{
+	FPointDamageEvent PointDmg;
+	PointDmg.DamageTypeClass = DamageType;
+	PointDmg.HitInfo = Impact;
+	PointDmg.ShotDirection = ShootDir;
+	PointDmg.Damage = HitDamage;
+
+	Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, OwningPawn->Controller, this);
+
+	UE_LOG(LogTemp, Log, TEXT("DAMAGE"));
+
+}
+
+
+bool ACrystallineAssualtRifle::ShouldDealDamage(AActor* TestActor) const
+{
+	// Only deal damage if the actor exists.
+	if (TestActor)
+	{
+		// If this is the server, or we have authority over the other actor, OR if the actor is not being replicated.
+		if (GetNetMode() != NM_Client ||
+			TestActor->Role == ROLE_Authority ||
+			TestActor->bTearOff)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
+void ACrystallineAssualtRifle::ONRep_HitNotify()
+{
+	// Simulate the hit.
+	SimulateHitScan(HitNotify.Origin, HitNotify.RandSeed, HitNotify.VSpread, HitNotify.HSpread);
+}
+
+void ACrystallineAssualtRifle::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// The owner doesn't need the replication because they already applied it.
+	DOREPLIFETIME_CONDITION(ACrystallineAssualtRifle, HitNotify, COND_SkipOwner);
 }
 

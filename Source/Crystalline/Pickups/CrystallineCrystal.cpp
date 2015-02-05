@@ -4,7 +4,7 @@
 #include "CrystallineCrystal.h"
 
 
-ACrystallineCrystal::ACrystallineCrystal(const class FPostConstructInitializeProperties& PCIP) : Super(PCIP)
+ACrystallineCrystal::ACrystallineCrystal(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	//TODO Stuff
 }

@@ -159,6 +159,15 @@ protected:
 	uint32 bAlive : 1;
 #pragma endregion
 
+#pragma region Functions
+
+	public:
+		float GetHealth() const;
+
+		float GetMaxHealth() const;
+
+#pragma endregion
+
 #pragma endregion
 
 // I'm not a Fan of "God classes", but I'd rather not wrestle with the editor too much. -John
