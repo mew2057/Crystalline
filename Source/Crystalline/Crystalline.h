@@ -9,6 +9,7 @@
 #include "Player/CrystallinePlayer.h"
 #include "Projectiles/CrystallineProjectile.h"
 #include "Weapons/CrystallineWeapon.h"
+#include "Weapons/CrystalGun.h"
 
 
 #define COLLISION_PROJECTILE ECC_GameTraceChannel1

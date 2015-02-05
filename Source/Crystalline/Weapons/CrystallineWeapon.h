@@ -6,6 +6,9 @@
 #include "Engine/Canvas.h"			/** Needed to include the canvas to get FCanvasIcon accessible in the weapon configuration. */
 #include "CrystallineWeapon.generated.h"
 
+/** A special tag for generic weapon traces. */
+#define WEAPON_TRACE_TAG FName("WeaponTrace")
+
 UENUM()
 namespace CrystallineWeaponState
 {
@@ -135,6 +138,11 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	//UPROPERTY(EditDefaultsOnly, Category = Effects)
 	//UParticleSystem* WeaponTrail;
 
+	////////////////////////////
+	// SFX
+	UPROPERTY(Transient)
+	UAudioComponent* FireAudioComponent;
+
 	// NOTE: Impact needs to be defined in the child classes.
 
 	/** The pawn holding the weapon. */
@@ -152,6 +160,44 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	UPROPERTY(Transient)
 	uint32 bWantsToFire : 1;
 	
+	// TODO move this section into a Struct.
+
+	/** If true the HandleFire Routine will call itself. */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	uint32 bAutomaticFire : 1;
+
+	/** The maximum Horizontal spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float HSpreadMax;
+
+	/** The base Horizontal spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float HSpreadBase;
+	/** The increment for the horizontal spread each fire.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float HSpreadIncrement;
+
+	/** The maximum Vertical spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float VSpreadMax;
+
+	/** The base Vertical spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float VSpreadBase;
+
+	/** The increment for the vertical spread each fire.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float VSpreadIncrement;
+
+	float HSpreadCurrent;
+	float VSpreadCurrent;
+
+	// This is common hitcast stuff!
+	// TODO move to a struct defined in CrystallineWeapon
+	/** The range the weapon is usable at.*/
+	UPROPERTY(EditDefaultsOnly, Category = FireConfig)
+	float WeaponRange;
+
 
 
 #pragma endregion
@@ -181,8 +227,6 @@ public:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopReload();
 
-
-
 	UFUNCTION()
 	void OnRep_OwningPawn();
 	////////////////////////////
@@ -195,6 +239,8 @@ public:
 	virtual void StopBurst();
 
 	virtual void SimulateWeaponFire();
+
+	virtual void StopWeaponFireSimulation();
 
 	/** [server] handles the weapon fire and ammo update.*/
 	UFUNCTION(reliable, server, WithValidation)
@@ -229,7 +275,7 @@ public:
 	// HUD Helper
 
 	/** Returns a number 0..1 representing how much of the clip has been used. (0 is none, 1 is everything).*/
-	virtual float GetClipPercent();
+	virtual float GetClipPercent() const;
 
 protected:
 	
@@ -244,6 +290,9 @@ protected:
 
 	/** Detach the mesh from the owning pawn. */
 	void ACrystallineWeapon::DetachMeshFromPawn();
+
+	FHitResult WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const;
+
 
 #pragma endregion
 

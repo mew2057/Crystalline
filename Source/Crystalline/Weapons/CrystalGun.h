@@ -18,7 +18,4 @@ class CRYSTALLINE_API ACrystalGun : public ACrystallineWeapon
 	virtual void FireWeapon() override;
 
 	virtual void UseAmmo() override;
-
-
-	
 };

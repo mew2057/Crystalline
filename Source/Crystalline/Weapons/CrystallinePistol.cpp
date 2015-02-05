@@ -12,39 +12,21 @@ ACrystallinePistol::ACrystallinePistol(const FObjectInitializer& ObjectInitializ
 
 void ACrystallinePistol::FireWeapon()
 {
-	// XXX THIS CODE IS DIIIIRTY!
-	// TODO clean this and compartmentalize it to functions.
-	// Not sure if this will work.
-	ACrystallinePlayer* Pawn = Cast<ACrystallinePlayer>(OwningPawn);
-
 	FVector StartTrace;
 	FRotator CamRot;
-	Pawn->Controller->GetPlayerViewPoint(StartTrace, CamRot);
+	OwningPawn->Controller->GetPlayerViewPoint(StartTrace, CamRot);
 
-	//FVector StartTrace2 = StartTrace + CamRot.Vector() * ((OwningPawn->GetActorLocation() - StartTrace) | CamRot.Vector());
-	// TODO remove magic number.
-	FVector EndTrace = StartTrace + CamRot.Vector() * 10000.0f;
+	FVector EndTrace = StartTrace + CamRot.Vector() * WeaponRange;
+	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 
-	// Trace Parameters, these should be relatively static, so maybe declare once per weapon? -John
-
-	const FName TraceTag("MyTraceTag");
-
-	FCollisionQueryParams TraceParams = FCollisionQueryParams(TraceTag, true, OwningPawn);
-	TraceParams.bTraceAsyncScene = true;
-	TraceParams.bReturnPhysicalMaterial = true;
-
-	FHitResult Hit(ForceInit);
-
-	// ECC_GameTraceChannel1 needs to be replaced with something that fits.
-	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, ECC_GameTraceChannel1, TraceParams);
 
 	// This needs to be more robust for multi mesh solutions.
 	FVector Origin = Mesh1P->GetSocketLocation(MuzzleSocket);
 	FVector Direction = CamRot.Vector();
 
-	if (Hit.bBlockingHit)
+	if (Impact.bBlockingHit)
 	{
-		Direction = (Hit.ImpactPoint - Origin).SafeNormal();
+		Direction = (Impact.ImpactPoint - Origin).SafeNormal();
 	}
 
 	ServerFireProjectile(Origin, Direction);
@@ -120,7 +102,7 @@ void ACrystallinePistol::ServerFireProjectile_Implementation(FVector Origin, FVe
 }
 
 
-float ACrystallinePistol::GetClipPercent()
+float ACrystallinePistol::GetClipPercent() const
 {
 	return WeaponHeat / ProjectileConfig.MaxHeat;
 }

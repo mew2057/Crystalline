@@ -29,6 +29,9 @@ protected:
 	/** Updates the character on tick. */
 	virtual void Tick(float DeltaSeconds) override;
 
+	/** Applies damage to the player. */
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
 
 #pragma endregion
 
@@ -138,6 +141,26 @@ protected:
 #pragma endregion
 
 
+#pragma region PlayerState
+
+#pragma region Fields
+	/** The starting health for the player.*/
+	UPROPERTY(EditDefaultsOnly, Category=PlayerState)
+	float BaseHealth;
+
+	/** The maximum health the player may have. */
+	UPROPERTY(EditDefaultsOnly, Category = PlayerState)
+	float MaxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = PlayerState)
+	float Health;
+
+	/** Keeps track of the player's continued existance. */
+	uint32 bAlive : 1;
+#pragma endregion
+
+#pragma endregion
+
 // I'm not a Fan of "God classes", but I'd rather not wrestle with the editor too much. -John
 #pragma region Inventory
 
@@ -163,6 +186,7 @@ protected:
 	/** The index of the currently equipped weapon. */
 	uint32 WeaponIndex;
 	
+#pragma endregion
 
 #pragma region Functions
 public:
@@ -210,6 +234,8 @@ protected:
 
 	
 
+
+#pragma endregion
 
 #pragma endregion
 

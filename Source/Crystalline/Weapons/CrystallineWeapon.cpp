@@ -32,6 +32,7 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	// Default colors for the ammo readout.
 	LowAmmoColor = FLinearColor(1, 0, 0, 1);
 	FullAmmoColor = FLinearColor(0, 1, 0, 1);
+	WeaponRange = 10000.0f;
 }
 
 
@@ -47,7 +48,21 @@ void ACrystallineWeapon::PostInitializeComponents()
 	{
 		AmmoGuageWidth = AmmoGuageFGIcon.UL;
 	}
+	//////////////////////////////////
+	// Initialize the spread factor.
+
+	// Halve the spread and convert to radians for the random cone.
+	HSpreadMax       = FMath::DegreesToRadians(HSpreadMax * 0.5f);
+	HSpreadBase      = FMath::DegreesToRadians(HSpreadBase * 0.5f);
+	HSpreadCurrent   = HSpreadBase;
+	HSpreadIncrement = FMath::DegreesToRadians(HSpreadIncrement * 0.5f);
+
+	VSpreadMax       = FMath::DegreesToRadians(VSpreadMax * 0.5f);
+	VSpreadBase      = FMath::DegreesToRadians(VSpreadBase * 0.5f);
+	VSpreadCurrent   = VSpreadBase;
+	VSpreadIncrement = FMath::DegreesToRadians(VSpreadIncrement * 0.5f);
 }
+
 
 void ACrystallineWeapon::StartFire()
 {	
@@ -99,7 +114,13 @@ void ACrystallineWeapon::HandleFire()
 		}
 		// Trigger a reload if needed.
 
+		// If this is an automatic weapon fire continue firing in TimeBetweenShots seconds.
+		if (bAutomaticFire)
+		{
+			GetWorldTimerManager().SetTimer(this, &ACrystallineWeapon::HandleFire, TimeBetweenShots, false);
+		}
 
+		
 	}
 
 	LastFireTime = GetWorld()->GetTimeSeconds();
@@ -115,8 +136,9 @@ void ACrystallineWeapon::SimulateWeaponFire()
 
 
 	// The sound effect.
-	if (FireSound)
+	if (FireSound )
 	{
+		//FireAudioComponent=
 		UGameplayStatics::PlaySoundAttached(FireSound, GetRootComponent());
 	}
 
@@ -126,14 +148,30 @@ void ACrystallineWeapon::SimulateWeaponFire()
 		const FVector FlashPoint = Mesh1P->GetSocketLocation(MuzzleSocket);
 
 		MuzzleFlashComp = UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh1P, MuzzleSocket);
-		//// TODO CONFIGURE THIS!
-		//
-		//MuzzleFlashComp->bOwnerNoSee = false;
-		//MuzzleFlashComp->bOnlyOwnerSee = true;
-		//
+		// TODO CONFIGURE THIS!
+		
+		MuzzleFlashComp->bOwnerNoSee = false;
+		MuzzleFlashComp->bOnlyOwnerSee = false;		
 	}
 
 }
+
+void ACrystallineWeapon::StopWeaponFireSimulation()
+{
+	// Clean up the components.
+	if (MuzzleFlashComp != NULL)
+	{
+		MuzzleFlashComp->DeactivateSystem();
+		MuzzleFlashComp = NULL;
+	}
+
+	if (FireAudioComponent)
+	{
+		FireAudioComponent->FadeOut(0.1f, 0.0f);
+		FireAudioComponent = NULL;
+	}
+}
+
 
 
 void ACrystallineWeapon::StartBurst()
@@ -156,16 +194,24 @@ void ACrystallineWeapon::StopBurst()
 {
 	GetWorldTimerManager().ClearTimer(this, &ACrystallineWeapon::HandleFire);
 	// Cancel weapon simulations.
+
+	// Since the server already doesn't simluate weapon visuals they don't need to Stop them.
+	// XXX is the ROLE check appropriate here? -John
+	// FIXME this is still not quite ready.
+	//if (GetNetMode() != NM_DedicatedServer)
+	//{
+	//	StopWeaponFireSimulation();
+	//}
+
+	// Reset the spread to the baseline.
+	HSpreadCurrent = HSpreadBase;
+	VSpreadCurrent = VSpreadBase;
 }
 
 bool ACrystallineWeapon::CanFire()
 {
 	return true;
 }
-
-
-
-
 #pragma region Inventory_Related
 
 void ACrystallineWeapon::OnEnterInventory(ACrystallinePlayer* NewOwner)
@@ -328,9 +374,20 @@ void ACrystallineWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 
 }
 
-float ACrystallineWeapon::GetClipPercent()
+float ACrystallineWeapon::GetClipPercent() const
 {
 	return 0.0f;
 }
 
+FHitResult ACrystallineWeapon::WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const
+{
+	FCollisionQueryParams TraceParams = FCollisionQueryParams(WEAPON_TRACE_TAG, true, OwningPawn);
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = true;
+
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingle(Hit, TraceFrom, TraceTo, COLLISION_WEAPON, TraceParams);
+
+	return Hit;
+}
 

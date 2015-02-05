@@ -89,7 +89,6 @@ void ACrystallineHUD::DrawWeaponHUD()
 
 			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 
-
 		}
 		
 

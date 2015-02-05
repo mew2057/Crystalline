@@ -39,6 +39,11 @@ ACrystallinePlayer::ACrystallinePlayer(const FObjectInitializer& ObjectInitializ
 
 	RunningSpeedModifier = 2.2f;
 
+
+	BaseHealth = 100;
+	MaxHealth = 100;
+	bAlive = true;
+
 }
 
 void ACrystallinePlayer::PostInitializeComponents()
@@ -55,6 +60,25 @@ void ACrystallinePlayer::PostInitializeComponents()
 void ACrystallinePlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+}
+
+
+float ACrystallinePlayer::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	// TODO make this mean something
+	//// Modify based on game rules.
+	//AShooterGameMode* const Game = GetWorld()->GetAuthGameMode<AShooterGameMode>();
+	//Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
+
+	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	if (ActualDamage > 0.f)
+	{
+		Health -= ActualDamage;
+
+		bAlive = Health > 0;
+	}
+
+	return ActualDamage;
 }
 
 
@@ -419,6 +443,7 @@ void ACrystallinePlayer::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 
 	// Everyone.
 	DOREPLIFETIME(ACrystallinePlayer, CurrentWeapon);
+	DOREPLIFETIME(ACrystallinePlayer, Health);
 }
 
 
