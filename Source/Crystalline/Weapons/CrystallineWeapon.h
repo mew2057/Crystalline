@@ -94,7 +94,7 @@ struct FWeaponConfigData
 		////////////////////////////////
 		// Fire settings.
 		bAutomaticFire   = false;		
-		WeaponRange      = 1000.f;
+		WeaponRange      = 10000.f;
 		AmmoType         = CrystallineAmmo::Cooldown;
 		
 		////////////////////////////////
@@ -277,7 +277,13 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	/** Keeps track of player attempting to shoot.*/
 	UPROPERTY(Transient)
 	uint32 bWantsToFire : 1;
-	
+
+
+	////////////////////////////
+	// Replicated Variables
+
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_BurstCounter)
+	int32 BurstCounter;
 	
 
 
@@ -395,6 +401,10 @@ protected:
 
 	FHitResult WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const;
 
+
+	/** Replicates the fire simulation .*/
+	UFUNCTION()
+	void OnRep_BurstCounter();
 
 #pragma endregion
 

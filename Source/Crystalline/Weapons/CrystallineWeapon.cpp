@@ -30,7 +30,7 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	
 
 	LastFireTime = 0.0f;
-
+	BurstCounter = 0;
 }
 
 
@@ -91,8 +91,10 @@ void ACrystallineWeapon::HandleFire()
 		return;
 	}
 
-	// IFF we can fire.
-	SimulateWeaponFire();
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		SimulateWeaponFire();
+	}
 
 
 	// TODO AmmoCheck
@@ -101,6 +103,7 @@ void ACrystallineWeapon::HandleFire()
 	{
 		FireWeapon();
 		UseAmmo();
+		BurstCounter++;
 	}
 
 
@@ -359,9 +362,27 @@ void ACrystallineWeapon::OnRep_OwningPawn()
 	}
 }
 
+
+void ACrystallineWeapon::OnRep_BurstCounter()
+{
+	if (BurstCounter > 0)
+	{
+		SimulateWeaponFire();
+	}
+	else
+	{
+		StopWeaponFireSimulation();
+	}
+
+}
+
+
 void ACrystallineWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Owner doesn't need the replication.
+	DOREPLIFETIME_CONDITION(ACrystallineWeapon, BurstCounter, COND_SkipOwner);
 
 	// Replicated across all players.
 	DOREPLIFETIME(ACrystallineWeapon, OwningPawn);
@@ -438,3 +459,4 @@ FVector ACrystallineWeapon::GetMuzzleRotation() const
 
 
 ////////////////////////////////////////////////////////
+// Replication
