@@ -55,10 +55,15 @@ void ACrystallineProjectile::OnImpact(const FHitResult& Hit)
 {
 	if (Role == ROLE_Authority)
 	{
-		Destroy();
-		MovementComp->StopMovementImmediately();
+		ProcessImpact(Hit);
+		PrepForDestroy();
 	}
 	
+	
+}
+
+void ACrystallineProjectile::ProcessImpact(const FHitResult& Hit)
+{
 	if (Hit.GetActor())
 	{
 		FPointDamageEvent PointDmg;
@@ -81,6 +86,12 @@ void ACrystallineProjectile::OnImpact(const FHitResult& Hit)
 	}*/
 }
 
+void ACrystallineProjectile::PrepForDestroy()
+{
+	MovementComp->StopMovementImmediately();
+	Destroy();
+}
+
 void ACrystallineProjectile::SetVelocity(FVector Direction)
 {
 	if (MovementComp)
@@ -96,8 +107,35 @@ void ACrystallineProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
 		MovementComp->Velocity = NewVelocity;
 	}
 }
-/*
+
+void ACrystallineProjectile::OnRep_Impacted()
+{
+	//////////////////////////////////////////////////////////
+	// TODO make sure this works on sub instances (borrowed from the unreal example).
+	FVector ProjDirection = GetActorRotation().Vector();
+
+	const FVector StartTrace = GetActorLocation() - ProjDirection * 100;
+	const FVector EndTrace = GetActorLocation() + ProjDirection * 100;
+	FHitResult Impact;
+
+	// This ensures we get the surface data (assuming the explosion worked).
+	if (!GetWorld()->LineTraceSingle(Impact, StartTrace, EndTrace, COLLISION_PROJECTILE, FCollisionQueryParams(TEXT("ProjectileClient"), true, Instigator)))
+	{
+		// This is missing surface data which is important for things having sounds matching a particular surface tpe.
+		Impact.ImpactPoint = GetActorLocation();
+		Impact.ImpactNormal = -ProjDirection;
+	}
+
+	//////////////////////////////////////////////////////////
+
+	ProcessImpact(Impact);
+}
+
 void ACrystallineProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}*/
+
+	// Replicates to all.
+	DOREPLIFETIME(ACrystallineProjectile, bImpacted);
+
+}

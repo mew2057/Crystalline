@@ -127,18 +127,17 @@ void ACrystallineWeapon::HandleFire()
 
 void ACrystallineWeapon::SimulateWeaponFire()
 {
-	// EARLY RETURN: The Server shouldn't play these effects.
-	if (Role == ROLE_Authority )
+	// EARLY RETURN: The Server shouldn't play these effects, if it isn't firing (You misread this one john).
+	/*if(Role == ROLE_Authority )
 	{
 		return;
 	}
-
+	*/
 
 	// The sound effect.
 	if (WeaponFXConfig.FireSound)
 	{
-		//FireAudioComponent=
-		UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
+		FireAudioComponent=	UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
 	}
 
 	// Muzzle Flash
@@ -156,6 +155,7 @@ void ACrystallineWeapon::SimulateWeaponFire()
 
 void ACrystallineWeapon::StopWeaponFireSimulation()
 {
+
 	// Clean up the components.
 	if (MuzzleFlashComp != NULL)
 	{
@@ -163,6 +163,8 @@ void ACrystallineWeapon::StopWeaponFireSimulation()
 		MuzzleFlashComp = NULL;
 	}
 
+	// TODO Configure this more when we actually have audio.
+	
 	if (FireAudioComponent)
 	{
 		FireAudioComponent->FadeOut(0.1f, 0.0f);
@@ -182,23 +184,23 @@ void ACrystallineWeapon::StartBurst()
 	}
 	else
 	{
-
 		HandleFire();
 	}
 }
 
 void ACrystallineWeapon::StopBurst()
 {
-	GetWorldTimerManager().ClearTimer(this, &ACrystallineWeapon::HandleFire);
-	// Cancel weapon simulations.
 
-	// Since the server already doesn't simluate weapon visuals they don't need to Stop them.
-	// XXX is the ROLE check appropriate here? -John
-	// FIXME this is still not quite ready.
-	//if (GetNetMode() != NM_DedicatedServer)
-	//{
-	//	StopWeaponFireSimulation();
-	//}
+	// This will stop FX on remote clients.
+	BurstCounter = 0;
+
+	GetWorldTimerManager().ClearTimer(this, &ACrystallineWeapon::HandleFire);
+
+	// This will stop weapon effects locally.
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		StopWeaponFireSimulation();
+	}
 
 	// Reset the spread to the baseline.
 	HSpreadCurrent = WeaponConfig.HSpreadBase;
@@ -283,6 +285,8 @@ void ACrystallineWeapon::ServerHandleFire_Implementation()
 {
 	HandleFire();
 // Ammo Update?
+
+	BurstCounter++;
 }
 
 bool ACrystallineWeapon::ServerHandleFire_Validate()

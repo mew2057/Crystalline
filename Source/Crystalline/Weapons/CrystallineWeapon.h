@@ -142,6 +142,7 @@ struct FWeaponFXData
 	////////////////////////////
 	// SFX
 
+	// XXX Maybe this should be a sound cue to prevent non prepped sounds from being used?
 	/** Played on weapon fire. */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	class USoundBase* FireSound;
