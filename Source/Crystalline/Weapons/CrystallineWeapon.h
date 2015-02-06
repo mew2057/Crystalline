@@ -267,7 +267,6 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Mesh1P;
 
-
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 

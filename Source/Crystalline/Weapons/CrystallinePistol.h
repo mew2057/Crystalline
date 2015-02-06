@@ -47,19 +47,19 @@ class CRYSTALLINE_API ACrystallinePistol : public ACrystallineWeapon
 	GENERATED_UCLASS_BODY()
 
 	/** The configuration for the pistol's projectile. */
-	UPROPERTY(EditDefaultsOnly, Category = ProjectileConfig)
+	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FProjectileData ProjectileConfig;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FPistolProjectileData PistolConfig;
 
-
+	//TODO this may need some degree of networking.	
 	/** Identifies if the pistol is in the overheated state, no shots are allowed. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammunition)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	uint32 bIsOverheated : 1;
 
 	/** Identifies if the pistol is in the overheated state, no shots are allowed. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammunition)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
 	uint32 bIsCoolingDown : 1;
 
 	////////////////////////////////////
