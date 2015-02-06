@@ -5,23 +5,10 @@
 #include "Weapons/CrystallineWeapon.h"
 #include "CrystallinePistol.generated.h"
 
-// XXX do we want this as a projectile or hitscan ?
-/** A collection of the psuedo constants used by the pistol. */
 USTRUCT()
 struct FPistolProjectileData
 {
 	GENERATED_USTRUCT_BODY()
-	/** The class of the Projectile that will be shot by the weapon. */
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class ACrystallineProjectile> ProjectileClass;
-
-	/** The life span of the projectile before despawning. */
-	UPROPERTY(EditDefaultsOnly)
-	float ProjectileLife;
-
-	/** The damage caused by the projectile. */
-	UPROPERTY(EditDefaultsOnly)
-	float ProjectileDamage;
 
 	/** The maximum "heat" that the pistol can achieve before */
 	UPROPERTY(EditDefaultsOnly)
@@ -42,16 +29,13 @@ struct FPistolProjectileData
 	/** Sets defaults */
 	FPistolProjectileData()
 	{
-		ProjectileClass   = NULL;
-		ProjectileLife    = 2.0f;
-		ProjectileDamage  = 1.f;
-
 		// Heat settings.
-		MaxHeat           = 100.f;
-		HeatPerShot       = 15.f;
+		MaxHeat = 100.f;
+		HeatPerShot = 15.f;
 		CooldownPerSecond = 30.f;
-		OverheatTime      = 0.5f;
+		OverheatTime = 0.5f;
 	}
+
 };
 
 /**
@@ -64,9 +48,11 @@ class CRYSTALLINE_API ACrystallinePistol : public ACrystallineWeapon
 
 	/** The configuration for the pistol's projectile. */
 	UPROPERTY(EditDefaultsOnly, Category = ProjectileConfig)
-	FPistolProjectileData ProjectileConfig;
+	FProjectileData ProjectileConfig;
 
-	
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FPistolProjectileData PistolConfig;
+
 
 	/** Identifies if the pistol is in the overheated state, no shots are allowed. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ammunition)

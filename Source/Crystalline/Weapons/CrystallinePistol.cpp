@@ -67,10 +67,10 @@ void ACrystallinePistol::FireWeapon()
 
 void ACrystallinePistol::UseAmmo()
 {
-	WeaponHeat = FMath::Min(WeaponHeat + ProjectileConfig.HeatPerShot, ProjectileConfig.MaxHeat);
+	WeaponHeat = FMath::Min(WeaponHeat + PistolConfig.HeatPerShot, PistolConfig.MaxHeat);
 
 	// May not need the overheated thing, but this is me trying to be sure we don't get too many timers running.
-	if (WeaponHeat == ProjectileConfig.MaxHeat && !bIsOverheated)
+	if (WeaponHeat == PistolConfig.MaxHeat && !bIsOverheated)
 	{
 
 		bIsOverheated  = true;
@@ -79,7 +79,7 @@ void ACrystallinePistol::UseAmmo()
 
 		GetWorldTimerManager().SetTimer(this, 
 			&ACrystallinePistol::HandleOverheatCooldown, 
-			ProjectileConfig.OverheatTime, false);
+			PistolConfig.OverheatTime, false);
 	}
 }
 
@@ -90,7 +90,7 @@ void ACrystallinePistol::HandleOverheatCooldown()
 
 	GetWorldTimerManager().SetTimer(this,
 		&ACrystallinePistol::FinishCooldown,
-		ProjectileConfig.MaxHeat/ProjectileConfig.CooldownPerSecond, false);
+		PistolConfig.MaxHeat / PistolConfig.CooldownPerSecond, false);
 }
 
 
@@ -103,7 +103,7 @@ void ACrystallinePistol::FinishCooldown()
 void ACrystallinePistol::Tick(float DeltaSeconds)
 {
 	if (!bIsOverheated)
-		WeaponHeat = FMath::Max(0.f,WeaponHeat - (ProjectileConfig.CooldownPerSecond * DeltaSeconds));
+		WeaponHeat = FMath::Max(0.f, WeaponHeat - (PistolConfig.CooldownPerSecond * DeltaSeconds));
 }
 
 
@@ -137,7 +137,7 @@ void ACrystallinePistol::ServerFireProjectile_Implementation(FVector Origin, FVe
 
 float ACrystallinePistol::GetClipPercent() const
 {
-	return WeaponHeat / ProjectileConfig.MaxHeat;
+	return WeaponHeat / PistolConfig.MaxHeat;
 }
 
 

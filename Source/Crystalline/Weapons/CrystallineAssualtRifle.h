@@ -34,21 +34,19 @@ class CRYSTALLINE_API ACrystallineAssualtRifle : public ACrystallineWeapon
 protected:
 
 #pragma region Fields
-	/***/
+	/** A replicated property which propogates the hitscan effects across clients. */
 	UPROPERTY(Transient, ReplicatedUsing = ONRep_HitNotify)
 	FInstantHit HitNotify;
 	
-	/** damage amount TODO MOVETHIS TO ROOT */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	int32 HitDamage;
-
+	/** Contains information*/
+	UPROPERTY(EditDefaultsOnly, Category=Config)
+	FHitScanData HitScanConfig;
 	
 
 #pragma endregion
 
 	virtual bool CanFire() override;
 
-	/** Fires the Assault Rifle projectile. */
 	virtual void FireWeapon() override;
 
 	virtual void UseAmmo() override;

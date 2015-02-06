@@ -139,6 +139,7 @@ struct FWeaponFXData
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UParticleSystem* WeaponTrail;
 
+
 	////////////////////////////
 	// SFX
 
@@ -152,9 +153,9 @@ struct FWeaponFXData
 		/** The default name of the Muzzle socket. */
 		MuzzleSocket     = TEXT("MuzzleFlashSocket");
 		TrailTargetParam = TEXT("TrailEnd");
+
 	}
 };
-
 
 /** HUD Textures and configuration.*/
 USTRUCT()
@@ -200,6 +201,51 @@ struct FWeaponHUDData
 	}
 };
 
+
+/** Common definitions for Projecticle configuration to reduce the repetition in the subclasses. */
+USTRUCT()
+struct FProjectileData
+{
+	GENERATED_USTRUCT_BODY()
+	
+	/** The class of the Projectile that will be shot by the weapon. */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class ACrystallineProjectile> ProjectileClass;
+
+	/** The life span of the projectile before despawning. */
+	UPROPERTY(EditDefaultsOnly)
+		float ProjectileLife;
+
+	/** The damage caused by the projectile. */
+	UPROPERTY(EditDefaultsOnly)
+	float ProjectileDamage;
+
+
+	/** Sets defaults */
+	FProjectileData()
+	{
+		ProjectileClass = NULL;
+		ProjectileLife  = 2.0f;
+		ProjectileDamage = 1.f;
+	}
+};
+
+/** Common definitions for hitscan configuration to reduce the repetition in the subclasses. */
+USTRUCT()
+struct FHitScanData
+{
+	//XXX Is this struct really necessary?
+	GENERATED_USTRUCT_BODY()
+
+	/** damage amount */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	int32 HitDamage;
+
+	FHitScanData()
+	{
+		HitDamage = 0.f;
+	}
+};
 
 /**
  * 

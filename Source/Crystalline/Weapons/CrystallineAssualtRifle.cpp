@@ -120,8 +120,6 @@ void ACrystallineAssualtRifle::ProcessHitScan(const FHitResult& Impact, const FV
 
 void ACrystallineAssualtRifle::ProcessHitScan_Confirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float VSpread, float HSpread)
 {
-	UE_LOG(LogTemp, Log, TEXT("HITCONFIRMED"));
-
 	// Deal Damage.
 	if (ShouldDealDamage(Impact.GetActor()))
 	{
@@ -221,12 +219,9 @@ void ACrystallineAssualtRifle::DealDamage(const FHitResult& Impact, const FVecto
 	PointDmg.DamageTypeClass = WeaponConfig.DamageType;
 	PointDmg.HitInfo = Impact;
 	PointDmg.ShotDirection = ShootDir;
-	PointDmg.Damage = HitDamage;
+	PointDmg.Damage = HitScanConfig.HitDamage;
 
 	Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, OwningPawn->Controller, this);
-
-	UE_LOG(LogTemp, Log, TEXT("DAMAGE"));
-
 }
 
 
