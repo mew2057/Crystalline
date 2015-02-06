@@ -6,7 +6,7 @@
 UCLASS(Abstract,config=Game)
 class ACrystallineProjectile : public AActor
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
@@ -17,9 +17,12 @@ class ACrystallineProjectile : public AActor
 	UProjectileMovementComponent* MovementComp;
 
 public:
-	ACrystallineProjectile(const FObjectInitializer& ObjectInitializer);
+	//ACrystallineProjectile(const FObjectInitializer& ObjectInitializer);
 	
 	virtual void PostInitializeComponents() override;
+
+
+
 
 	/** called when projectile hits something */
 	UFUNCTION()

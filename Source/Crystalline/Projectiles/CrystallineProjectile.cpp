@@ -58,6 +58,20 @@ void ACrystallineProjectile::OnImpact(const FHitResult& Hit)
 		Destroy();
 		MovementComp->StopMovementImmediately();
 	}
+	
+	if (Hit.GetActor())
+	{
+		FPointDamageEvent PointDmg;
+		//PointDmg.DamageTypeClass = WeaponConfig.DamageType;
+		PointDmg.HitInfo = Hit;
+		//PointDmg.ShotDirection = ShootDir;
+		PointDmg.Damage = 10; // This needs to move.
+
+
+		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
+	}
+	//GameplayStatics::ApplyRadialDamage(this, WeaponConfig.ExplosionDamage, NudgedImpactLocation, WeaponConfig.ExplosionRadius, WeaponConfig.DamageType, TArray<AActor*>(), this, MyController.Get());
+
 	// Only add impulse and destroy projectile if we hit a physics
 	/*if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
