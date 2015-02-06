@@ -34,23 +34,15 @@ class CRYSTALLINE_API ACrystallineAssualtRifle : public ACrystallineWeapon
 protected:
 
 #pragma region Fields
+	/***/
 	UPROPERTY(Transient, ReplicatedUsing = ONRep_HitNotify)
-	FInstantHit HitNotify;
-
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	UParticleSystem* TrailFX;
-
-	/** The name of the end of the trail in the material editor, should be in the target property.*/
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	FName TrailTargetParam;
-
-	/** damage amount */
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+		FInstantHit HitNotify;
+	
+	/** damage amount TODO MOVETHIS TO ROOT */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 HitDamage;
 
-	/** type of damage */
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	TSubclassOf<UDamageType> DamageType;
+	
 
 #pragma endregion
 

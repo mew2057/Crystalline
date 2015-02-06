@@ -33,6 +33,173 @@ namespace CrystallineAmmo
 	};
 }
 
+/** Defines weapon firing behavior.*/
+USTRUCT()
+struct FWeaponConfigData
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** If true the HandleFire Routine will call itself. */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	uint32 bAutomaticFire : 1;
+
+	/** The range the weapon is usable at.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float WeaponRange;
+
+	/** The ammo type of the gun. */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	TEnumAsByte <CrystallineAmmo::Type> AmmoType;
+
+	/** type of damage */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	TSubclassOf<UDamageType> DamageType;
+
+
+	/** The maximum Horizontal spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float HSpreadMax;
+
+	/** The base Horizontal spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float HSpreadBase;
+	
+	/** The increment for the horizontal spread each fire.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float HSpreadIncrement;
+
+	/** The maximum Vertical spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float VSpreadMax;
+
+	/** The base Vertical spread of the angle for the weapon in degrees.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float VSpreadBase;
+
+	/** The increment for the vertical spread each fire.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
+	float VSpreadIncrement;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = Timing)
+	float TimeBetweenShots;
+
+	UPROPERTY(EditDefaultsOnly, Category = Timing)
+	float ReloadTime;
+	
+
+
+	FWeaponConfigData()
+	{
+		////////////////////////////////
+		// Fire settings.
+		bAutomaticFire   = false;		
+		WeaponRange      = 1000.f;
+		AmmoType         = CrystallineAmmo::Cooldown;
+		
+		////////////////////////////////
+		// Spread		
+		HSpreadMax       = 0.f;
+		HSpreadBase      = 0.f;
+		HSpreadIncrement = 0.f;
+		
+		VSpreadMax		 = 0.f;
+		VSpreadBase		 = 0.f;
+		VSpreadIncrement = 0.f;
+
+		////////////////////////////////
+		// Time
+		TimeBetweenShots = 0.f;
+		ReloadTime       = 0.f;
+	}
+};
+
+/** VFX and SFX related to the weapon.*/
+USTRUCT()
+struct FWeaponFXData
+{
+	GENERATED_USTRUCT_BODY()
+
+	////////////////////////////
+	// VFX
+
+	/** The socket on the gun model that corresponds to the muzzle of the gun. */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	FName MuzzleSocket;
+
+	/** The Muzzle flash for the gun. */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* MuzzleFlash;
+
+	/** The name of the end of the trail in the material editor, should be in the target property.*/
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	FName TrailTargetParam;
+
+	/** The Weapon trail for the bullet. Typically only used by hit scan weapons. */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* WeaponTrail;
+
+	////////////////////////////
+	// SFX
+
+	/** Played on weapon fire. */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	class USoundBase* FireSound;
+
+	FWeaponFXData()
+	{
+		/** The default name of the Muzzle socket. */
+		MuzzleSocket     = TEXT("MuzzleFlashSocket");
+		TrailTargetParam = TEXT("TrailEnd");
+	}
+};
+
+
+/** HUD Textures and configuration.*/
+USTRUCT()
+struct FWeaponHUDData
+{
+	GENERATED_USTRUCT_BODY()
+
+	/**The crosshair icon for the weapon. Base color should be white. */
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon CrosshairIcon;
+
+	/**The Ammo Guage Background for the weapon. Base color should be white. */
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon AmmoGuageBGIcon;
+
+	/**The Ammo Guage Foreground for the weapon. Base color should be white. */
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon AmmoGuageFGIcon;
+	
+	/**The Weapon Icon for the weapon. Base color should be white. */
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon WeaponIcon;
+
+	/** Color for when the player has expended all of their available ammo for a clip.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FLinearColor  LowAmmoColor;
+
+	/** Color for when the player has expended none of their available ammo for a clip.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FLinearColor  FullAmmoColor;
+
+	/** The width of the ammo clip in pixels*/
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	float AmmoGuageWidth;
+
+	FWeaponHUDData()
+	{
+		// Default colors for the ammo readout.
+		LowAmmoColor   = FLinearColor(1, 0, 0, 1); // Red
+		FullAmmoColor  = FLinearColor(0, 1, 0, 1); // Green
+
+		AmmoGuageWidth = 256.0f;
+	}
+};
+
+
 /**
  * 
  */
@@ -62,141 +229,56 @@ class CRYSTALLINE_API ACrystallineWeapon : public AActor
 
 #pragma region Fields
 
+	/** The pawn holding the weapon. */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_OwningPawn)
+	class ACrystallinePlayer* OwningPawn; // Class is needed (forward declaration).
 
 	////////////////////////////
-	// HUD Elements
+	// Config
 
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FCanvasIcon CrosshairIcon;
+	/** Generic weapon configuration settings.*/
+	UPROPERTY(EditDefaultsOnly, Category =Config)
+	FWeaponConfigData WeaponConfig;
 
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FCanvasIcon AmmoGuageBGIcon;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FCanvasIcon AmmoGuageFGIcon;
+	/** Generic weapon effect configuration settings.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FWeaponFXData WeaponFXConfig;
 
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FCanvasIcon WeaponIcon;
-	
-	/** Color for when the player has expended all of their available ammo for a clip.*/
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FLinearColor  LowAmmoColor;
+	/** Generic weapon HUD configuration settings.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FWeaponHUDData WeaponHUDConfig;
 
-	/** Color for when the player has expended none of their available ammo for a clip.*/
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	FLinearColor  FullAmmoColor;
+	////////////////////////////
+	// Mutable weapon fields
 
-	/** The width of the ammo clip in pixels*/
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-	float AmmoGuageWidth;
+	/** Half-angle (radians) of the horizontal spread cone.*/
+	float HSpreadCurrent;
 
-	//////////////////////////
-	// Timing
-	
+	/** Half-angle (radians) of the vertical spread cone.*/
+	float VSpreadCurrent;
+
 	/** The time when the gun last fired. */
-	float LastFireTime;
+	float LastFireTime;	
 
-	UPROPERTY(EditDefaultsOnly, Category = Timing)
-	float TimeBetweenShots;
-
-	UPROPERTY(EditDefaultsOnly, Category = Timing)
-	float ReloadTime;
-	
 	////////////////////////////
-	//// Ammo Details
-	// XXX This might be better in a case by case basis.
-	/** The type of ammo used in the gun. */
-	UPROPERTY(EditDefaultsOnly, Category = Ammunition)
-	TEnumAsByte <CrystallineAmmo::Type> AmmoType; // NOTE: TEnumAsByte is needed for blueprint exposed enumerated types.
+	//  Components
 	
-	///** The number of rounds available to the gun. */
-	//float Shots;
-	//
-	///** The number of rounds in a single ammo clip */
-	//UPROPERTY(EditDefaultsOnly, Category = Ammunition)
-	//float ShotsPerClip;
-	//
-	//
-	//float Clips;	 
-	
-	////////////////////////////
-	// Visual Effects
-
-	/** The socket on the gun model that corresponds to the muzzle of the gun. */
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	FName MuzzleSocket; 
-
-	/** The Muzzle flash for the gun. */
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	UParticleSystem* MuzzleFlash;
-
 	/** Used to manage the flash particle system. */
 	UPROPERTY(Transient)
 	UParticleSystemComponent* MuzzleFlashComp;
 
-	/** The Weapon trail for the bullet. */
-	//UPROPERTY(EditDefaultsOnly, Category = Effects)
-	//UParticleSystem* WeaponTrail;
-
-	////////////////////////////
-	// SFX
+	/** Used to manage audio playback. */
 	UPROPERTY(Transient)
 	UAudioComponent* FireAudioComponent;
 
-	// NOTE: Impact needs to be defined in the child classes.
-
-	/** The pawn holding the weapon. */
-	UPROPERTY(Transient, ReplicatedUsing=OnRep_OwningPawn)
-	class ACrystallinePlayer* OwningPawn; // Class is needed (forward declaration).
-	
 	////////////////////////////
-	// Sound Effects
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effects)
-	class USoundBase* FireSound;
+	// State Variables
 
-
-	////////////////////////////
-	// Firing
+	/** Keeps track of player attempting to shoot.*/
 	UPROPERTY(Transient)
 	uint32 bWantsToFire : 1;
 	
-	// TODO move this section into a Struct.
-
-	/** If true the HandleFire Routine will call itself. */
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	uint32 bAutomaticFire : 1;
-
-	/** The maximum Horizontal spread of the angle for the weapon in degrees.*/
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	float HSpreadMax;
-
-	/** The base Horizontal spread of the angle for the weapon in degrees.*/
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	float HSpreadBase;
-	/** The increment for the horizontal spread each fire.*/
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	float HSpreadIncrement;
-
-	/** The maximum Vertical spread of the angle for the weapon in degrees.*/
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	float VSpreadMax;
-
-	/** The base Vertical spread of the angle for the weapon in degrees.*/
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	float VSpreadBase;
-
-	/** The increment for the vertical spread each fire.*/
-	UPROPERTY(EditDefaultsOnly, Category = WeaponConfiguration)
-	float VSpreadIncrement;
-
-	float HSpreadCurrent;
-	float VSpreadCurrent;
-
-	// This is common hitcast stuff!
-	// TODO move to a struct defined in CrystallineWeapon
-	/** The range the weapon is usable at.*/
-	UPROPERTY(EditDefaultsOnly, Category = FireConfig)
-	float WeaponRange;
+	
 
 
 
@@ -266,24 +348,35 @@ public:
 
 	/** Sets the owner of the Weapon. */
 	void SetOwningPawn(ACrystallinePlayer* Owner);
-
-	/**Returns camera information through the parameters. */
-	void GetCameraDetails(FVector& Origin, FVector& Aim) const;
-
+	
 	/* @return True if the weapon is able to be used, Base Class defaults to true.**/
 	virtual bool CanFire();
 
 
 	////////////////////////////
-	// HUD Helper
+	// HUD Helpers
 
 	/** Returns a number 0..1 representing how much of the clip has been used. (0 is none, 1 is everything).*/
 	virtual float GetClipPercent() const;
+	
 
+	////////////////////////////
+	// Weapon Transform Helpers
 
+	/** Gets the aim vector for the player.*/
+	FVector GetCameraAim() const;
+
+	/** Gets the location of the player's camera.*/
+	FVector GetCameraLocation() const;
+
+	/** Gets the muzzle location for spawning projectiles and playing effects.*/
 	FVector GetMuzzleLocation() const; 
 
+	/** Gets the vector for the rotation of the muzzle.*/
 	FVector GetMuzzleRotation() const;
+
+	////////////////////////////
+
 
 
 protected:

@@ -120,7 +120,6 @@
     <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystalGun.cpp">
       <Filter>Source\Crystalline\cpp\Weapons</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Private\CrystallineCharacter.cpp" />
     <ClCompile Include="..\..\Source\Crystalline\Pickups\CrystallineCrystal.cpp">
       <Filter>Source\Crystalline\cpp\Pickups</Filter>
     </ClCompile>
@@ -159,7 +158,6 @@
     <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystalGun.h">
       <Filter>Source\Crystalline\h\Weapons</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Public\CrystallineCharacter.h" />
     <ClInclude Include="..\..\Source\Crystalline\Pickups\CrystallineCrystal.h">
       <Filter>Source\Crystalline\h\Pickups</Filter>
     </ClInclude>

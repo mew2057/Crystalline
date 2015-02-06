@@ -15,10 +15,8 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
 	RootComponent = Mesh1P;										 // Makes the first player mesh the root component.
-	LastFireTime = 0.0f;
 
-	/** The default name of the Muzzle socket. */
-	MuzzleSocket = TEXT("MuzzleFlashSocket");
+	
 
 	// Allows weapon to have a tick update (Necessary for some mechanics).
 	PrimaryActorTick.bCanEverTick = true;
@@ -29,10 +27,10 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	bReplicateInstigator = true;
 	bNetUseOwnerRelevancy = true;
 
-	// Default colors for the ammo readout.
-	LowAmmoColor = FLinearColor(1, 0, 0, 1);
-	FullAmmoColor = FLinearColor(0, 1, 0, 1);
-	WeaponRange = 10000.0f;
+	
+
+	LastFireTime = 0.0f;
+
 }
 
 
@@ -44,23 +42,23 @@ void ACrystallineWeapon::PostInitializeComponents()
 	DetachMeshFromPawn();
 
 	// If the ammo guage width is not set, then set it to the width of the gauge icon.
-	if (AmmoGuageWidth == 0.f)
+	if (WeaponHUDConfig.AmmoGuageWidth == 0.f)
 	{
-		AmmoGuageWidth = AmmoGuageFGIcon.UL;
+		WeaponHUDConfig.AmmoGuageWidth = WeaponHUDConfig.AmmoGuageFGIcon.UL;
 	}
 	//////////////////////////////////
 	// Initialize the spread factor.
 
 	// Halve the spread and convert to radians for the random cone.
-	HSpreadMax       = FMath::DegreesToRadians(HSpreadMax * 0.5f);
-	HSpreadBase      = FMath::DegreesToRadians(HSpreadBase * 0.5f);
-	HSpreadCurrent   = HSpreadBase;
-	HSpreadIncrement = FMath::DegreesToRadians(HSpreadIncrement * 0.5f);
+	WeaponConfig.HSpreadMax       = FMath::DegreesToRadians(WeaponConfig.HSpreadMax * 0.5f);
+	WeaponConfig.HSpreadBase      = FMath::DegreesToRadians(WeaponConfig.HSpreadBase * 0.5f);
+	HSpreadCurrent				  = WeaponConfig.HSpreadBase;
+	WeaponConfig.HSpreadIncrement = FMath::DegreesToRadians(WeaponConfig.HSpreadIncrement * 0.5f);
 
-	VSpreadMax       = FMath::DegreesToRadians(VSpreadMax * 0.5f);
-	VSpreadBase      = FMath::DegreesToRadians(VSpreadBase * 0.5f);
-	VSpreadCurrent   = VSpreadBase;
-	VSpreadIncrement = FMath::DegreesToRadians(VSpreadIncrement * 0.5f);
+	WeaponConfig.VSpreadMax       = FMath::DegreesToRadians(WeaponConfig.VSpreadMax * 0.5f);
+	WeaponConfig.VSpreadBase      = FMath::DegreesToRadians(WeaponConfig.VSpreadBase * 0.5f);
+	VSpreadCurrent				 = WeaponConfig.VSpreadBase;
+	WeaponConfig.VSpreadIncrement = FMath::DegreesToRadians(WeaponConfig.VSpreadIncrement * 0.5f);
 }
 
 
@@ -115,12 +113,10 @@ void ACrystallineWeapon::HandleFire()
 		// Trigger a reload if needed.
 
 		// If this is an automatic weapon fire continue firing in TimeBetweenShots seconds.
-		if (bAutomaticFire)
+		if (WeaponConfig.bAutomaticFire)
 		{
-			GetWorldTimerManager().SetTimer(this, &ACrystallineWeapon::HandleFire, TimeBetweenShots, false);
-		}
-
-		
+			GetWorldTimerManager().SetTimer(this, &ACrystallineWeapon::HandleFire, WeaponConfig.TimeBetweenShots, false);
+		}		
 	}
 
 	LastFireTime = GetWorld()->GetTimeSeconds();
@@ -136,20 +132,19 @@ void ACrystallineWeapon::SimulateWeaponFire()
 
 
 	// The sound effect.
-	if (FireSound )
+	if (WeaponFXConfig.FireSound)
 	{
 		//FireAudioComponent=
-		UGameplayStatics::PlaySoundAttached(FireSound, GetRootComponent());
+		UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
 	}
 
 	// Muzzle Flash
-	if (MuzzleFlash)
+	if (WeaponFXConfig.MuzzleFlash)
 	{
-		const FVector FlashPoint = Mesh1P->GetSocketLocation(MuzzleSocket);
+		const FVector FlashPoint = Mesh1P->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
 
-		MuzzleFlashComp = UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh1P, MuzzleSocket);
-		// TODO CONFIGURE THIS!
-		
+		MuzzleFlashComp = UGameplayStatics::SpawnEmitterAttached(WeaponFXConfig.MuzzleFlash, Mesh1P, WeaponFXConfig.MuzzleSocket);
+		// TODO CONFIGURE THIS!		
 		MuzzleFlashComp->bOwnerNoSee = false;
 		MuzzleFlashComp->bOnlyOwnerSee = false;		
 	}
@@ -178,13 +173,12 @@ void ACrystallineWeapon::StartBurst()
 {
 	float TimeSinceShot = GetWorld()->GetTimeSeconds() - LastFireTime;
 
-	if (LastFireTime > 0.f && TimeBetweenShots > 0.f && TimeSinceShot < TimeBetweenShots)
+	if (LastFireTime > 0.f && WeaponConfig.TimeBetweenShots > 0.f && TimeSinceShot < WeaponConfig.TimeBetweenShots)
 	{
-		GetWorldTimerManager().SetTimer(this, &ACrystallineWeapon::HandleFire, TimeSinceShot + TimeBetweenShots, false);
+		GetWorldTimerManager().SetTimer(this, &ACrystallineWeapon::HandleFire, TimeSinceShot + WeaponConfig.TimeBetweenShots, false);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Burst"));
 
 		HandleFire();
 	}
@@ -204,8 +198,8 @@ void ACrystallineWeapon::StopBurst()
 	//}
 
 	// Reset the spread to the baseline.
-	HSpreadCurrent = HSpreadBase;
-	VSpreadCurrent = VSpreadBase;
+	HSpreadCurrent = WeaponConfig.HSpreadBase;
+	VSpreadCurrent = WeaponConfig.VSpreadBase;
 }
 
 bool ACrystallineWeapon::CanFire()
@@ -391,33 +385,56 @@ FHitResult ACrystallineWeapon::WeaponTrace(const FVector& TraceFrom, const FVect
 	return Hit;
 }
 
+////////////////////////////////////////////////////////
+// Weapon Transform Helpers
+
+#pragma region TransformHelpers
+
+FVector ACrystallineWeapon::GetCameraAim() const
+{
+	// Zero the aim  in case of failure.
+	FVector Aim = FVector::ZeroVector;
+	AController* Controller = Instigator ? Instigator->Controller : NULL;
+	if (Controller)
+	{
+		FVector  TempOrigin;
+		FRotator TempRotator;
+		Controller->GetPlayerViewPoint(TempOrigin, TempRotator);
+
+		Aim = TempRotator.Vector();
+	}
+
+	return Aim;
+}
+
+FVector ACrystallineWeapon::GetCameraLocation() const
+{
+	// Zero the origin in case of failure.
+	FVector Origin = FVector::ZeroVector;
+	AController* Controller = Instigator ? Instigator->Controller : NULL;
+	if (Controller)
+	{
+		FRotator TempRotator;
+		Controller->GetPlayerViewPoint(Origin, TempRotator);
+	}
+
+	return Origin;
+}
 
 FVector ACrystallineWeapon::GetMuzzleLocation() const
 {
 	// TODO Mesh for not locally controlled.
 
-	return Mesh1P->GetSocketLocation(MuzzleSocket);
+	return Mesh1P->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
 }
 
 FVector ACrystallineWeapon::GetMuzzleRotation() const
 {
 	// TODO Mesh for not locally controlled.
-		return Mesh1P->GetSocketRotation(MuzzleSocket).Vector();
+	return Mesh1P->GetSocketRotation(WeaponFXConfig.MuzzleSocket).Vector();
 }
 
-//FIXME for AI.
-void ACrystallineWeapon::GetCameraDetails(FVector& Origin, FVector& Aim) const
-{
-	// Zero the origin and aim  in case of failure.
-	Origin = FVector::ZeroVector;
-	Aim    = FVector::ZeroVector;
-	AController* Controller = Instigator ? Instigator->Controller : NULL;
+#pragma endregion
 
-	if (Controller)
-	{
-		FRotator TempRot;
-		Controller->GetPlayerViewPoint(Origin, TempRot);
 
-		Aim = TempRot.Vector();
-	}
-}
+////////////////////////////////////////////////////////

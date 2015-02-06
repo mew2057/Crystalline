@@ -37,7 +37,7 @@ void ACrystallineHUD::DrawHUD()
 
 			//////////////////////////
 			// Crosshair	
-			FCanvasIcon CrosshairIcon = Weapon->CrosshairIcon;
+			FCanvasIcon CrosshairIcon = Weapon->WeaponHUDConfig.CrosshairIcon;
 			// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
 			// The UL and VL values indicate the width and length of the texture respectively.
 			Canvas->DrawIcon(CrosshairIcon,
@@ -63,23 +63,24 @@ void ACrystallineHUD::DrawWeaponHUD()
 	/** Get Primary weapon for the player. */
 	if (CurrentWeapon)
 	{
+		FWeaponHUDData WeaponHUDConfig = CurrentWeapon->WeaponHUDConfig;
 		// TODO team modifications.
 		Canvas->SetDrawColor(FColor::White);
 
-		AmmoIcon = CurrentWeapon->AmmoGuageBGIcon;
+		AmmoIcon = WeaponHUDConfig.AmmoGuageBGIcon;
 		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 
-		AmmoIcon = CurrentWeapon->AmmoGuageFGIcon;
+		AmmoIcon = WeaponHUDConfig.AmmoGuageFGIcon;
 
 		// If the weapon uses cooldown ammo, then the way the icon is drawn varies.
-		if (CurrentWeapon->AmmoType == CrystallineAmmo::Cooldown)
+		if (CurrentWeapon->WeaponConfig.AmmoType == CrystallineAmmo::Cooldown)
 		{
 			const float Percent = CurrentWeapon->GetClipPercent();
 
 			// Determine the appropriate color for the guage.
-			Canvas->SetDrawColor(FMath::Lerp(CurrentWeapon->FullAmmoColor, CurrentWeapon->LowAmmoColor, Percent));
+			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
 
-			AmmoIcon.UL = CurrentWeapon->AmmoGuageWidth * Percent + ICON_FUDGE;
+			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
 			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 		}
 		else
@@ -88,9 +89,9 @@ void ACrystallineHUD::DrawWeaponHUD()
 			const float Percent = CurrentWeapon->GetClipPercent();
 
 			// Determine the appropriate color for the guage.
-			Canvas->SetDrawColor(FMath::Lerp(CurrentWeapon->FullAmmoColor, CurrentWeapon->LowAmmoColor, Percent));
+			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
 
-			AmmoIcon.UL = -CurrentWeapon->AmmoGuageWidth * Percent + ICON_FUDGE;
+			AmmoIcon.UL = -WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
 
 			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 
@@ -99,8 +100,7 @@ void ACrystallineHUD::DrawWeaponHUD()
 
 		Canvas->SetDrawColor(FColor::White);
 
-		WeaponIcon = CurrentWeapon->WeaponIcon;
-		Canvas->DrawIcon(WeaponIcon, 40, 20, ScaleUIY);
+		Canvas->DrawIcon(WeaponHUDConfig.WeaponIcon, 40, 20, ScaleUIY);
 	}
 
 
@@ -109,7 +109,8 @@ void ACrystallineHUD::DrawWeaponHUD()
 
 	if (SecondaryWeapon)
 	{
-		WeaponIcon = SecondaryWeapon->WeaponIcon;
+
+		WeaponIcon = SecondaryWeapon->WeaponHUDConfig.WeaponIcon;
 		Canvas->DrawIcon(WeaponIcon, 40, 60, ScaleUIY);
 
 		// Output the icon.

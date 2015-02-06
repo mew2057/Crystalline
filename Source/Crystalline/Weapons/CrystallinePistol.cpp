@@ -12,11 +12,9 @@ ACrystallinePistol::ACrystallinePistol(const FObjectInitializer& ObjectInitializ
 
 void ACrystallinePistol::FireWeapon()
 {
-	FVector StartTrace;
-	FVector AimDir;
-	GetCameraDetails(StartTrace, AimDir);
-
-	FVector EndTrace = StartTrace + AimDir * WeaponRange;
+	const FVector StartTrace = GetCameraLocation();
+	const FVector AimDir     = GetCameraAim();
+	const FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 
 

@@ -16,25 +16,23 @@ void ACrystallineAssualtRifle::FireWeapon()
 
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
-	FVector StartTrace;
-	FVector AimDir;
-	GetCameraDetails(StartTrace, AimDir);
+	const FVector StartTrace = GetCameraAim();
+	const FVector AimDir = GetCameraLocation();
 
 	// Adds variation to the bullet.
 	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpreadCurrent, VSpreadCurrent);
 
 	// Specify the end point for the weapon's fire.
-	FVector EndTrace = StartTrace + AimDir * WeaponRange;
+	FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 
 	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, VSpreadCurrent, HSpreadCurrent);
-	UE_LOG(LogTemp, Log, TEXT("FIRE"));
 
 	// Update the spread for the weapon.
-	HSpreadCurrent = FMath::Min(HSpreadMax, HSpreadCurrent + HSpreadIncrement);
-	VSpreadCurrent = FMath::Min(VSpreadMax, VSpreadCurrent + VSpreadIncrement);
+	HSpreadCurrent = FMath::Min(WeaponConfig.HSpreadMax, HSpreadCurrent + WeaponConfig.HSpreadIncrement);
+	VSpreadCurrent = FMath::Min(WeaponConfig.VSpreadMax, VSpreadCurrent + WeaponConfig.VSpreadIncrement);
 }
 
 void ACrystallineAssualtRifle::UseAmmo()
@@ -85,7 +83,7 @@ void ACrystallineAssualtRifle::ServerNotifyMiss_Implementation(FVector_NetQuanti
 	// play FX locally
 	if (GetNetMode() != NM_DedicatedServer)
 	{
-		const FVector EndTrace = Origin + ShootDir * WeaponRange;
+		const FVector EndTrace = Origin + ShootDir *WeaponConfig.WeaponRange;
 		SpawnTrailEffect(EndTrace);
 	}
 	
@@ -144,7 +142,7 @@ void ACrystallineAssualtRifle::ProcessHitScan_Confirmed(const FHitResult& Impact
 	// Plays the local FX.
 	if (GetNetMode() != NM_DedicatedServer)
 	{
-		FVector EndPoint = Impact.GetActor() ? Impact.ImpactPoint : Origin + ShootDir * WeaponRange;
+		FVector EndPoint = Impact.GetActor() ? Impact.ImpactPoint : Origin + ShootDir * WeaponConfig.WeaponRange;
 
 		// Do spawning here.
 		SpawnTrailEffect(EndPoint);
@@ -155,14 +153,17 @@ void ACrystallineAssualtRifle::ProcessHitScan_Confirmed(const FHitResult& Impact
 
 void ACrystallineAssualtRifle::SpawnTrailEffect(const FVector& EndPoint)
 {
-	if (TrailFX)
+	if (WeaponFXConfig.WeaponTrail)
 	{
-		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(this, TrailFX, GetMuzzleLocation());
+		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(
+			this, 
+			WeaponFXConfig.WeaponTrail,
+			GetMuzzleLocation());
 
 		if (TrailPSC)
 		{
 			// Set the vector for the particle.
-			TrailPSC->SetVectorParameter(TrailTargetParam, EndPoint);
+			TrailPSC->SetVectorParameter(WeaponFXConfig.TrailTargetParam, EndPoint);
 		}
 	}
 }
@@ -195,12 +196,10 @@ void ACrystallineAssualtRifle::SimulateHitScan(const FVector& Origin, int32 Rand
 {
 	FRandomStream WeaponRandomStream(RandomSeed);
 	
-	FVector StartTrace;
-	FVector AimDir;
-	GetCameraDetails(StartTrace, AimDir);
-
+	const FVector StartTrace = GetCameraAim();
+	const FVector AimDir = GetCameraLocation();
 	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpread, VSpread);
-	const FVector EndTrace = StartTrace + AimDir * WeaponRange;
+	const FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(Origin, EndTrace);
@@ -219,7 +218,7 @@ void ACrystallineAssualtRifle::SimulateHitScan(const FVector& Origin, int32 Rand
 void ACrystallineAssualtRifle::DealDamage(const FHitResult& Impact, const FVector& ShootDir)
 {
 	FPointDamageEvent PointDmg;
-	PointDmg.DamageTypeClass = DamageType;
+	PointDmg.DamageTypeClass = WeaponConfig.DamageType;
 	PointDmg.HitInfo = Impact;
 	PointDmg.ShotDirection = ShootDir;
 	PointDmg.Damage = HitDamage;
