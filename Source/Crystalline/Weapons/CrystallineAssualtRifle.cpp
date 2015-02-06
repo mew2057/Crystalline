@@ -16,8 +16,8 @@ void ACrystallineAssualtRifle::FireWeapon()
 
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
-	const FVector StartTrace = GetCameraAim();
-	const FVector AimDir = GetCameraLocation();
+	const FVector StartTrace = GetCameraLocation();
+	const FVector AimDir = GetCameraAim();
 
 	// Adds variation to the bullet.
 	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpreadCurrent, VSpreadCurrent);
@@ -195,11 +195,11 @@ void ACrystallineAssualtRifle::SpawnImpactEffects(const FHitResult& Impact)
 void ACrystallineAssualtRifle::SimulateHitScan(const FVector& Origin, int32 RandomSeed, float VSpread, float HSpread)
 {
 	FRandomStream WeaponRandomStream(RandomSeed);
-	
-	const FVector StartTrace = GetCameraAim();
-	const FVector AimDir = GetCameraLocation();
-	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpread, VSpread);
-	const FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
+
+	const FVector StartTrace = GetCameraLocation();
+	const FVector AimDir     = GetCameraAim();
+	const FVector ShootDir   = WeaponRandomStream.VRandCone(AimDir, HSpread, VSpread);
+	const FVector EndTrace   = StartTrace + AimDir * WeaponConfig.WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(Origin, EndTrace);

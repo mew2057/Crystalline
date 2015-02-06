@@ -36,7 +36,7 @@ protected:
 #pragma region Fields
 	/***/
 	UPROPERTY(Transient, ReplicatedUsing = ONRep_HitNotify)
-		FInstantHit HitNotify;
+	FInstantHit HitNotify;
 	
 	/** damage amount TODO MOVETHIS TO ROOT */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
