@@ -229,7 +229,7 @@ void ACrystallinePlayer::PreviousWeapon()
 	// Check for undeflow.
 	if (NumberOfWeapons > 1)
 	{
-		// TODO Add animation call.
+		// TODO Add animation call.MoveForward
 		// This removes the need for a branch.
 		WeaponIndex = (WeaponIndex - 1 + NumberOfWeapons) % NumberOfWeapons;
 

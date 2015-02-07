@@ -1,165 +1,229 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <None Include="..\..\Crystalline.uproject" />
-    <Filter Include="Source">
-      <UniqueIdentifier>{CA6C22D2-437A-4A86-9A7B-BC02B42F31C0}</UniqueIdentifier>
-    </Filter>
-    <None Include="..\..\Source\Crystalline.Target.cs">
-      <Filter>Source</Filter>
-    </None>
-    <None Include="..\..\Source\CrystallineEditor.Target.cs">
-      <Filter>Source</Filter>
-    </None>
-    <Filter Include="Config">
-      <UniqueIdentifier>{C5EB3AFF-8582-48A4-AD2E-C7795CE71321}</UniqueIdentifier>
-    </Filter>
-    <None Include="..\..\Config\DefaultEditor.ini">
-      <Filter>Config</Filter>
-    </None>
-    <None Include="..\..\Config\DefaultEngine.ini">
-      <Filter>Config</Filter>
-    </None>
-    <None Include="..\..\Config\DefaultGame.ini">
-      <Filter>Config</Filter>
-    </None>
-    <None Include="..\..\Config\DefaultInput.ini">
-      <Filter>Config</Filter>
-    </None>
-    <Filter Include="Source\Crystalline">
-      <UniqueIdentifier>{5327B0E3-08F2-4A57-9F29-D644FDBBF1DA}</UniqueIdentifier>
-    </Filter>
-    <None Include="..\..\Source\Crystalline\Crystalline.Build.cs">
-      <Filter>Source\Crystalline</Filter>
-    </None>
-    <Filter Include="Source\Crystalline\Resources">
-      <UniqueIdentifier>{35856AFD-8DA0-4E7B-8693-7B72378FD1BD}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\Resources\Windows">
-      <UniqueIdentifier>{0A48DC66-B261-4931-94EE-001A1EEAA75B}</UniqueIdentifier>
-    </Filter>
-    <ResourceCompile Include="..\..\Source\Crystalline\Resources\Windows\Crystalline.rc">
-      <Filter>Source\Crystalline\Resources\Windows</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Source\Crystalline\h">
-      <UniqueIdentifier>{478955a0-5974-4b48-8ac8-7f5e406c2415}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\cpp">
-      <UniqueIdentifier>{0e923cda-1a9f-478e-8a9c-1f4632f67132}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\h\Player">
-      <UniqueIdentifier>{ff10b3f1-46b6-4c33-b31a-66eb31ca3e56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\h\Weapons">
-      <UniqueIdentifier>{b176ceb1-2896-4989-b3c1-6e947a5c813f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\cpp\Player">
-      <UniqueIdentifier>{b1b67b95-7a1b-4b6d-b415-6d90a430f532}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\cpp\Weapons">
-      <UniqueIdentifier>{34d376df-f62a-432d-9dcf-7a0e95e008f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\cpp\Projectiles">
-      <UniqueIdentifier>{648b771c-68d0-4af2-9996-3886feef2b5e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\h\Projectiles">
-      <UniqueIdentifier>{727a6e3c-edc9-40d8-b72e-872f9eade518}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\cpp\GameModes">
-      <UniqueIdentifier>{b8603c1d-16bb-4fb4-9be8-5f7ed55892c0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\h\GameModes">
-      <UniqueIdentifier>{6861ff49-6e01-4d81-aa37-06d7db1f9ce4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\h\GUI">
-      <UniqueIdentifier>{ea93e929-a812-402d-82bf-c2b68c3e7854}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\cpp\GUI">
-      <UniqueIdentifier>{ebe88cea-9d40-4f38-bfd5-c0f9c0def622}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\h\Pickups">
-      <UniqueIdentifier>{4f71cd01-722e-41b8-ac0a-f15e6f5baa9f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Crystalline\cpp\Pickups">
-      <UniqueIdentifier>{8658b52e-78b7-4cd8-8371-d7ca8cac3f29}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\Source\Crystalline\Player\CrystallinePlayer.cpp">
-      <Filter>Source\Crystalline\cpp\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Player\CrystallinePlayerController.cpp">
-      <Filter>Source\Crystalline\cpp\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Player\CrystallinePlayerMoveComponent.cpp">
-      <Filter>Source\Crystalline\cpp\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallineAssualtRifle.cpp">
-      <Filter>Source\Crystalline\cpp\Weapons</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallinePistol.cpp">
-      <Filter>Source\Crystalline\cpp\Weapons</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallineWeapon.cpp">
-      <Filter>Source\Crystalline\cpp\Weapons</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.cpp">
-      <Filter>Source\Crystalline\cpp\GameModes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.cpp">
-      <Filter>Source\Crystalline\cpp\Projectiles</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\GUI\CrystallineHUD.cpp">
-      <Filter>Source\Crystalline\cpp\GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Crystalline.cpp">
-      <Filter>Source\Crystalline\cpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\CrystalGun.cpp">
-      <Filter>Source\Crystalline\cpp\Weapons</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\Pickups\CrystallineCrystal.cpp">
-      <Filter>Source\Crystalline\cpp\Pickups</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Source\Crystalline\Player\CrystallinePlayer.h">
-      <Filter>Source\Crystalline\h\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Player\CrystallinePlayerController.h">
-      <Filter>Source\Crystalline\h\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Player\CrystallinePlayerMoveComponent.h">
-      <Filter>Source\Crystalline\h\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallineWeapon.h">
-      <Filter>Source\Crystalline\h\Weapons</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallineAssualtRifle.h">
-      <Filter>Source\Crystalline\h\Weapons</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallinePistol.h">
-      <Filter>Source\Crystalline\h\Weapons</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.h">
-      <Filter>Source\Crystalline\h\GameModes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.h">
-      <Filter>Source\Crystalline\h\Projectiles</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\GUI\CrystallineHUD.h">
-      <Filter>Source\Crystalline\h\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Crystalline.h">
-      <Filter>Source\Crystalline\h</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Weapons\CrystalGun.h">
-      <Filter>Source\Crystalline\h\Weapons</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\Pickups\CrystallineCrystal.h">
-      <Filter>Source\Crystalline\h\Pickups</Filter>
-    </ClInclude>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\Crystalline.uproject" />
+		<Filter Include="Source">
+			<UniqueIdentifier>{BBE1252E-2172-4D78-B50C-1424F3110D85}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Source\Crystalline.Target.cs">
+			<Filter>Source</Filter>
+		</None >
+		<None Include="..\..\Source\CrystallineEditor.Target.cs">
+			<Filter>Source</Filter>
+		</None >
+		<Filter Include="Config">
+			<UniqueIdentifier>{EDAA08EA-E859-4179-99F2-904537870FCA}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Config\DefaultEditor.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultEngine.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultGame.ini">
+			<Filter>Config</Filter>
+		</None >
+		<None Include="..\..\Config\DefaultInput.ini">
+			<Filter>Config</Filter>
+		</None >
+		<Filter Include="Source\Crystalline">
+			<UniqueIdentifier>{0E30A8BC-0089-413D-A597-F7A39D607F94}</UniqueIdentifier>
+		</Filter>
+		<None Include="..\..\Source\Crystalline\Crystalline.Build.cs">
+			<Filter>Source\Crystalline</Filter>
+		</None >
+		<ClCompile Include="..\..\Source\Crystalline\Crystalline.cpp">
+			<Filter>Source\Crystalline</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Crystalline.h">
+			<Filter>Source\Crystalline</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\GameModes">
+			<UniqueIdentifier>{22BDE919-D2C9-447E-89AF-6DA12A76C39E}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\GameModes\CGBaseGameMode.cpp">
+			<Filter>Source\Crystalline\GameModes</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\GameModes\CGBaseGameMode.h">
+			<Filter>Source\Crystalline\GameModes</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.cpp">
+			<Filter>Source\Crystalline\GameModes</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\GameModes\CrystallineGameMode.h">
+			<Filter>Source\Crystalline\GameModes</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\GUI">
+			<UniqueIdentifier>{06D57955-56B1-415C-A424-65B9D1FBDEE9}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\GUI\CGPlayerHUD.cpp">
+			<Filter>Source\Crystalline\GUI</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\GUI\CGPlayerHUD.h">
+			<Filter>Source\Crystalline\GUI</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\GUI\CrystallineHUD.cpp">
+			<Filter>Source\Crystalline\GUI</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\GUI\CrystallineHUD.h">
+			<Filter>Source\Crystalline\GUI</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\Pickups">
+			<UniqueIdentifier>{6B053F95-150C-4B4B-B186-E968ABF450C8}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\Pickups\CrystallineCrystal.cpp">
+			<Filter>Source\Crystalline\Pickups</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Pickups\CrystallineCrystal.h">
+			<Filter>Source\Crystalline\Pickups</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\Player">
+			<UniqueIdentifier>{DA07FE13-5BC8-44FB-A54D-FB8ED16D118E}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\Player\CGCharacter.cpp">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Player\CGCharacter.h">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Player\CGCharacterMovementComponent.cpp">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Player\CGCharacterMovementComponent.h">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Player\CGPlayerController.cpp">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Player\CGPlayerController.h">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Player\CrystallinePlayer.cpp">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Player\CrystallinePlayer.h">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Player\CrystallinePlayerController.cpp">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Player\CrystallinePlayerController.h">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Player\CrystallinePlayerMoveComponent.cpp">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Player\CrystallinePlayerMoveComponent.h">
+			<Filter>Source\Crystalline\Player</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\Private">
+			<UniqueIdentifier>{80824B81-C78C-4C90-B798-2FAFD1B4CF78}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\Private\CrystallineCharacter.cpp">
+			<Filter>Source\Crystalline\Private</Filter>
+		</ClCompile >
+		<Filter Include="Source\Crystalline\Projectiles">
+			<UniqueIdentifier>{FBFDB7CE-DFC4-484A-A63C-23E15989E889}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.cpp">
+			<Filter>Source\Crystalline\Projectiles</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Projectiles\CrystallineProjectile.h">
+			<Filter>Source\Crystalline\Projectiles</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\Public">
+			<UniqueIdentifier>{2E214EA0-B7AE-4004-BD71-ED59A699EE76}</UniqueIdentifier>
+		</Filter>
+		<ClInclude Include="..\..\Source\Crystalline\Public\CrystallineCharacter.h">
+			<Filter>Source\Crystalline\Public</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\Resources">
+			<UniqueIdentifier>{11048460-9167-460E-BDC5-CFC1AEEF78F7}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Source\Crystalline\Resources\Windows">
+			<UniqueIdentifier>{693C3838-0F7C-482E-8173-DBCD87DEFF52}</UniqueIdentifier>
+		</Filter>
+		<ResourceCompile Include="..\..\Source\Crystalline\Resources\Windows\Crystalline.rc">
+			<Filter>Source\Crystalline\Resources\Windows</Filter>
+		</ResourceCompile >
+		<Filter Include="Source\Crystalline\Weapons">
+			<UniqueIdentifier>{F93455F5-3180-4257-B9B9-1C550CC565E2}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\CGWeapon.cpp">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\CGWeapon.h">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\CrystalGun.cpp">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\CrystalGun.h">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallineAssualtRifle.cpp">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallineAssualtRifle.h">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallinePistol.cpp">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallinePistol.h">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\CrystallineWeapon.cpp">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\CrystallineWeapon.h">
+			<Filter>Source\Crystalline\Weapons</Filter>
+		</ClInclude >
+		<Filter Include="Source\Crystalline\Weapons\States">
+			<UniqueIdentifier>{3EDC5D21-36F9-4FB8-A044-9DFEF1E413AC}</UniqueIdentifier>
+		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponActiveState.cpp">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponActiveState.h">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponEquippingState.cpp">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponEquippingState.h">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponFiringState.cpp">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponFiringState.h">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponInactiveState.cpp">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponInactiveState.h">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponReloadingState.cpp">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponReloadingState.h">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponState.cpp">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponState.h">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponUnequippingState.cpp">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponUnequippingState.h">
+			<Filter>Source\Crystalline\Weapons\States</Filter>
+		</ClInclude >
+	</ItemGroup>
 </Project>

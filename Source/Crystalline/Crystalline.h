@@ -11,6 +11,9 @@
 #include "Weapons/CrystallineWeapon.h"
 #include "Weapons/CrystalGun.h"
 
+#include "Player/CGCharacter.h"
+#include "Weapons/CGWeapon.h"
+
 
 #define COLLISION_PROJECTILE ECC_GameTraceChannel1
 #define COLLISION_WEAPON     ECC_GameTraceChannel2

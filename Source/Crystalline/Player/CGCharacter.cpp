@@ -1,0 +1,241 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#include "Crystalline.h"
+#include "CGCharacter.h"
+#include "CGCharacterMovementComponent.h"
+
+
+ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
+	: Super(PCIP.SetDefaultSubobjectClass<UCGCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+{
+	// Create a CameraComponent	
+	FirstPersonCameraComponent = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FirstPersonCamera"));
+	FirstPersonCameraComponent->AttachParent = GetCapsuleComponent();
+	FirstPersonCameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
+	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+
+	// Creates a mesh component to be used in the first person view. This is edited in the blueprint.
+	Mesh1P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("CharacterMesh1P"));
+	Mesh1P->AttachParent = FirstPersonCameraComponent;
+	Mesh1P->bOnlyOwnerSee = false; // NOTE this should be true.
+	Mesh1P->bOwnerNoSee = false;
+	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -90); // Relative location of the mesh to the origin of the player.
+	Mesh1P->bCastDynamicShadow = false;
+	Mesh1P->CastShadow = false;
+	Mesh1P->bReceivesDecals = false;
+	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	// Set the Collision Capsule Size (TODO hitbox!)
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	// Set turn rates for input
+	BaseTurnRate   = 45.f;
+	BaseLookUpRate = 45.f;
+
+	MaxShield     = 100.0f;
+	CurrentShield = MaxShield;
+
+	MaxHealth     = 100.0f;
+	CurrentHealth = MaxHealth;
+}
+
+void ACGCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	// Only the authority should spwan the inventory.
+	if (Role == ROLE_Authority)
+	{
+	//	SpawnInventory();
+	}
+}
+
+void ACGCharacter::Tick(float DeltaSeconds)
+{
+
+
+}
+
+float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	return 0.f;
+}
+
+
+#pragma region Input
+void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+{
+	check(InputComponent);
+
+	// Actions
+	InputComponent->BindAction("Jump", IE_Pressed,   this, &ACharacter::Jump);
+	InputComponent->BindAction("Jump", IE_Released,  this, &ACharacter::StopJumping);
+												     
+	InputComponent->BindAction("Fire", IE_Pressed,   this, &ACGCharacter::StartFire);
+	InputComponent->BindAction("Fire", IE_Released,  this, &ACGCharacter::StopFire);
+
+	InputComponent->BindAction("Reload", IE_Pressed, this, &ACGCharacter::OnReload);
+
+	/* XXX Not implemented!
+	InputComponent->BindAction("AltFire", IE_Pressed,       this, &ACGCharacter::StartAltFire);
+	InputComponent->BindAction("AltFire", IE_Released,      this, &ACGCharacter::StopAltFire);
+	InputComponent->BindAction("ToggleRunning", IE_Pressed, this, &ACGCharacter::ToggleRunning);
+	*/
+
+	InputComponent->BindAction("NextWeapon",     IE_Pressed, this, &ACGCharacter::NextWeapon);
+	InputComponent->BindAction("PreviousWeapon", IE_Pressed, this, &ACGCharacter::PreviousWeapon);
+
+	// Axis
+	InputComponent->BindAxis("MoveForward", this, &ACGCharacter::MoveForward);
+	InputComponent->BindAxis("MoveRight",   this, &ACGCharacter::MoveRight);
+
+	///////////////
+	// Look Around
+
+	// Mouse Input
+	InputComponent->BindAxis("Turn",   this, &APawn::AddControllerYawInput);
+	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+	// Controller Input
+	InputComponent->BindAxis("TurnRate",   this, &ACGCharacter::TurnAtRate);
+	InputComponent->BindAxis("LookUpRate", this, &ACGCharacter::LookUpAtRate);
+
+	///////////////
+
+}
+
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region Movement
+void ACGCharacter::MoveForward(float Val)
+{
+	if (Controller && Val != 0.0f)
+	{
+		// TODO falling.
+		AddMovementInput(GetActorForwardVector(), Val);
+	}
+}
+
+void ACGCharacter::MoveRight(float Val)
+{
+	if (Controller && Val != 0.0f)
+	{
+		// TODO falling.
+
+		AddMovementInput(GetActorRightVector(), Val);
+	}
+}
+
+void ACGCharacter::TurnAtRate(float Rate)
+{
+	// Use Delta to ensure smooth motion.
+	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+
+void ACGCharacter::LookUpAtRate(float Rate)
+{
+	// Use Delta to ensure smooth motion.
+	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+
+}
+#pragma endregion
+
+#pragma region Inventory
+void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
+{
+	ACGWeapon* LocalLastWeapon = NULL;
+
+	if (LastWeapon != NULL)
+	{
+		LocalLastWeapon = LastWeapon;
+	}
+	else if (NewWeapon != CurrentWeapon)
+	{
+		LocalLastWeapon = CurrentWeapon;
+	}
+
+	if (LocalLastWeapon)
+	{
+		LocalLastWeapon->OnUnEquip();
+	}
+
+	CurrentWeapon = NewWeapon;
+
+	if (NewWeapon)
+	{
+		CurrentWeapon->SetCGOwner(this);
+		CurrentWeapon->OnEquip();
+	}
+}
+
+
+#pragma endregion
+
+
+#pragma region Replication
+
+void ACGCharacter::OnRep_CurrentWeapon(ACGWeapon* LastWeapon)
+{
+	SetCurrentWeapon(CurrentWeapon, LastWeapon);
+}
+
+void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Only local owner.
+	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
+
+
+	// Everyone.
+	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
+	//DOREPLIFETIME(ACrystallinePlayer, Health);
+}
+
+#pragma endregion
+
+#pragma region Input
+/** Initiates the fire for current weapon. */
+void ACGCharacter::StartFire()
+{
+	if (IsLocallyControlled() && CurrentWeapon != NULL)
+	{
+		CurrentWeapon->StartFire();
+	}
+}
+
+/** Stops the fire for current weapon. */
+void ACGCharacter::StopFire()
+{
+	if (CurrentWeapon != NULL)
+	{
+		CurrentWeapon->StopFire();
+	}
+}
+
+/** Triggers the reload for current weapon. */
+void ACGCharacter::OnReload()
+{
+
+}
+
+/** Changes the equipped weapon to the next one in the Inventory Weapon array. */
+void ACGCharacter::NextWeapon()
+{
+
+}
+
+/** Changes the equipped weapon to the previous one in the Inventory Weapon array. */
+void ACGCharacter::PreviousWeapon()
+{
+
+}
+
+
+
+#pragma endregion
