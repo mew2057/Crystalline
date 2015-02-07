@@ -5,6 +5,8 @@
 #include "CGCharacterMovementComponent.h"
 
 
+#pragma region Overrides
+
 ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	: Super(PCIP.SetDefaultSubobjectClass<UCGCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
@@ -34,8 +36,11 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	BaseTurnRate   = 45.f;
 	BaseLookUpRate = 45.f;
 
-	MaxShield     = 100.0f;
-	CurrentShield = MaxShield;
+	MaxShield            = 100.0f;
+	CurrentShield        = MaxShield;
+	ShieldRegenPerSecond = 50.f;
+	TimeToRegen			= 2.f;
+	bShieldRegenerating  = false;
 
 	MaxHealth     = 100.0f;
 	CurrentHealth = MaxHealth;
@@ -48,23 +53,45 @@ void ACGCharacter::PostInitializeComponents()
 	// Only the authority should spwan the inventory.
 	if (Role == ROLE_Authority)
 	{
-	//	SpawnInventory();
+		SpawnBaseInventory();
 	}
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
 {
+	if (bShieldRegenerating)
+	{
+		CurrentShield = FMath::Min(MaxShield, CurrentShield + ShieldRegenPerSecond * DeltaSeconds);
 
-
+		// The Shield is regenerating while this is true.
+		bShieldRegenerating = CurrentShield < MaxShield;
+	}
 }
 
 float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
-	return 0.f;
+	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	if (ActualDamage > 0.f)
+	{
+		// Stop the regeneration of the player's shields.
+		bShieldRegenerating = false;
+
+		CurrentShield -= ActualDamage;
+
+		if (CurrentShield < 0)
+		{
+			CurrentHealth += CurrentShield;
+			CurrentShield = 0;
+		}
+
+		// Set a timer for to start the shield regeneration for the player, if one is set this should reset the time elapsed to zero.
+		GetWorldTimerManager().SetTimer(this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
+	}
+
+	return ActualDamage;
 }
 
 
-#pragma region Input
 void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	check(InputComponent);
@@ -108,9 +135,22 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 
 #pragma endregion
 
+#pragma region PlayerLife
+
+void ACGCharacter::StartShieldRegen()
+{
+	bShieldRegenerating = true;
+
+	// TODO Document why I decided to do this in the wiki or something. -John
+	// The health is automatically recovered. The health is really only there to add the "shield break" feel.
+	CurrentHealth = MaxHealth;
+}
+
+#pragma endregion
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region Movement
+
 void ACGCharacter::MoveForward(float Val)
 {
 	if (Controller && Val != 0.0f)
@@ -125,7 +165,6 @@ void ACGCharacter::MoveRight(float Val)
 	if (Controller && Val != 0.0f)
 	{
 		// TODO falling.
-
 		AddMovementInput(GetActorRightVector(), Val);
 	}
 }
@@ -143,9 +182,11 @@ void ACGCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 
 }
+
 #pragma endregion
 
 #pragma region Inventory
+
 void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 {
 	ACGWeapon* LocalLastWeapon = NULL;
@@ -173,28 +214,72 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 	}
 }
 
-
-#pragma endregion
-
-
-#pragma region Replication
-
-void ACGCharacter::OnRep_CurrentWeapon(ACGWeapon* LastWeapon)
+void ACGCharacter::SpawnBaseInventory()
 {
-	SetCurrentWeapon(CurrentWeapon, LastWeapon);
+	if (Role < ROLE_Authority)
+	{
+		return;
+	}
+
+	const int32 NumDefaultWeapons = DefaultWeaponClasses.Num();
+
+	for (int i = 0; i < NumDefaultWeapons; ++i)
+	{
+		// If it exists spawn the weapon.
+		if (DefaultWeaponClasses[i])
+		{
+			FActorSpawnParameters spawnInfo;
+			spawnInfo.bNoCollisionFail = true;
+
+			// Spawn an actor of type ACrystallineWeapon with the DefaultWeaponClasses[i] as the archetype, and the spawnInfo settings.
+			ACGWeapon* NewWeapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponClasses[i], spawnInfo);
+
+			AddWeapon(NewWeapon);
+		}
+	}
+
+	if (Weapons.Num() > 0 && Weapons[0])
+	{
+		WeaponIndex = 0;
+		EquipWeapon(Weapons[0]);
+	}
 }
 
-void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+void ACGCharacter::AddWeapon(ACGWeapon* NewWeapon)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	if (NewWeapon && Role == ROLE_Authority)
+	{
+		Weapons.AddUnique(NewWeapon);
+		NewWeapon->OnEnterInventory(this);
+	}
+}
 
-	// Only local owner.
-	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
+void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
+{
+	if (Weapon)
+	{
+		// Only the authoraty should change the current weapon.
+		if (Role == ROLE_Authority)
+		{
+			SetCurrentWeapon(Weapon);
+		}
+		else
+		{
+			ServerEquipWeapon(Weapon);
+		}
+
+	}
+}
+
+bool ACGCharacter::ServerEquipWeapon_Validate(ACGWeapon* NewWeapon)
+{
+	return true;
+}
 
 
-	// Everyone.
-	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
-	//DOREPLIFETIME(ACrystallinePlayer, Health);
+void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
+{
+	EquipWeapon(NewWeapon);
 }
 
 #pragma endregion
@@ -227,15 +312,53 @@ void ACGCharacter::OnReload()
 /** Changes the equipped weapon to the next one in the Inventory Weapon array. */
 void ACGCharacter::NextWeapon()
 {
+	// Cache the number of weapons.
+	const int32 NumberOfWeapons = Weapons.Num();
 
+	if (NumberOfWeapons > 1)
+	{
+		WeaponIndex = (WeaponIndex + 1) % NumberOfWeapons;
+		EquipWeapon(Weapons[WeaponIndex]);
+	}
 }
 
 /** Changes the equipped weapon to the previous one in the Inventory Weapon array. */
 void ACGCharacter::PreviousWeapon()
 {
+	// Cache the number of weapons.
+	const int32 NumberOfWeapons = Weapons.Num();
 
+	// Check for undeflow.
+	if (NumberOfWeapons > 1)
+	{
+		WeaponIndex = (WeaponIndex - 1 + NumberOfWeapons) % NumberOfWeapons;
+
+		EquipWeapon(Weapons[WeaponIndex]);
+	}
 }
 
+#pragma endregion
 
+#pragma region Replication
+
+void ACGCharacter::OnRep_CurrentWeapon(ACGWeapon* LastWeapon)
+{
+	SetCurrentWeapon(CurrentWeapon, LastWeapon);
+}
+
+void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Only local owner.
+	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
+
+
+	// Everyone.
+	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
+	DOREPLIFETIME(ACGCharacter, CurrentHealth);
+	DOREPLIFETIME(ACGCharacter, CurrentShield);
+
+}
 
 #pragma endregion

@@ -11,7 +11,7 @@
 UCLASS( Abstract,  Config=Game)
 class CRYSTALLINE_API ACGWeapon : public AActor
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 	// Give the states access to the weapon.
 	friend class UCGWeaponState;
@@ -23,17 +23,19 @@ class CRYSTALLINE_API ACGWeapon : public AActor
 	friend class UCGWeaponReloadingState;
 
 	
-//	ACGWeapon(const FObjectInitializer& PCIP);
+	ACGWeapon(const FObjectInitializer& PCIP);
 	
 	virtual void PostInitializeComponents() override;
 
-	/***/
+private:
+	/** The ACGCharacter holding this weapon. Replication triggers the inventory update functions. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
 	ACGCharacter* CGOwner;
 
+public:
+
 	UFUNCTION()
 	void OnRep_CGOwner();
-
 
 	/** Invoked when a weapon enters the inventory of a player or bot. */
 	void OnEnterInventory(class ACGCharacter* CGOwner);
@@ -63,30 +65,33 @@ class CRYSTALLINE_API ACGWeapon : public AActor
 	/** Retrieves the owner of the weapon. */
 	FORCEINLINE ACGCharacter* GetCGOwner() const { return CGOwner; };
 
+	/**
+	 * Attempts to transition current state to the supplied state.
+	 */
 	void GotoState(UCGWeaponState* NewState);
 
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "States")
-	 UCGWeaponState* CurrentState;
+	UPROPERTY(BlueprintReadOnly, Category = States)
+	UCGWeaponState* CurrentState;
 
 	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-	TSubobjectPtr<class UCGWeaponActiveState> ActiveState;
+	class UCGWeaponActiveState* ActiveState;
 
 	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-		TSubobjectPtr<class UCGWeaponInactiveState > InactiveState;
+	class UCGWeaponInactiveState* InactiveState;
 
 	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-		TSubobjectPtr<class UCGWeaponEquippingState> EquippingState;
+	class UCGWeaponEquippingState* EquippingState;
 
 	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-		TSubobjectPtr<class UCGWeaponUnequippingState> UnequippingState;
+	class UCGWeaponUnequippingState* UnequippingState;
 
 	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-		TSubobjectPtr<class UCGWeaponReloadingState> ReloadingState;
+	class UCGWeaponReloadingState* ReloadingState;
 	
 	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-		TSubobjectPtr<class UCGWeaponFiringState> FiringState;
+	class UCGWeaponFiringState* FiringState;
 
 	//UCGWeaponState;
 };

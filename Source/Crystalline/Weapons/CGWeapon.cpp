@@ -14,12 +14,12 @@
 ACGWeapon::ACGWeapon(const FObjectInitializer& PCIP) : Super(PCIP)
 {
 
-	ActiveState = PCIP.CreateDefaultSubobject<UCGWeaponActiveState>(this, TEXT("StateActive"));
-	InactiveState = PCIP.CreateDefaultSubobject<UCGWeaponInactiveState>(this, TEXT("StateInactive"));
-	EquippingState = PCIP.CreateDefaultSubobject<UCGWeaponEquippingState>(this, TEXT("StateEquipping"));
+	ActiveState      = PCIP.CreateDefaultSubobject<UCGWeaponActiveState>(this, TEXT("StateActive"));
+	InactiveState    = PCIP.CreateDefaultSubobject<UCGWeaponInactiveState>(this, TEXT("StateInactive"));
+	EquippingState   = PCIP.CreateDefaultSubobject<UCGWeaponEquippingState>(this, TEXT("StateEquipping"));
 	UnequippingState = PCIP.CreateDefaultSubobject<UCGWeaponUnequippingState>(this, TEXT("StateUnequipping"));
-	ReloadingState = PCIP.CreateDefaultSubobject<UCGWeaponReloadingState>(this, TEXT("StateReloading"));
-	FiringState = PCIP.CreateDefaultSubobject<UCGWeaponFiringState>(this, TEXT("StateFiring"));
+	ReloadingState   = PCIP.CreateDefaultSubobject<UCGWeaponReloadingState>(this, TEXT("StateReloading"));
+	FiringState      = PCIP.CreateDefaultSubobject<UCGWeaponFiringState>(this, TEXT("StateFiring"));
 	
 
 }
