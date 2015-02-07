@@ -22,7 +22,7 @@ class CRYSTALLINE_API ACGWeapon : public AActor
 	friend class UCGWeaponFiringState;
 	friend class UCGWeaponReloadingState;
 
-	
+public:
 	ACGWeapon(const FObjectInitializer& PCIP);
 	
 	virtual void PostInitializeComponents() override;

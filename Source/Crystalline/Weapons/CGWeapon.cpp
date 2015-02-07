@@ -27,7 +27,7 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& PCIP) : Super(PCIP)
 
 void ACGWeapon::PostInitializeComponents()
 {
-
+	Super::PostInitializeComponents();
 
 }
 
