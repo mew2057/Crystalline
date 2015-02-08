@@ -16,8 +16,6 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
 	RootComponent = Mesh1P;										 // Makes the first player mesh the root component.
 
-	
-
 	// Allows weapon to have a tick update (Necessary for some mechanics).
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
@@ -25,9 +23,7 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	bReplicateInstigator = true;
-	bNetUseOwnerRelevancy = true;
-
-	
+	bNetUseOwnerRelevancy = true;	
 
 	LastFireTime = 0.0f;
 	BurstCounter = 0;

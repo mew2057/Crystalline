@@ -13,6 +13,7 @@ class CRYSTALLINE_API ACGCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
 	ACGCharacter(const FObjectInitializer& PCIP);
 
 	virtual void PostInitializeComponents() override;
@@ -23,6 +24,7 @@ class CRYSTALLINE_API ACGCharacter : public ACharacter
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	virtual void Restart() override;
 protected:
 	/** Max player shield amount. This is decayed before the health.*/
 	UPROPERTY(EditDefaultsOnly, Category=Config)
@@ -60,6 +62,10 @@ protected:
 
 	/** Begin the shield regeneration and set the player's CurrentHealth to max.*/
 	void StartShieldRegen();
+
+public:
+
+	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
 
 #pragma region Movement
 
@@ -136,12 +142,18 @@ protected:
 	TArray<class ACGWeapon*> Weapons;
 
 	/** The currently equipped weapon for the player. */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
+	UPROPERTY(Transient)// , ReplicatedUsing = OnRep_CurrentWeapon)
 	class ACGWeapon* CurrentWeapon;
+
+	/** A pending weapon for equips. */
+	UPROPERTY(Transient)
+	ACGWeapon* PendingWeapon;
+
 
 	//XXX This is getting removed when I get the crystal system in.
 	/** The index of the currently equipped weapon. */
 	uint32 WeaponIndex;
+
 
 
 public:
@@ -151,6 +163,12 @@ public:
 	* @param LastWeapon [Optional] Included for the sake of ensuring replication unequips the right item.
 	*/
 	void SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon = NULL);
+
+	/*
+	 * Invoked when the weapon has been changed, the character performs the actual equip call.
+	 */
+	void WeaponChanged();
+
 
 	/** Spawns the base inventory as specified in the Defaul WeaponClasses array.*/
 	void SpawnBaseInventory();

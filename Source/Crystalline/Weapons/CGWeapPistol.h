@@ -12,7 +12,7 @@ UCLASS(Abstract)
 class CRYSTALLINE_API ACGWeapPistol : public ACGWeapon
 {
 	GENERATED_BODY()
-
-	
+public:
+	ACGWeapPistol(const FObjectInitializer& ObjectInitializer);
 	
 };

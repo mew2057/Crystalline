@@ -3,6 +3,8 @@
 #include "Crystalline.h"
 #include "CGWeapAssaultRifle.h"
 
+ACGWeapAssaultRifle::ACGWeapAssaultRifle(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
 
-
+}
 

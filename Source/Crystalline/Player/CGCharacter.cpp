@@ -44,6 +44,7 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 
 	MaxHealth     = 10.0f;
 	CurrentHealth = MaxHealth;
+	PendingWeapon = false;
 }
 
 void ACGCharacter::PostInitializeComponents()
@@ -53,12 +54,17 @@ void ACGCharacter::PostInitializeComponents()
 	// Only the authority should spwan the inventory.
 	if (Role == ROLE_Authority)
 	{
-		SpawnBaseInventory();
+		CurrentShield = MaxShield;
+		CurrentHealth = MaxHealth;
+	//	SpawnBaseInventory();
 	}
+
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+
 	if (bShieldRegenerating)
 	{
 		CurrentShield = FMath::Min(MaxShield, CurrentShield + ShieldRegenPerSecond * DeltaSeconds);
@@ -133,7 +139,21 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 
 }
 
+void ACGCharacter::Restart()
+{
+	Super::Restart();
+
+	/// XXX WRONG
+	// This should be invoked after the inventory is spawned by the game mode.
+	if (IsLocallyControlled() && Weapons.Num() > 0)
+	{
+		EquipWeapon(Weapons[0]);
+	}
+}
+
 #pragma endregion
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -205,14 +225,35 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 		LocalLastWeapon = CurrentWeapon;
 	}
 
-	if (LocalLastWeapon)
+	// If there's an existing weapon it needs to be unequipped first.
+	if (LocalLastWeapon != NULL && NewWeapon != NULL)
 	{
-		LocalLastWeapon->OnUnEquip();
+		PendingWeapon = NewWeapon;
+
+		// This may need something to prevent issues.
+		// Add a check to see this is a legal operation.
+		LocalLastWeapon->OnUnequip();
 	}
+	else if (NewWeapon != NULL)
+	{
+		PendingWeapon = NewWeapon;
+		WeaponChanged();		
+	}
+}
 
-	CurrentWeapon = NewWeapon;
+void ACGCharacter::WeaponChanged()
+{
 
-	if (NewWeapon)
+	if (PendingWeapon != NULL)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Weapon Changed!"));
+
+		CurrentWeapon = PendingWeapon;
+		PendingWeapon = NULL;
+		CurrentWeapon->SetCGOwner(this);
+		CurrentWeapon->OnEquip();
+	}
+	else if (CurrentWeapon != NULL)
 	{
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();
@@ -245,9 +286,11 @@ void ACGCharacter::SpawnBaseInventory()
 
 	if (Weapons.Num() > 0 && Weapons[0])
 	{
+		UE_LOG(LogTemp, Log, TEXT("SpawnInventoryEquipping"));
 		WeaponIndex = 0;
 		EquipWeapon(Weapons[0]);
 	}
+
 }
 
 void ACGCharacter::AddWeapon(ACGWeapon* NewWeapon)
@@ -359,12 +402,12 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// Only local owner.
-	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
+
+	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_None);
 
 
 	// Everyone.
-	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
+//	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
 	DOREPLIFETIME(ACGCharacter, CurrentHealth);
 	DOREPLIFETIME(ACGCharacter, CurrentShield);
 

@@ -5,4 +5,6 @@
 
 
 
-
+ACGWeapPistol::ACGWeapPistol(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+}

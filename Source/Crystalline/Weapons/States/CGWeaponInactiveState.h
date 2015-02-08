@@ -8,12 +8,14 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(CustomConstructor)
 class UCGWeaponInactiveState : public UCGWeaponState
 {
 	GENERATED_BODY()
-	
-	
+
+public:
+	UCGWeaponInactiveState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+	{}
 	
 	
 };

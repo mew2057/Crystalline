@@ -12,6 +12,7 @@ UCLASS(Abstract)
 class CRYSTALLINE_API ACGWeapAssaultRifle : public ACGWeapon
 {
 	GENERATED_BODY()
-	
-	
+public:
+	ACGWeapAssaultRifle(const FObjectInitializer& ObjectInitializer);
+
 };

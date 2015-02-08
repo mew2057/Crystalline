@@ -8,12 +8,26 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(CustomConstructor)
 class UCGWeaponEquippingState : public UCGWeaponState
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+public:
+	UCGWeaponEquippingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+	{}
+
+	virtual void EnterState() override
+	{}
+
+	virtual void StartEquip() override
+	{}
+
+
+	virtual void EquipFinished() 
+	{
+		//GetOuterACGWeapon()->Goto
+		// GOTO Active State
+	}
+
 };

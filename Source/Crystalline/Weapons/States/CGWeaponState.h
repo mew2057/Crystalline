@@ -7,15 +7,17 @@
 /**
  * Base Definition for the weapon states, defines general behavior for the classes.
  */
-UCLASS(DefaultToInstanced, EditInlineNew, CustomConstructor, Within=CGWeapon)
+UCLASS(DefaultToInstanced, EditInlineNew, Within = CGWeapon)
 class UCGWeaponState : public UObject
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
-	UCGWeaponState(const FObjectInitializer& PCIP) : Super(PCIP)
-	{}	
 
-	
+public:
+	UCGWeaponState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+	{}
+
+
 	inline ACGCharacter* GetCGOwner()
 	{
 		return GetOuterACGWeapon()->GetCGOwner();
@@ -25,8 +27,37 @@ class UCGWeaponState : public UObject
 	{
 		return GetOuterACGWeapon()->GetWorld();
 	}
-	
 
+	virtual void EnterState()
+	{}
 	
+	virtual void EndState() 
+	{}
+	
+	// Do Nothing, only inactive/Equipping should process this.
+	virtual void StartEquip() 
+	{
+		
+	}
+
+	virtual void StartUnequip()
+	{
+		GetOuterACGWeapon()->GotoUnequippingState();
+	}
+
+
+	virtual void StartReload()
+	{}
+
+	virtual void FinishReload()
+	{}
+	
+	virtual void StartFire()
+	{}
+
+	virtual void FinishFire()
+	{}
+	
+	// Add more as needed.
 	
 };

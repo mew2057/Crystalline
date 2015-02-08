@@ -23,13 +23,24 @@ class CRYSTALLINE_API ACGWeapon : public AActor
 	friend class UCGWeaponReloadingState;
 
 public:
-	ACGWeapon(const FObjectInitializer& PCIP);
+	ACGWeapon(const FObjectInitializer& ObjectInitializer);
 	
 	virtual void PostInitializeComponents() override;
+	virtual void BeginPlay() override;
 
-private:
+#pragma region Visuals
+protected:
+	/** weapon mesh: 1st person view */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* Mesh1P;
+
+public:
+	/** Returns Mesh1P subobject **/
+	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
+
+
 	/** The ACGCharacter holding this weapon. Replication triggers the inventory update functions. */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
+	UPROPERTY(BlueprintReadOnly)
 	ACGCharacter* CGOwner;
 
 public:
@@ -47,7 +58,7 @@ public:
 	virtual void OnEquip();
 
 	/** Invoked when the weapon is unequipped by a player or bot. */
-	virtual void OnUnEquip();
+	virtual void OnUnequip();
 
 
 	/** Starts the firing of a weapon if possible. */
@@ -65,33 +76,57 @@ public:
 	/** Retrieves the owner of the weapon. */
 	FORCEINLINE ACGCharacter* GetCGOwner() const { return CGOwner; };
 
+
+
+#pragma region Visuals
+
+protected:
+	/** Adds the mesh to the owner's mesh. */
+	void AttachMeshToPawn();
+
+	/** Removes the mesh from the owner's mesh. */
+	void DetachMeshFromPawn();
+
+#pragma endregion
+
+#pragma region State Management
+public :
 	/**
-	 * Attempts to transition current state to the supplied state.
-	 */
+	* Attempts to transition current state to the supplied state.
+	*/
 	void GotoState(UCGWeaponState* NewState);
 
+	/**Switches the weapon to the equipping state.*/
+	void GotoEquippingState();
+
+	/**Switches the weapon to the firing state.*/
+	void GotoFiringState();
+
+	/**Switches the weapon to the unequipping state.*/
+	void GotoUnequippingState();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = States)
 	UCGWeaponState* CurrentState;
 
-	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-	class UCGWeaponActiveState* ActiveState;
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "States")
+	UCGWeaponState* ActiveState;
 
-	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-	class UCGWeaponInactiveState* InactiveState;
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = States)
+	UCGWeaponState* InactiveState;
 
-	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-	class UCGWeaponEquippingState* EquippingState;
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = States)
+	UCGWeaponState* EquippingState;
 
-	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-	class UCGWeaponUnequippingState* UnequippingState;
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = States)
+	UCGWeaponState* UnequippingState;
 
-	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-	class UCGWeaponReloadingState* ReloadingState;
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = States)
+	UCGWeaponState* ReloadingState;
 	
-	UPROPERTY(Instanced, BlueprintReadOnly, Category = States)
-	class UCGWeaponFiringState* FiringState;
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = States)
+	UCGWeaponState* FiringState;
 
-	//UCGWeaponState;
+#pragma endregion
+
 };

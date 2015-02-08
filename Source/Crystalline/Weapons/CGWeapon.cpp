@@ -11,17 +11,54 @@
 
 #include "CGWeapon.h"
 
-ACGWeapon::ACGWeapon(const FObjectInitializer& PCIP) : Super(PCIP)
+ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	// Initializes the weapon mesh.
+	Mesh1P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh1P"));
+	Mesh1P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+	Mesh1P->bChartDistanceFactor = false;                        // prevents the mesh from being added to the gloabal chart
+	Mesh1P->bReceivesDecals = false;                             // Prevents decals from spawning on the gun.
+	Mesh1P->CastShadow = false;                                  // Hides the shadow.
+	Mesh1P->bOnlyOwnerSee = false;
+	Mesh1P->bOwnerNoSee = false;
+	Mesh1P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
+	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
+	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
+	Mesh1P->SetHiddenInGame(true);
+	RootComponent = Mesh1P;										 // Makes the first player mesh the root component.
 
-	ActiveState      = PCIP.CreateDefaultSubobject<UCGWeaponActiveState>(this, TEXT("StateActive"));
-	InactiveState    = PCIP.CreateDefaultSubobject<UCGWeaponInactiveState>(this, TEXT("StateInactive"));
-	EquippingState   = PCIP.CreateDefaultSubobject<UCGWeaponEquippingState>(this, TEXT("StateEquipping"));
-	UnequippingState = PCIP.CreateDefaultSubobject<UCGWeaponUnequippingState>(this, TEXT("StateUnequipping"));
-	ReloadingState   = PCIP.CreateDefaultSubobject<UCGWeaponReloadingState>(this, TEXT("StateReloading"));
-	FiringState      = PCIP.CreateDefaultSubobject<UCGWeaponFiringState>(this, TEXT("StateFiring"));
-	
+	// Initializes the weapon mesh.
+	/*Mesh3P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh1P"));
+	Mesh3P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+	Mesh3P->bChartDistanceFactor = false;                        // prevents the mesh from being added to the gloabal chart
+	Mesh3P->bReceivesDecals = false;                             // Prevents decals from spawning on the gun.
+	Mesh3P->CastShadow = false;                                  // Hides the shadow.
+	Mesh1P->bOnlyOwnerSee = false;
+	Mesh1P->bOwnerNoSee = true;
+	Mesh3P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
+	Mesh3P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
+	Mesh3P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
+	Mesh3P->AttachParent = Mesh1P;
+	*/
 
+
+	ActiveState      = ObjectInitializer.CreateDefaultSubobject<UCGWeaponActiveState>(this, TEXT("StateActive"));
+	InactiveState    = ObjectInitializer.CreateDefaultSubobject<UCGWeaponInactiveState>(this, TEXT("StateInactive"));
+	EquippingState   = ObjectInitializer.CreateDefaultSubobject<UCGWeaponEquippingState>(this, TEXT("StateEquipping"));
+	UnequippingState = ObjectInitializer.CreateDefaultSubobject<UCGWeaponUnequippingState>(this, TEXT("StateUnequipping"));
+	ReloadingState   = ObjectInitializer.CreateDefaultSubobject<UCGWeaponReloadingState>(this, TEXT("StateReloading"));
+	FiringState      = ObjectInitializer.CreateDefaultSubobject<UCGWeaponFiringState>(this, TEXT("StateFiring"));
+
+	CurrentState = InactiveState;
+
+	// Allows weapon to have a tick update (Necessary for some mechanics).
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
+
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+	bReplicateInstigator = true;
+	bNetUseOwnerRelevancy = true;
 }
 
 
@@ -29,10 +66,23 @@ void ACGWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	
+}
+
+void ACGWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Ensure we're in a state.
+	if (CurrentState == NULL)
+	{
+		GotoState(InactiveState);
+	}
 }
 
 
 #pragma region Set Functions
+
 void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 {
 	if (CGOwner != NewOwner)
@@ -52,30 +102,40 @@ void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 void ACGWeapon::OnEnterInventory(ACGCharacter* NewOwner)
 {
 	SetCGOwner(NewOwner);
+
+	if (CurrentState == NULL)
+	{
+		GotoState(InactiveState);
+	}
 }
 
 void ACGWeapon::OnExitInventory()
 {
+	// Make it inactive.
+	GotoState(InactiveState);
+
 	// If this has authorative control, remove null the pawn.
 	if (Role == ROLE_Authority)
 	{
 		SetCGOwner(NULL);
 	}
-	//TODO Remove attachment.
-
 }
 
 void ACGWeapon::OnEquip()
 {
 	// Timer and reload.
-	//AttachMeshToPawn();
-	// TODO add switch animation id appropriate.
+	AttachMeshToPawn();	
+	CurrentState->StartEquip();
+
 }
 
-void ACGWeapon::OnUnEquip()
+void ACGWeapon::OnUnequip()
 {
-	//DetachMeshFromPawn();
+	DetachMeshFromPawn();
+	CurrentState->StartUnequip();
 }
+
+
 
 void ACGWeapon::StartFire()
 {
@@ -104,22 +164,107 @@ void ACGWeapon::StopFire()
 
 #pragma endregion
 
+
+#pragma region State Management
+
 void ACGWeapon::GotoState(UCGWeaponState* NewState)
 {
-	// STATE transition happens here.
+	UE_LOG(LogTemp, Log, TEXT(" GOTO STATE!"));
+
+	// Don't transition back into the same state.
+	if (NewState != NULL && NewState != CurrentState)
+	{
+		UCGWeaponState* PrevState = CurrentState;
+		if (CurrentState != NULL)
+		{
+			CurrentState->EndState();
+		}
+
+		// Ensure the states are the same.
+		if (PrevState == CurrentState)
+		{
+			UE_LOG(LogTemp, Log, TEXT(" State Set!"));
+
+			CurrentState = NewState;
+			CurrentState->EnterState();
+		}
+	}
+}
+
+void ACGWeapon::GotoFiringState()
+{
+	// TODO Checks.
+	GotoState(FiringState);
 }
 
 
+void ACGWeapon::GotoEquippingState()
+{
+	// TODO checks.
+	GotoState(EquippingState);
+}
+
+void ACGWeapon::GotoUnequippingState()
+{
+	GotoState(UnequippingState);
+}
+
+#pragma endregion
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region Visuals
+
+void ACGWeapon::AttachMeshToPawn()
+{
+	if (CGOwner)
+	{
+		DetachMeshFromPawn();
+
+		const FName ConnectionPoint = CGOwner->GetWeaponAttachPoint();
+
+		// This lets the flags for the mesh handle everything.
+		USkeletalMeshComponent * PawnMesh1P = CGOwner->GetMesh1P();
+		Mesh1P->SetHiddenInGame(false);
+		Mesh1P->AttachTo(PawnMesh1P, ConnectionPoint, EAttachLocation::SnapToTarget);
+
+		// TODO attach the 3rd person weapon.
+		// FIXME At Some point get the locally controlled gate workng.
+	}
+}
+
+void ACGWeapon::DetachMeshFromPawn()
+{
+	Mesh1P->DetachFromParent();
+	Mesh1P->SetHiddenInGame(true);
+}
+
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region Replication
+/*
 void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACGWeapon, CGOwner);
+}*/
+
+void ACGWeapon::OnRep_CGOwner()
+{
+	if (CGOwner)
+	{
+		OnEnterInventory(CGOwner);
+	}
+	else
+	{
+		OnExitInventory();
+	}
 }
 
-void ACGWeapon::OnRep_CGOwner() 
-{ 
-	CGOwner ? OnEnterInventory(CGOwner) : OnExitInventory(); 
-}
+#pragma endregion
