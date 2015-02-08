@@ -142,7 +142,7 @@ protected:
 	TArray<class ACGWeapon*> Weapons;
 
 	/** The currently equipped weapon for the player. */
-	UPROPERTY(Transient, Replicated)//,  ReplicatedUsing = OnRep_CurrentWeapon)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
 	class ACGWeapon* CurrentWeapon;
 
 	/** A pending weapon for equips. */

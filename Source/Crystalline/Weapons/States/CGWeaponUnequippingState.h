@@ -24,7 +24,7 @@ public:
 
 	virtual void EnterState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime);
+		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime);
 	}
 	
 	void UnequipFinished()

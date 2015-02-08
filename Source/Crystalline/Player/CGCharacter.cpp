@@ -271,17 +271,17 @@ void ACGCharacter::SpawnBaseInventory()
 		// If it exists spawn the weapon.
 		if (DefaultWeaponClasses[i])
 		{
-			FActorSpawnParameters spawnInfo;
-			spawnInfo.bNoCollisionFail = true;
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.bNoCollisionFail = true;
 
 			// Spawn an actor of type ACrystallineWeapon with the DefaultWeaponClasses[i] as the archetype, and the spawnInfo settings.
-			ACGWeapon* NewWeapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponClasses[i], spawnInfo);
+			ACGWeapon* NewWeapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponClasses[i], SpawnInfo);
 
 			AddWeapon(NewWeapon);
 		}
 	}
 	
-	if (Weapons.Num() > 0 && Weapons[0])
+	if (Weapons.Num() > 0)
 	{
 		WeaponIndex = 0;
 		EquipWeapon(Weapons[0]);
@@ -302,14 +302,13 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 {
 	if (Weapon)
 	{
-		// Only the authoraty should change the current weapon.
+		// Only the authority should change the current weapon.
 		if (Role == ROLE_Authority)
 		{
-			ClientSetWeapon(Weapon);
+			SetCurrentWeapon(Weapon);
 		}
 		else
 		{
-			SetCurrentWeapon(Weapon);
 			ServerEquipWeapon(Weapon);
 		}
 	}
@@ -415,7 +414,8 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 
-	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_None);
+	// Not sure about this one.
+	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
 
 
 	// Everyone.

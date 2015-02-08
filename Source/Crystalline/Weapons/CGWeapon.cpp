@@ -19,7 +19,7 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 	Mesh1P->bChartDistanceFactor = false;                        // prevents the mesh from being added to the gloabal chart
 	Mesh1P->bReceivesDecals = false;                             // Prevents decals from spawning on the gun.
 	Mesh1P->CastShadow = false;                                  // Hides the shadow.
-	Mesh1P->bOnlyOwnerSee = false;
+	Mesh1P->bOnlyOwnerSee = true;
 	Mesh1P->bOwnerNoSee = false;
 	Mesh1P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
@@ -128,12 +128,19 @@ void ACGWeapon::OnEquip()
 	// Timer and reload.
 	AttachMeshToPawn();	
 
-	CurrentState->StartEquip();
+	// XXX this catches the starting issue wherein the weapon owners haven't been replicated yet.
+	// XXX If anims don't play on start this is likely the source!
+	if (CurrentState)
+		CurrentState->StartEquip();
+
 }
 
 void ACGWeapon::OnUnequip()
 {
-	CurrentState->StartUnequip();
+	// XXX this catches the starting issue wherein the weapon owners haven't been replicated yet.
+	// XXX If anims don't play on start this is likely the source!
+	if (CurrentState)
+		CurrentState->StartUnequip();
 }
 
 

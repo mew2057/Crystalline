@@ -15,13 +15,13 @@ struct FCGWeaponConfig
 	float EquipTime;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
-	float UnEquipTime;
+	float UnequipTime;
 
 
 	FCGWeaponConfig()
 	{
 		EquipTime = .05f;
-		UnEquipTime = .05f;
+		UnequipTime = .05f;
 	}
 };
 /**
