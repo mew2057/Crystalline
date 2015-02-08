@@ -142,7 +142,7 @@ protected:
 	TArray<class ACGWeapon*> Weapons;
 
 	/** The currently equipped weapon for the player. */
-	UPROPERTY(Transient,  ReplicatedUsing = OnRep_CurrentWeapon)
+	UPROPERTY(Transient, Replicated)//,  ReplicatedUsing = OnRep_CurrentWeapon)
 	class ACGWeapon* CurrentWeapon;
 
 	/** A pending weapon for equips. */
@@ -188,8 +188,8 @@ public:
 	/**
 	 * Replicates the inventory change to the owning player.
 	 */
-	//UFUNCTION(Client, Reliable)
-	//void ClientSetWeapon(ACGWeapon* Weapon);
+	UFUNCTION(Client, Reliable)
+	void ClientSetWeapon(ACGWeapon* Weapon);
 
 	/**
 	* [server]Equips the supplied weapon to the player.

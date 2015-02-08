@@ -250,6 +250,7 @@ void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACGWeapon, CGOwner);
+	//DOREPLIFETIME(ACGWeapon, CurrentState);
 }
 
 void ACGWeapon::OnRep_CGOwner()

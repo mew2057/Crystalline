@@ -305,16 +305,17 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 		// Only the authoraty should change the current weapon.
 		if (Role == ROLE_Authority)
 		{
-			SetCurrentWeapon(Weapon);
+			ClientSetWeapon(Weapon);
 		}
 		else
 		{
+			SetCurrentWeapon(Weapon);
 			ServerEquipWeapon(Weapon);
 		}
 	}
 }
 
-/*
+
 void ACGCharacter::ClientSetWeapon_Implementation(ACGWeapon* Weapon)
 {
 	SetCurrentWeapon(Weapon);
@@ -324,7 +325,7 @@ void ACGCharacter::ClientSetWeapon_Implementation(ACGWeapon* Weapon)
 	{
 		ServerEquipWeapon(Weapon);
 	}
-}*/
+}
 
 bool ACGCharacter::ServerEquipWeapon_Validate(ACGWeapon* NewWeapon)
 {
@@ -334,7 +335,10 @@ bool ACGCharacter::ServerEquipWeapon_Validate(ACGWeapon* NewWeapon)
 
 void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 {
-	SetCurrentWeapon(NewWeapon);
+	if (NewWeapon != NULL)
+	{
+		SetCurrentWeapon(NewWeapon);
+	}
 }
 
 #pragma endregion

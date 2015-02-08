@@ -17,5 +17,10 @@ public:
 	UCGWeaponInactiveState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 	{}
 	
+
+	virtual void StartEquip() override
+	{
+		GetOuterACGWeapon()->GotoEquippingState();
+	}
 	
 };

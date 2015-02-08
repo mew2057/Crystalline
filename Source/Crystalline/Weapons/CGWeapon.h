@@ -56,12 +56,10 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FCGWeaponConfig WeaponConfig;
-
-
+	
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
-
-
+	
 	/** The ACGCharacter holding this weapon. Replication triggers the inventory update functions. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
 	ACGCharacter* CGOwner;
@@ -82,8 +80,7 @@ public:
 
 	/** Invoked when the weapon is unequipped by a player or bot. */
 	virtual void OnUnequip();
-
-
+	
 	/** Starts the firing of a weapon if possible. */
 	virtual void StartFire();
 
@@ -130,7 +127,7 @@ public :
 	void GotoUnequippingState();
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = States)
+	UPROPERTY(BlueprintReadOnly)//, Replicated)//Category = States)
 	UCGWeaponState* CurrentState;
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "States")
