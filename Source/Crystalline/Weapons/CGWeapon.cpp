@@ -49,7 +49,8 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 	ReloadingState   = ObjectInitializer.CreateDefaultSubobject<UCGWeaponReloadingState>(this, TEXT("StateReloading"));
 	FiringState      = ObjectInitializer.CreateDefaultSubobject<UCGWeaponFiringState>(this, TEXT("StateFiring"));
 
-	CurrentState = InactiveState;
+	// NO! THIS IS BAD, LEFT IN SO YOU KNOW HOW TO KILL A SATURDAY!
+	//	CurrentState = InactiveState;
 
 	// Allows weapon to have a tick update (Necessary for some mechanics).
 	PrimaryActorTick.bCanEverTick = true;
@@ -92,6 +93,11 @@ void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 	}
 }
 
+ACGCharacter* ACGWeapon::GetCGOwner() const
+{ 
+	return CGOwner; 
+}
+
 #pragma endregion
 
 
@@ -132,6 +138,12 @@ void ACGWeapon::OnEquip()
 void ACGWeapon::OnUnequip()
 {
 	DetachMeshFromPawn();
+	if (this != Cast<ACGWeapon>(CurrentState->GetOuter()))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Outer Mismatch"));
+
+	}
+
 	CurrentState->StartUnequip();
 }
 
@@ -172,7 +184,7 @@ void ACGWeapon::GotoState(UCGWeaponState* NewState)
 	UE_LOG(LogTemp, Log, TEXT(" GOTO STATE!"));
 
 	// Don't transition back into the same state.
-	if (NewState != NULL && NewState != CurrentState)
+	if (NewState != NULL && NewState->IsIn(this) && NewState != CurrentState)
 	{
 		UCGWeaponState* PrevState = CurrentState;
 		if (CurrentState != NULL)

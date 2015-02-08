@@ -40,7 +40,6 @@ public:
 
 
 	/** The ACGCharacter holding this weapon. Replication triggers the inventory update functions. */
-	UPROPERTY(BlueprintReadOnly)
 	ACGCharacter* CGOwner;
 
 public:
@@ -74,8 +73,7 @@ public:
 	void SetCGOwner(ACGCharacter* NewOwner);
 
 	/** Retrieves the owner of the weapon. */
-	FORCEINLINE ACGCharacter* GetCGOwner() const { return CGOwner; };
-
+	ACGCharacter* GetCGOwner() const;
 
 
 #pragma region Visuals

@@ -30,7 +30,8 @@ public:
 	{
 		// Owner not set on pistol in local!
 		ACGWeapon* chaar = GetOuterACGWeapon();
-		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponUnequippingState::UnequipFinished, UnequipTime);
+		if (chaar)
+			GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponUnequippingState::UnequipFinished, UnequipTime);
 	}
 	
 	void UnequipFinished()
