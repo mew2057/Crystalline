@@ -349,6 +349,7 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 /** Initiates the fire for current weapon. */
 void ACGCharacter::StartFire()
 {
+	 // TODO cache fire?
 	if (IsLocallyControlled() && CurrentWeapon != NULL)
 	{
 		CurrentWeapon->StartFire();

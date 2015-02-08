@@ -49,13 +49,10 @@ public:
 	virtual void StartReload()
 	{}
 
-	virtual void FinishReload()
-	{}
-	
 	virtual void StartFire()
 	{}
 
-	virtual void FinishFire()
+	virtual void StopFire()
 	{}
 	
 	// Add more as needed.

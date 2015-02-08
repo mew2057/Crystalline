@@ -140,27 +140,45 @@ void ACGWeapon::OnUnequip()
 
 void ACGWeapon::StartFire()
 {
-	/*
+	// Verify we can fire.
+
+
 	if (Role < ROLE_Authority)
 	{
 		ServerStartFire();
 	}
 
-	// Firing is set to be true.
-	if (!bWantsToFire)
-	{
-		bWantsToFire = true;
-		// TODO state update
-		StartBurst();
-	}*/
+	StartFiring();
+}
+
+void ACGWeapon::StartFiring()
+{
+	CurrentState->StartFire();
+}
+
+bool ACGWeapon::ServerStartFire_Validate()
+{
+	return true;
+}
+
+void ACGWeapon::ServerStartFire_Implementation()
+{
+	StartFiring();
 }
 
 void ACGWeapon::StopFire()
 {
-	/**
-	bWantsToFire = false;
-	StopBurst();
-	*/
+	CurrentState->StopFire();
+}
+
+bool ACGWeapon::ServerStopFire_Validate()
+{
+	return true;
+}
+
+void ACGWeapon::ServerStopFire_Implementation()
+{
+	//
 }
 
 #pragma endregion

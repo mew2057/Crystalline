@@ -84,6 +84,14 @@ public:
 	/** Starts the firing of a weapon if possible. */
 	virtual void StartFire();
 
+	virtual void StartFiring();
+
+	UFUNCTION(server, reliable, WithValidation)
+	void ServerStartFire();
+
+	UFUNCTION(server, reliable, WithValidation)
+	void ServerStopFire();
+
 	/** Ends the firing of the weapon, stop in StartFire for non automatic weapons. */
 	virtual void StopFire();
 
