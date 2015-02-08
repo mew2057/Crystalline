@@ -8,12 +8,12 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS()
 class CRYSTALLINE_API ACGBaseGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
 	ACGBaseGameMode(const FObjectInitializer& ObjectInitializer);
 
-	virtual void SetPlayerDefaults(APawn* PlayerPawn) override;
+//	virtual void SetPlayerDefaults(APawn* PlayerPawn) override;
 };

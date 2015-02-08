@@ -142,7 +142,7 @@ protected:
 	TArray<class ACGWeapon*> Weapons;
 
 	/** The currently equipped weapon for the player. */
-	UPROPERTY(Transient)// , ReplicatedUsing = OnRep_CurrentWeapon)
+	UPROPERTY(Transient,  ReplicatedUsing = OnRep_CurrentWeapon)
 	class ACGWeapon* CurrentWeapon;
 
 	/** A pending weapon for equips. */
@@ -160,7 +160,6 @@ public:
 	/**
 	* Sets up the current weapon and triggers the OnEquip and OnUnequip calls.
 	* @param NewWeapon The Weapon that is equipped.
-	* @param LastWeapon [Optional] Included for the sake of ensuring replication unequips the right item.
 	*/
 	void SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon = NULL);
 
@@ -185,6 +184,12 @@ public:
 	 * @param The weapon to equip.
 	 */
 	void EquipWeapon(ACGWeapon* Weapon);
+
+	/**
+	 * Replicates the inventory change to the owning player.
+	 */
+	//UFUNCTION(Client, Reliable)
+	//void ClientSetWeapon(ACGWeapon* Weapon);
 
 	/**
 	* [server]Equips the supplied weapon to the player.

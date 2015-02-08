@@ -18,16 +18,23 @@ public:
 	{}
 
 	virtual void EnterState() override
-	{}
+	{
+		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime);
+	}
 
 	virtual void StartEquip() override
-	{}
-
+	{
+		// TODO React to an equip in the middle of equipping.
+	}
 
 	virtual void EquipFinished() 
 	{
-		//GetOuterACGWeapon()->Goto
-		// GOTO Active State
+		GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->ActiveState);
+	}
+
+	virtual void EndState() override
+	{
+		GetCGOwner()->GetWorldTimerManager().ClearTimer(this, &UCGWeaponEquippingState::EquipFinished);
 	}
 
 };

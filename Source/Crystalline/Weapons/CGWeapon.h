@@ -5,6 +5,25 @@
 #include "GameFramework/Actor.h"
 #include "CGWeapon.generated.h"
 
+
+USTRUCT()
+struct FCGWeaponConfig
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Timing)
+	float EquipTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = Timing)
+	float UnEquipTime;
+
+
+	FCGWeaponConfig()
+	{
+		EquipTime = .05f;
+		UnEquipTime = .05f;
+	}
+};
 /**
  * 
  */
@@ -35,11 +54,16 @@ protected:
 	USkeletalMeshComponent* Mesh1P;
 
 public:
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FCGWeaponConfig WeaponConfig;
+
+
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
 
 
 	/** The ACGCharacter holding this weapon. Replication triggers the inventory update functions. */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
 	ACGCharacter* CGOwner;
 
 public:
@@ -73,8 +97,10 @@ public:
 	void SetCGOwner(ACGCharacter* NewOwner);
 
 	/** Retrieves the owner of the weapon. */
-	ACGCharacter* GetCGOwner() const;
-
+	FORCEINLINE ACGCharacter* GetCGOwner() const
+	{
+		return CGOwner;
+	}
 
 #pragma region Visuals
 

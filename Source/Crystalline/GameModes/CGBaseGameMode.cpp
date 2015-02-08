@@ -16,7 +16,7 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) : 
 	PlayerControllerClass = ACGPlayerController::StaticClass();
 	HUDClass = ACGPlayerHUD::StaticClass();
 }
-
+/*
 void ACGBaseGameMode::SetPlayerDefaults(APawn* PlayerPawn)
 {
 	Super::SetPlayerDefaults(PlayerPawn);
@@ -29,7 +29,7 @@ void ACGBaseGameMode::SetPlayerDefaults(APawn* PlayerPawn)
 	}
 
 }
-
+*/
 /*
 void ACGBaseGameMode::PostLogin(APlayerController* NewPlayer)
 {

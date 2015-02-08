@@ -56,7 +56,7 @@ void ACGCharacter::PostInitializeComponents()
 	{
 		CurrentShield = MaxShield;
 		CurrentHealth = MaxHealth;
-	//	SpawnBaseInventory();
+		SpawnBaseInventory();
 	}
 
 }
@@ -224,7 +224,7 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 	{
 		LocalLastWeapon = CurrentWeapon;
 	}
-
+	
 	// If there's an existing weapon it needs to be unequipped first.
 	if (LocalLastWeapon != NULL && NewWeapon != NULL)
 	{
@@ -243,11 +243,8 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 
 void ACGCharacter::WeaponChanged()
 {
-
 	if (PendingWeapon != NULL)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Weapon Changed!"));
-
 		CurrentWeapon = PendingWeapon;
 		PendingWeapon = NULL;
 		CurrentWeapon->SetCGOwner(this);
@@ -283,10 +280,9 @@ void ACGCharacter::SpawnBaseInventory()
 			AddWeapon(NewWeapon);
 		}
 	}
-
+	
 	if (Weapons.Num() > 0 && Weapons[0])
 	{
-		UE_LOG(LogTemp, Log, TEXT("SpawnInventoryEquipping"));
 		WeaponIndex = 0;
 		EquipWeapon(Weapons[0]);
 	}
@@ -315,9 +311,20 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 		{
 			ServerEquipWeapon(Weapon);
 		}
-
 	}
 }
+
+/*
+void ACGCharacter::ClientSetWeapon_Implementation(ACGWeapon* Weapon)
+{
+	SetCurrentWeapon(Weapon);
+	
+	// Tell the server that it needs to set the weapon to be safe.
+	if (Role < ROLE_Authority)
+	{
+		ServerEquipWeapon(Weapon);
+	}
+}*/
 
 bool ACGCharacter::ServerEquipWeapon_Validate(ACGWeapon* NewWeapon)
 {
@@ -327,7 +334,7 @@ bool ACGCharacter::ServerEquipWeapon_Validate(ACGWeapon* NewWeapon)
 
 void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 {
-	EquipWeapon(NewWeapon);
+	SetCurrentWeapon(NewWeapon);
 }
 
 #pragma endregion
@@ -407,7 +414,7 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 
 
 	// Everyone.
-//	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
+	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
 	DOREPLIFETIME(ACGCharacter, CurrentHealth);
 	DOREPLIFETIME(ACGCharacter, CurrentShield);
 

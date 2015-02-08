@@ -93,10 +93,6 @@ void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 	}
 }
 
-ACGCharacter* ACGWeapon::GetCGOwner() const
-{ 
-	return CGOwner; 
-}
 
 #pragma endregion
 
@@ -131,19 +127,12 @@ void ACGWeapon::OnEquip()
 {
 	// Timer and reload.
 	AttachMeshToPawn();	
-	CurrentState->StartEquip();
 
+	CurrentState->StartEquip();
 }
 
 void ACGWeapon::OnUnequip()
 {
-	DetachMeshFromPawn();
-	if (this != Cast<ACGWeapon>(CurrentState->GetOuter()))
-	{
-		UE_LOG(LogTemp, Log, TEXT("Outer Mismatch"));
-
-	}
-
 	CurrentState->StartUnequip();
 }
 
@@ -181,8 +170,6 @@ void ACGWeapon::StopFire()
 
 void ACGWeapon::GotoState(UCGWeaponState* NewState)
 {
-	UE_LOG(LogTemp, Log, TEXT(" GOTO STATE!"));
-
 	// Don't transition back into the same state.
 	if (NewState != NULL && NewState->IsIn(this) && NewState != CurrentState)
 	{
@@ -195,8 +182,6 @@ void ACGWeapon::GotoState(UCGWeaponState* NewState)
 		// Ensure the states are the same.
 		if (PrevState == CurrentState)
 		{
-			UE_LOG(LogTemp, Log, TEXT(" State Set!"));
-
 			CurrentState = NewState;
 			CurrentState->EnterState();
 		}
@@ -259,13 +244,13 @@ void ACGWeapon::DetachMeshFromPawn()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region Replication
-/*
+
 void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACGWeapon, CGOwner);
-}*/
+}
 
 void ACGWeapon::OnRep_CGOwner()
 {
@@ -278,5 +263,7 @@ void ACGWeapon::OnRep_CGOwner()
 		OnExitInventory();
 	}
 }
+
+
 
 #pragma endregion

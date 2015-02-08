@@ -15,23 +15,16 @@ class  UCGWeaponUnequippingState : public UCGWeaponState
 
 protected:
 
-	/** Time to unequip. */
-	UPROPERTY(EditDefaultsOnly)
-	float UnequipTime;
 
 public:
 
 	UCGWeaponUnequippingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 	{
-		UnequipTime = .5f;
 	}
 
 	virtual void EnterState() override
 	{
-		// Owner not set on pistol in local!
-		ACGWeapon* chaar = GetOuterACGWeapon();
-		if (chaar)
-			GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponUnequippingState::UnequipFinished, UnequipTime);
+		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime);
 	}
 	
 	void UnequipFinished()
