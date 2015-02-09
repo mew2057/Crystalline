@@ -17,12 +17,14 @@ struct FCGWeaponConfig
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 	uint32 bAutomaticFire : 1;
 
-
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 	float EquipTime;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 	float UnequipTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	uint32 bUsesProjectile : 1;
 
 	/** The damage caused by a single shot. */
 	UPROPERTY(EditDefaultsOnly, Category=WeaponAttributes)
@@ -41,6 +43,7 @@ struct FCGWeaponConfig
 		UnequipTime = .05f;
 	
 		// Attributes.
+		bUsesProjectile = true;
 		BaseDamage  = 10.f;
 		WeaponRange = 10000.f;
 	}
@@ -53,7 +56,7 @@ struct FCGProjectileData
 
 	/** The class of the Projectile that will be shot by the weapon. */
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class ACrystallineProjectile> ProjectileClass;
+	TSubclassOf<class ACGProjectile> ProjectileClass;
 
 	/** The life span of the projectile before despawning. */
 	UPROPERTY(EditDefaultsOnly)
@@ -171,11 +174,6 @@ class CRYSTALLINE_API ACGWeapon : public AActor
 	friend class UCGWeaponFiringState;
 	friend class UCGWeaponReloadingState;
 
-protected:
-	/** The time of the last shot by the weapon.*/
-	UPROPERTY()
-	float LastFireTime;
-
 public:
 	ACGWeapon(const FObjectInitializer& ObjectInitializer);
 	
@@ -215,8 +213,12 @@ public:
 	// Mutable weapon fields
 
 	// Keeps track of the current burst. Ammo Doesn't need to be replicated.
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_BurstCount)
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_BurstCount)
 	int32 BurstCount;
+	
+	/** The time of the last shot by the weapon.*/
+	UPROPERTY()
+	float LastFireTime;
 
 	////////////////////////////
 	//  Components
@@ -276,10 +278,26 @@ public:
 
 	virtual void StopWeaponFireSimulation();
 
+#pragma region Projectile
+
+	virtual void FireProjectile();
+
+	UFUNCTION(server, reliable, WithValidation)
+	void ServerFireProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
+
+#pragma endregion
+
+#pragma region Hit Scan
+
+	virtual void FireHitScan();
+
+#pragma endregion
+
+	virtual void UseAmmo();
+
 	/**Replicates weapon fire simulation. */
 	UFUNCTION()
-	virtual void OnRep_BurstCount();
-
+	void OnRep_BurstCount();
 
 	/**
 	 * Sets the owner of the weapon. 
@@ -289,6 +307,25 @@ public:
 
 	/** Retrieves the owner of the weapon. */
 	FORCEINLINE ACGCharacter* GetCGOwner() const {	return CGOwner;	}
+
+	////////////////////////////
+	// Weapon Transform Helpers
+
+	/** Gets the aim vector for the player.*/
+	FVector GetCameraAim() const;
+
+	/** Gets the location of the player's camera.*/
+	FVector GetCameraLocation() const;
+
+	/** Gets the muzzle location for spawning projectiles and playing effects.*/
+	FVector GetMuzzleLocation() const;
+
+	/** Gets the vector for the rotation of the muzzle.*/
+	FVector GetMuzzleRotation() const;
+
+protected:
+	FHitResult WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const;
+
 
 #pragma region Visuals
 
@@ -315,11 +352,11 @@ public :
 	virtual void GotoFiringState();
 
 public:
+
 	UPROPERTY(BlueprintReadOnly)
 	UCGWeaponState* CurrentState;
 
 protected:
-	
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "States")
 	UCGWeaponState* ActiveState;

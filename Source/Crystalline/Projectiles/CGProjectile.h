@@ -15,8 +15,6 @@ class CRYSTALLINE_API ACGProjectile : public AActor
 
 	ACGProjectile(const FObjectInitializer& ObjectInitializer);
 
-
-
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp;

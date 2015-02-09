@@ -144,11 +144,12 @@ void ACGPlayerHUD::DrawHealth()
 {
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 
+
 	// TODO replace this!
 	// Write a text function.
-	/*
+	
 	float SizeX, SizeY;
-	FString Text = FString::SanitizeFloat(Pawn->GetHealth());
+	FString Text = FString::SanitizeFloat(Pawn->GeCurrentShield());
 
 	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
 	TextItem.EnableShadow(FLinearColor::Black);
@@ -160,8 +161,13 @@ void ACGPlayerHUD::DrawHealth()
 	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
 	//TextItem.FontRenderInfo = ShadowedFont;
 
-	Canvas->DrawItem(TextItem, 100, 100);
-	*/
+	Canvas->DrawItem(TextItem, 100, 300);
+
+	Text = FString::SanitizeFloat(Pawn->GetCurrentHealth());
+	TextItem.Text = FText::FromString(Text);
+
+	Canvas->DrawItem(TextItem, 100, 350);
+
 
 }
 

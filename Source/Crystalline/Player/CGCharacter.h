@@ -25,6 +25,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	virtual void Restart() override;
+
 protected:
 	/** Max player shield amount. This is decayed before the health.*/
 	UPROPERTY(EditDefaultsOnly, Category=Config)
@@ -66,7 +67,11 @@ protected:
 
 public:
 
-	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
+	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	FORCEINLINE float GeCurrentShield() const { return CurrentShield; }
+	FORCEINLINE float GetCurrentHealth() const{ return CurrentHealth; }
+	FORCEINLINE float GeMaxShieldP() const { return MaxShield; }
+	
 
 
 #pragma region Movement

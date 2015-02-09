@@ -8,6 +8,8 @@
 #include "Weapons/States/CGWeaponUnequippingState.h"
 #include "Weapons/States/CGWeaponReloadingState.h"
 #include "Weapons/States/CGWeaponFiringState.h"
+#include "Projectiles/CGProjectile.h"
+
 
 #include "CGWeapon.h"
 
@@ -60,6 +62,9 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 	bReplicates = true;
 	bReplicateInstigator = true;
 	bNetUseOwnerRelevancy = true;
+
+	BurstCount = 0;
+	LastFireTime = 0.0f;
 }
 
 
@@ -90,7 +95,9 @@ void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 {
 	if (CGOwner != NewOwner)
 	{
-		CGOwner = NewOwner;
+		CGOwner    = NewOwner;
+		Instigator = NewOwner;
+
 		SetOwner(CGOwner);
 	}
 }
@@ -197,13 +204,31 @@ void ACGWeapon::ServerStopFire_Implementation()
 
 void ACGWeapon::StartFiring()
 {
+	// XXX Must be able to fire.
+
 	// Don't fire if the netmode is dedicated server.
 	if (GetNetMode() != NM_DedicatedServer)
 	{
 		StartWeaponFireSimulation();
 	}
 
+	if (CGOwner && CGOwner->IsLocallyControlled())
+	{
+		if (WeaponConfig.bUsesProjectile)
+		{
+			FireProjectile();
+		}
+		else
+		{
+			FireHitScan();
+		}
+		UseAmmo();
+	}
+
+	// Triggers the OnRep
 	BurstCount++;
+
+	LastFireTime = GetWorld()->GetTimeSeconds();
 }
 
 void ACGWeapon::StopFiring()
@@ -253,6 +278,97 @@ void ACGWeapon::StopWeaponFireSimulation()
 	}*/
 }
 
+#pragma region Projectile Fire
+
+void ACGWeapon::FireProjectile()
+{
+	const FVector StartTrace = GetCameraLocation();
+	const FVector AimDir     = GetCameraAim();
+	const FVector EndTrace   = StartTrace + AimDir * WeaponConfig.WeaponRange;
+	FHitResult Impact        = WeaponTrace(StartTrace, EndTrace);
+
+	// This needs to be more robust for multi mesh solutions.
+	FVector Origin = GetMuzzleLocation();
+	FVector Direction = AimDir;
+
+	if (Impact.bBlockingHit)
+	{
+		FVector MuzzleDir = (Impact.ImpactPoint - Origin).SafeNormal();
+
+		bool bIntersecting = false;
+		float GunDot = FVector::DotProduct(MuzzleDir, Direction);
+
+		// If it's less than zero we're penetrating.
+		if (GunDot < 0.0f)
+		{
+			bIntersecting = true;
+		}
+		else if (GunDot < 0.5f) // If there's an angle there's a chance of penetration
+		{
+			// TOOD can shoot through walls in doorways.
+			// XXX the 150 may change.
+			FVector WeaponTraceStart = Origin - GetMuzzleRotation() * 200.f;
+
+			bIntersecting = WeaponTrace(WeaponTraceStart, Origin).bBlockingHit;
+
+			// Basically the check finds the gun intersection.
+			//				____________	
+			//				|/
+			//			    / (Gun)
+			//	(Gun Inter)*|
+			//				|
+			//				|
+		}
+
+		if (bIntersecting)
+		{
+			Origin = Impact.ImpactPoint;
+		}
+		else
+		{
+			Direction = MuzzleDir;
+		}
+	}
+	
+	// Server should only spawn the projectile.
+	ServerFireProjectile(Origin, Direction);
+}
+
+bool ACGWeapon::ServerFireProjectile_Validate(FVector Origin, FVector_NetQuantizeNormal ShootDir)
+{
+	return true;
+}
+
+void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal ShootDir)
+{
+	// Determine the spawn point and create a bullet to fire.
+	FTransform BulletSpawn(ShootDir.Rotation(), Origin);
+	ACGProjectile* Bullet = Cast<ACGProjectile>(
+		UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn));
+
+	if (Bullet)
+	{
+		Bullet->Instigator = Instigator;
+		Bullet->SetOwner(this);
+		Bullet->SetVelocity(ShootDir); // This ensures the behavior matches it's intended use case.
+		Bullet->ImpactDamage = WeaponConfig.BaseDamage;
+		UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);
+	}
+}
+
+#pragma endregion
+
+void ACGWeapon::FireHitScan()
+{
+
+}
+
+void ACGWeapon::UseAmmo()
+{
+
+}
+
+
 void ACGWeapon::OnRep_BurstCount()
 {
 	if (BurstCount > 0)
@@ -264,7 +380,6 @@ void ACGWeapon::OnRep_BurstCount()
 		StopWeaponFireSimulation();
 	}
 }
-
 
 #pragma endregion
 
@@ -285,11 +400,7 @@ void ACGWeapon::GotoState(UCGWeaponState* NewState)
 		// Ensure the states are the same.
 		if (PrevState == CurrentState)
 		{
-			if (CurrentState)
-				UE_LOG(LogTemp, Log, TEXT("Old State: %s"), *CurrentState->GetName());
-
 			CurrentState = NewState;
-			UE_LOG(LogTemp, Log, TEXT("New State: %s"), *CurrentState->GetName());
 
 			CurrentState->EnterState();
 		}
@@ -311,9 +422,6 @@ void ACGWeapon::GotoEquippingState()
 
 
 #pragma endregion
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -347,6 +455,68 @@ void ACGWeapon::DetachMeshFromPawn()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma region TransformHelpers
+
+FVector ACGWeapon::GetCameraAim() const
+{
+	// Zero the aim  in case of failure.
+	FVector Aim = FVector::ZeroVector;
+	AController* Controller = Instigator ? Instigator->Controller : NULL;
+	if (Controller)
+	{
+		FVector  TempOrigin;
+		FRotator TempRotator;
+		Controller->GetPlayerViewPoint(TempOrigin, TempRotator);
+
+		Aim = TempRotator.Vector();
+	}
+
+	return Aim;
+}
+
+FVector ACGWeapon::GetCameraLocation() const
+{
+	// Zero the origin in case of failure.
+	FVector Origin = FVector::ZeroVector;
+	AController* Controller = Instigator ? Instigator->Controller : NULL;
+	if (Controller)
+	{
+		FRotator TempRotator;
+		Controller->GetPlayerViewPoint(Origin, TempRotator);
+	}
+
+	return Origin;
+}
+
+FVector ACGWeapon::GetMuzzleLocation() const
+{
+	// TODO Mesh for not locally controlled.
+
+	return Mesh1P->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
+}
+
+FVector ACGWeapon::GetMuzzleRotation() const
+{
+	// TODO Mesh for not locally controlled.
+	return Mesh1P->GetSocketRotation(WeaponFXConfig.MuzzleSocket).Vector();
+}
+
+
+FHitResult ACGWeapon::WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const
+{
+	FCollisionQueryParams TraceParams = FCollisionQueryParams(WEAPON_TRACE_TAG, true, CGOwner);
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = true;
+
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingle(Hit, TraceFrom, TraceTo, COLLISION_WEAPON, TraceParams);
+
+	return Hit;
+}
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma region Replication
 
 void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -368,7 +538,5 @@ void ACGWeapon::OnRep_CGOwner()
 		OnExitInventory();
 	}
 }
-
-
 
 #pragma endregion

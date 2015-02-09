@@ -13,7 +13,7 @@ void UCGWeaponFiringState::EnterState()
 	const float TimeRemaining = FMath::Max( 0.f, GetOuterACGWeapon()->WeaponConfig.TimeBetweenShots - TimeSinceShot);
 
 	// XXX verify this!
-	if (TimeRemaining > 0)
+	if (TimeRemaining > 0 && GetOuterACGWeapon()->LastFireTime > 0.f)
 	{
 		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponFiringState::FireShot, TimeRemaining, false);	// Time for the first iteration.
 	}
@@ -37,15 +37,6 @@ void UCGWeaponFiringState::StopFire()
 
 void UCGWeaponFiringState::FireShot()
 {
-	if (GetCGOwner()->Role < ROLE_Authority)
-	{
-		UE_LOG(LogTemp, Log, TEXT("ClientFire"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("ServerFire"));
-
-	}
 	// Fire the gun.
 	GetOuterACGWeapon()->StartFiring();
 

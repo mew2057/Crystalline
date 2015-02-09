@@ -35,7 +35,6 @@ struct FPistolProjectileData
 		CooldownPerSecond = 30.f;
 		OverheatTime = 0.5f;
 	}
-
 };
 
 /**
