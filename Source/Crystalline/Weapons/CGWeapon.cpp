@@ -174,20 +174,32 @@ void ACGWeapon::OnStartReload()
 void ACGWeapon::StopReload()
 {
 	// If firing was pending, continue firing.
-	GotoState(ActiveState);
+	if (CGOwner->bWantsToFire)
+	{
+		GotoState(FiringState);
+	}
+	else
+	{
+		GotoState(ActiveState);
+	}
 }
 
-void ACGWeapon::StartCooldown()
+void ACGWeapon::StartOverheat(){ }
+
+float ACGWeapon::GetReloadTime() const
+{
+	return 0.f; 
+}
+
+bool ACGWeapon::GetCanReload() const
+{
+	return false;
+}
+
+void ACGWeapon::ApplyReload()
 {
 
 }
-
-void ACGWeapon::EndCooldown()
-{
-
-}
-
-
 
 #pragma endregion
 
@@ -243,14 +255,14 @@ void ACGWeapon::ServerStopFire_Implementation()
 }
 
 
-void ACGWeapon::StartFiring()
+bool ACGWeapon::StartFiring()
 {
 	// XXX maybe put it in the firing state?
 	// EARLY RETURN! If the gun can't fire goto the reload state.
 	if (!CanFire())
 	{
 		GotoState(ReloadingState);
-		return;
+		return false;
 	}
 
 	if (CGOwner && CGOwner->IsLocallyControlled())
@@ -277,6 +289,8 @@ void ACGWeapon::StartFiring()
 	BurstCount++;
 
 	LastFireTime = GetWorld()->GetTimeSeconds();
+
+	return true;
 }
 
 void ACGWeapon::StopFiring()

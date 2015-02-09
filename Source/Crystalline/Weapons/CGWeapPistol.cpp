@@ -10,7 +10,6 @@ ACGWeapPistol::ACGWeapPistol(const FObjectInitializer& ObjectInitializer) : Supe
 {
 	WeaponConfig.bUsesProjectile = true;
 	ReloadingState = ObjectInitializer.CreateDefaultSubobject<UCGWeaponReloadOverheatState>(this, TEXT("StateOverheating"));
-
 }
 
 void ACGWeapPistol::PostInitializeComponents()
@@ -23,10 +22,11 @@ void ACGWeapPistol::PostInitializeComponents()
 
 void ACGWeapPistol::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds);
-
 	if (!bIsOverheated)
 		WeaponHeat = FMath::Max(0.f, WeaponHeat - (OverheatConfig.CooldownPerSecond * DeltaSeconds));
+
+	Super::Tick(DeltaSeconds);
+
 }
 
 
@@ -47,8 +47,7 @@ bool ACGWeapPistol::CanFire() const
 	else
 	{
 		return WeaponHeat + OverheatConfig.HeatPerShot <= OverheatConfig.MaxHeat;
-	}
-	
+	}	
 }
 
 float ACGWeapPistol::GetClipPercent() const
@@ -56,14 +55,26 @@ float ACGWeapPistol::GetClipPercent() const
 	return  WeaponHeat / OverheatConfig.MaxHeat;
 }
 
-void ACGWeapPistol::StartCooldown()
+void ACGWeapPistol::StartOverheat()
 {
 	bIsOverheated = true;
+
+	GetWorldTimerManager().SetTimer(this,
+		&ACGWeapPistol::BeginCooldown,
+		OverheatConfig.OverheatTime, false);
 }
 
-void ACGWeapPistol::EndCooldown()
+void ACGWeapPistol::BeginCooldown()
 {
 	bIsOverheated = false;
+	GetWorldTimerManager().ClearTimer(this, &ACGWeapPistol::BeginCooldown);
 }
 
 #pragma endregion
+
+void ACGWeapPistol::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ACGWeapPistol, WeaponHeat, COND_OwnerOnly);
+}

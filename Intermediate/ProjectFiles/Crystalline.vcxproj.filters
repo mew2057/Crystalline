@@ -206,15 +206,9 @@
     <Filter Include="Source\Crystalline\Weapons\States">
       <UniqueIdentifier>{005B189E-846D-45FB-AEDB-55A11516946A}</UniqueIdentifier>
     </Filter>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponActiveState.cpp">
-      <Filter>Source\Crystalline\Weapons\States</Filter>
-    </ClCompile>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponActiveState.h">
       <Filter>Source\Crystalline\Weapons\States</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponEquippingState.cpp">
-      <Filter>Source\Crystalline\Weapons\States</Filter>
-    </ClCompile>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponEquippingState.h">
       <Filter>Source\Crystalline\Weapons\States</Filter>
     </ClInclude>
@@ -224,15 +218,9 @@
     <ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponFiringState.h">
       <Filter>Source\Crystalline\Weapons\States</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponInactiveState.cpp">
-      <Filter>Source\Crystalline\Weapons\States</Filter>
-    </ClCompile>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponInactiveState.h">
       <Filter>Source\Crystalline\Weapons\States</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponReloadingState.cpp">
-      <Filter>Source\Crystalline\Weapons\States</Filter>
-    </ClCompile>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponReloadingState.h">
       <Filter>Source\Crystalline\Weapons\States</Filter>
     </ClInclude>

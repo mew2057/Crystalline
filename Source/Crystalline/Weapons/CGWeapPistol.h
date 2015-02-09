@@ -27,9 +27,12 @@ public:
 
 	virtual float GetClipPercent() const override;
 
-	virtual void StartCooldown() override;
+	virtual void StartOverheat() override;
 
-	virtual void EndCooldown() override;
+	void BeginCooldown();
+
+	virtual int32 GetAmmoInClip() const  override{ return WeaponHeat; }
+
 
 #pragma endregion
 
@@ -49,7 +52,7 @@ protected:
 	////////////////////////////////////
 	// Overheat Mechanic
 	/** The current heat of the weapon, Zero at start.*/
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated)
 	float WeaponHeat;
 
 

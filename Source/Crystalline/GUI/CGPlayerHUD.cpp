@@ -110,6 +110,29 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 		Canvas->SetDrawColor(FColor::White);	
 		Canvas->DrawIcon(WeaponHUDConfig.WeaponIcon, 40, 20, ScaleUIY);
+
+		// Debug Ammo Text
+		////////////////////////////////////////////////////
+		float SizeX, SizeY;
+		FString Text = FString::SanitizeFloat(CurrentWeapon->GetAmmoInClip());
+
+		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
+		TextItem.EnableShadow(FLinearColor::Black);
+		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+
+		const float TopTextScale = 0.73f; // of 51pt font
+
+		TextItem.Text = FText::FromString(Text);
+		TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
+		//TextItem.FontRenderInfo = ShadowedFont;
+
+		Canvas->DrawItem(TextItem, 20, 10);
+
+		Text = FString::SanitizeFloat(CurrentWeapon->GetAmmo());
+		TextItem.Text = FText::FromString(Text);
+
+		Canvas->DrawItem(TextItem, 50, 10);
+		////////////////////////////////////////////////////
 	}
 	
 	

@@ -71,11 +71,16 @@ struct FCGAmmoData
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 	int32 ClipSize;
 
+	/** The amount of time that the weapon is in the "Reload" state. */
+	UPROPERTY(EditDefaultsOnly)
+	float ReloadTime;
+
 	FCGAmmoData()
 	{
 		AmmoPerShot  = 1;
 		AmmoCapacity = 100;
 		ClipSize     = 10;
+		ReloadTime = .5f;
 	}
 };
 
@@ -96,9 +101,9 @@ struct FCGOverheatAmmoData
 	UPROPERTY(EditDefaultsOnly)
 	float CooldownPerSecond;
 
-	/** The amount of time that the weapon is in the "overheat" state. */
 	UPROPERTY(EditDefaultsOnly)
 	float OverheatTime;
+
 
 	/** Sets defaults */
 	FCGOverheatAmmoData()
@@ -107,7 +112,7 @@ struct FCGOverheatAmmoData
 		MaxHeat = 100.f;
 		HeatPerShot = 15.f;
 		CooldownPerSecond = 30.f;
-		OverheatTime = 0.5f;
+		OverheatTime = .5f;
 	}
 };
 
@@ -392,11 +397,20 @@ public:
 
 	virtual void OnStartReload();
 
-	virtual void StopReload();
+	void StopReload();
 
-	// XXX these two are a hack
-	virtual void StartCooldown();
-	virtual void EndCooldown();
+	// This is managed by the weapon, not the state at the present.
+	// FIXME
+	virtual void StartOverheat();
+
+	// Gives the Reload state the information it requires to spawn a timer.
+	virtual float GetReloadTime() const;
+
+	virtual bool GetCanReload() const;
+		
+	virtual void ApplyReload();
+
+
 
 #pragma endregion
 
@@ -414,7 +428,7 @@ public:
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerStopFire();
 	
-	virtual void StartFiring();
+	virtual bool StartFiring();
 
 	virtual void StopFiring();
 
@@ -472,6 +486,11 @@ public:
 	virtual bool CanFire() const;
 
 	virtual float GetClipPercent() const;
+
+	virtual int32 GetAmmo() const { return 0; }
+
+	virtual int32 GetAmmoInClip() const { return 0; }
+
 
 #pragma endregion
 

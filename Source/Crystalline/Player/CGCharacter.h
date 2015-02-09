@@ -157,6 +157,7 @@ protected:
 	ACGWeapon* PendingWeapon;
 
 
+
 	//XXX This is getting removed when I get the crystal system in.
 	/** The index of the currently equipped weapon. */
 	uint32 WeaponIndex;
@@ -164,6 +165,12 @@ protected:
 
 
 public:
+
+	// TODO make me private
+	/** Tracks whether or not the player is attempting to shoot the gun.*/
+	UPROPERTY(Transient)
+	uint32 bWantsToFire : 1;
+
 	/**
 	* Sets up the current weapon and triggers the OnEquip and OnUnequip calls.
 	* @param NewWeapon The Weapon that is equipped.

@@ -17,3 +17,8 @@ bool ACrystalGun::CanFire()
 {
 	return false;
 }
+
+void GetReloadTime()
+{
+
+}

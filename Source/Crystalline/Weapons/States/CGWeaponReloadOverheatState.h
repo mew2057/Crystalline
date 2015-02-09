@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include "Weapons/States/CGWeaponReloadingState.h"
+#include "Weapons/States/CGWeaponState.h"
 #include "CGWeaponReloadOverheatState.generated.h"
 
 /**
  * XXX FIXME TODO THIS IS A HACK! Redo me.
+ * XXX Tightly Coupled
  */
 UCLASS()
-class CRYSTALLINE_API UCGWeaponReloadOverheatState : public UCGWeaponReloadingState
+class CRYSTALLINE_API UCGWeaponReloadOverheatState : public UCGWeaponState
 {
 	GENERATED_BODY()
 	
@@ -23,18 +24,8 @@ public:
 	{
 		// Make sure the overheat guage is fully maxed.
 		GetOuterACGWeapon()->UseAmmo();
-		GetOuterACGWeapon()->StartCooldown();
-
-		GetCGOwner()->GetWorldTimerManager().SetTimer(this,
-			&UCGWeaponReloadOverheatState::OverheatFinished, 
-			OverheatTime,
-			false);	// Time for the first iteration.
-
-	}
-
-	void OverheatFinished()
-	{
-		GetOuterACGWeapon()->EndCooldown();
+		GetOuterACGWeapon()->UseAmmo();
+		GetOuterACGWeapon()->StartOverheat();
 	}
 
 	void Tick(float DeltaSeconds)

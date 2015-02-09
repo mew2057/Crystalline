@@ -44,7 +44,8 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 
 	MaxHealth     = 10.0f;
 	CurrentHealth = MaxHealth;
-	PendingWeapon = false;
+	PendingWeapon = NULL;
+	bWantsToFire  = false;
 }
 
 void ACGCharacter::PostInitializeComponents()
@@ -349,9 +350,10 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 /** Initiates the fire for current weapon. */
 void ACGCharacter::StartFire()
 {
-	 // TODO cache fire?
-	if (IsLocallyControlled() && CurrentWeapon != NULL)
+	// TODO make sure bWantsToFire works.
+	if (IsLocallyControlled() && CurrentWeapon != NULL && !bWantsToFire)
 	{
+		bWantsToFire = true;
 		CurrentWeapon->StartFire();
 	}
 }
@@ -359,8 +361,9 @@ void ACGCharacter::StartFire()
 /** Stops the fire for current weapon. */
 void ACGCharacter::StopFire()
 {
-	if (CurrentWeapon != NULL)
+	if (IsLocallyControlled() && CurrentWeapon != NULL && bWantsToFire)
 	{
+		bWantsToFire = false;
 		CurrentWeapon->StopFire();
 	}
 }
@@ -368,7 +371,10 @@ void ACGCharacter::StopFire()
 /** Triggers the reload for current weapon. */
 void ACGCharacter::OnReload()
 {
-
+	if (IsLocallyControlled() && CurrentWeapon != NULL)
+	{
+		CurrentWeapon->OnStartReload();
+	}
 }
 
 /** Changes the equipped weapon to the next one in the Inventory Weapon array. */
