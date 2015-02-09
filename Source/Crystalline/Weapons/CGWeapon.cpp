@@ -568,17 +568,17 @@ void ACGWeapon::SimulateHitScan(const FVector& Origin, int32 RandomSeed, float S
 {
 	FRandomStream WeaponRandomStream(RandomSeed);
 
-	const FVector StartTrace = GetCameraLocation();
-	const FVector AimDir = GetCameraAim();
-	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, Spread);
+	const FVector StartTrace = Origin;
+	const FVector AimDir = GetCameraAim(); // Fails here!
+	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, Spread, Spread);
 	const FVector EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
-	FHitResult Impact = WeaponTrace(Origin, EndTrace);
+	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 
 	if (Impact.bBlockingHit)
 	{
-		SpawnTrailEffect(EndTrace);
+		SpawnTrailEffect(Impact.ImpactPoint);
 		SpawnHitEffect(Impact);
 	}
 	else
@@ -586,7 +586,6 @@ void ACGWeapon::SimulateHitScan(const FVector& Origin, int32 RandomSeed, float S
 		SpawnTrailEffect(EndTrace);
 	}
 }
-
 
 
 void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
@@ -607,9 +606,7 @@ void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
 }
 
 // TODO
-void ACGWeapon::SpawnHitEffect(const FHitResult& Impact)
-{
-}
+void ACGWeapon::SpawnHitEffect(const FHitResult& Impact) { }
 
 
 void ACGWeapon::DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir)
@@ -677,8 +674,6 @@ void ACGWeapon::OnRep_BurstCount()
 		StopWeaponFireSimulation();
 	}
 }
-
-
 
 #pragma region State Management
 
@@ -770,6 +765,10 @@ FVector ACGWeapon::GetCameraAim() const
 		Controller->GetPlayerViewPoint(TempOrigin, TempRotator);
 
 		Aim = TempRotator.Vector();
+	}
+	else if (Instigator)
+	{
+		Aim = Instigator->GetBaseAimRotation().Vector();
 	}
 
 	return Aim;

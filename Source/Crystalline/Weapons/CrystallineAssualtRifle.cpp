@@ -204,7 +204,7 @@ void ACrystallineAssualtRifle::SimulateHitScan(const FVector& Origin, int32 Rand
 
 	if (Impact.bBlockingHit)
 	{
-		SpawnTrailEffect(EndTrace);
+		SpawnTrailEffect(Impact.ImpactPoint);
 		SpawnImpactEffects(Impact);
 	}
 	else

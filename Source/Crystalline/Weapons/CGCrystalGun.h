@@ -18,6 +18,7 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+
 #pragma region Ammo
 
 	virtual void UseAmmo() override;

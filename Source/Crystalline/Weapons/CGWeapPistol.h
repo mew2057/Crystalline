@@ -19,6 +19,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void OnStartReload() override {}// No manual reload behavior!
+
 #pragma region Ammo
 
 	virtual void UseAmmo() override;
