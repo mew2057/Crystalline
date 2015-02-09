@@ -181,6 +181,7 @@ void ACGWeapon::StopFire()
 
 	// TODO make a function?
 	CurrentState->StopFire();
+
 }
 
 bool ACGWeapon::ServerStopFire_Validate()
@@ -196,24 +197,23 @@ void ACGWeapon::ServerStopFire_Implementation()
 
 void ACGWeapon::StartFiring()
 {
-	StartWeaponFireSimulation();
+	// Don't fire if the netmode is dedicated server.
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		StartWeaponFireSimulation();
+	}
+
+	BurstCount++;
 }
 
 void ACGWeapon::StopFiring()
-{
+{	
 	// Clean up
 	StopWeaponFireSimulation();
 }
 
 void ACGWeapon::StartWeaponFireSimulation()
-{
-	// EARLY RETURN: The Server shouldn't play these effects, if it isn't firing (You misread this one john).
-	/*if(Role == ROLE_Authority )
-	{
-	return;
-	}
-	*/
-	
+{  
 	// The sound effect.
 	if (WeaponFXConfig.FireSound)
 	{
@@ -235,6 +235,7 @@ void ACGWeapon::StartWeaponFireSimulation()
 
 void ACGWeapon::StopWeaponFireSimulation()
 { 
+	BurstCount = 0;
 	/*
 	// Clean up the components.
 	if (MuzzleFlashComp != NULL)
@@ -250,6 +251,18 @@ void ACGWeapon::StopWeaponFireSimulation()
 		FireAudioComponent->FadeOut(0.1f, 0.0f);
 		FireAudioComponent = NULL;
 	}*/
+}
+
+void ACGWeapon::OnRep_BurstCount()
+{
+	if (BurstCount > 0)
+	{
+		StartWeaponFireSimulation();
+	}
+	else
+	{
+		StopWeaponFireSimulation();
+	}
 }
 
 
@@ -272,7 +285,12 @@ void ACGWeapon::GotoState(UCGWeaponState* NewState)
 		// Ensure the states are the same.
 		if (PrevState == CurrentState)
 		{
+			if (CurrentState)
+				UE_LOG(LogTemp, Log, TEXT("Old State: %s"), *CurrentState->GetName());
+
 			CurrentState = NewState;
+			UE_LOG(LogTemp, Log, TEXT("New State: %s"), *CurrentState->GetName());
+
 			CurrentState->EnterState();
 		}
 	}
@@ -334,9 +352,9 @@ void ACGWeapon::DetachMeshFromPawn()
 void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ACGWeapon, BurstCount, COND_SkipOwner);
 
 	DOREPLIFETIME(ACGWeapon, CGOwner);
-	//DOREPLIFETIME(ACGWeapon, CurrentState);
 }
 
 void ACGWeapon::OnRep_CGOwner()

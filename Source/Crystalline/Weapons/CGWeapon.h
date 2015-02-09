@@ -214,6 +214,10 @@ public:
 	////////////////////////////
 	// Mutable weapon fields
 
+	// Keeps track of the current burst. Ammo Doesn't need to be replicated.
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_BurstCount)
+	int32 BurstCount;
+
 	////////////////////////////
 	//  Components
 
@@ -271,6 +275,12 @@ public:
 	virtual void StartWeaponFireSimulation();
 
 	virtual void StopWeaponFireSimulation();
+
+	/**Replicates weapon fire simulation. */
+	UFUNCTION()
+	virtual void OnRep_BurstCount();
+
+
 	/**
 	 * Sets the owner of the weapon. 
 	 * @param The new owner of this weapon.	
@@ -278,10 +288,7 @@ public:
 	void SetCGOwner(ACGCharacter* NewOwner);
 
 	/** Retrieves the owner of the weapon. */
-	FORCEINLINE ACGCharacter* GetCGOwner() const
-	{
-		return CGOwner;
-	}
+	FORCEINLINE ACGCharacter* GetCGOwner() const {	return CGOwner;	}
 
 #pragma region Visuals
 

@@ -245,6 +245,8 @@ void ACGCharacter::WeaponChanged()
 	if (PendingWeapon != NULL)
 	{
 		CurrentWeapon = PendingWeapon;
+		UE_LOG(LogTemp, Log, TEXT("Weapon Changed"));
+
 		PendingWeapon = NULL;
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();

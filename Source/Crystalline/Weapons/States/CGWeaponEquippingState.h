@@ -20,8 +20,6 @@ public:
 	virtual void EnterState() override
 	{
 		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime);
-		UE_LOG(LogTemp, Log, TEXT("Starting Equip State"));
-
 	}
 
 	virtual void StartEquip() override
@@ -32,8 +30,6 @@ public:
 	virtual void EquipFinished() 
 	{
 		GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->ActiveState);
-		UE_LOG(LogTemp, Log, TEXT("Going Active"));
-
 	}
 
 	virtual void StartFire() override {}
