@@ -63,8 +63,13 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 	bReplicateInstigator = true;
 	bNetUseOwnerRelevancy = true;
 
-	BurstCount = 0;
-	LastFireTime = 0.0f;
+	BurstCount    = 0;
+	LastFireTime  = 0.f;
+
+	HitScanConfig.MaxSpread     = FMath::DegreesToRadians(HitScanConfig.MaxSpread * 0.5f);
+	HitScanConfig.BaseSpread    = FMath::DegreesToRadians(HitScanConfig.BaseSpread * 0.5f);
+	CurrentSpread				= HitScanConfig.BaseSpread;
+	HitScanConfig.SpreadPerShot = FMath::DegreesToRadians(HitScanConfig.SpreadPerShot * 0.5f);
 }
 
 
@@ -360,7 +365,24 @@ void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQ
 
 void ACGWeapon::FireHitScan()
 {
+	// My old nemesis
+	int32 FireSeed = FMath::Rand();
+	FRandomStream WeaponRandomStream(FireSeed);
 
+
+	// Perform a raycast from the crosshair in to the world space.
+	// Get the starting location and rotation for the player.
+	const FVector StartTrace = GetCameraLocation();
+	const FVector AimDir = GetCameraAim();
+
+	// Adds variation to the bullet.
+	//FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpreadCurrent, VSpreadCurrent);
+
+	// Specify the end point for the weapon's fire.
+	FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
+
+	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
+	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 }
 
 void ACGWeapon::UseAmmo()
@@ -401,7 +423,6 @@ void ACGWeapon::GotoState(UCGWeaponState* NewState)
 		if (PrevState == CurrentState)
 		{
 			CurrentState = NewState;
-
 			CurrentState->EnterState();
 		}
 	}

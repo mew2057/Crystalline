@@ -70,6 +70,31 @@ struct FCGProjectileData
 	}
 };
 
+USTRUCT()
+struct FCGHitScanData
+{
+	GENERATED_USTRUCT_BODY()	
+
+	/** The angle (in Degrees) of the base spread for this gun.*/
+	UPROPERTY(EditDefaultsOnly)
+	float BaseSpread;
+
+	/** The angle (in Degrees) of the max spread for this gun.*/
+	UPROPERTY(EditDefaultsOnly)
+	float MaxSpread;
+
+	/** The angle (in Degrees) that the gun spreads each continuous shot.*/
+	UPROPERTY(EditDefaultsOnly)
+	float SpreadPerShot;
+
+	FCGHitScanData()
+	{
+		MaxSpread     = 0.f;
+		BaseSpread    = 0.f;
+		SpreadPerShot = 0.f;
+	}
+};
+
 /** VFX and SFX related to the weapon.*/
 USTRUCT()
 struct FCGWeaponFXData
@@ -91,6 +116,9 @@ struct FCGWeaponFXData
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	FName TrailTargetParam;
 
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	uint32 bDrawWeaponTrail : 1;
+
 	/** The Weapon trail for the bullet. Typically only used by hit scan weapons. */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UParticleSystem* WeaponTrail;
@@ -109,6 +137,7 @@ struct FCGWeaponFXData
 		/** The default name of the Muzzle socket. */
 		MuzzleSocket = TEXT("MuzzleFlashSocket");
 		TrailTargetParam = TEXT("TrailEnd");
+		bDrawWeaponTrail = false;
 
 	}
 };
@@ -200,6 +229,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FCGProjectileData ProjectileConfig;
 
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FCGHitScanData HitScanConfig;
+
 	/** Generic weapon effect configuration settings.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FCGWeaponFXData WeaponFXConfig;
@@ -220,6 +252,9 @@ public:
 	UPROPERTY()
 	float LastFireTime;
 
+	UPROPERTY()
+	float CurrentSpread;
+
 	////////////////////////////
 	//  Components
 
@@ -230,7 +265,6 @@ public:
 	/** Used to manage audio playback. */
 	UPROPERTY(Transient)
 	UAudioComponent* FireAudioComponent;
-
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };

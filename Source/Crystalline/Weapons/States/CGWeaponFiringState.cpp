@@ -33,6 +33,9 @@ void UCGWeaponFiringState::EndState()
 void UCGWeaponFiringState::StopFire()
 {
 	GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->ActiveState);
+
+	// Reset any spread that may have developed for the gun.
+	GetOuterACGWeapon()->CurrentSpread = GetOuterACGWeapon()->HitScanConfig.BaseSpread;
 }
 
 void UCGWeaponFiringState::FireShot()
