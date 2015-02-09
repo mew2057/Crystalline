@@ -1,6 +1,8 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+#include "Projectiles/CGProjectile.h"
+
 #include "CrystallineCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -32,7 +34,7 @@ public:
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class ACrystallineProjectile> ProjectileClass;
+	TSubclassOf<class ACGProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)

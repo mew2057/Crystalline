@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "CGWeapon.generated.h"
 
+#define WEAPON_TRACE_TAG FName("WeaponTrace")
+
 #pragma region Structs
 USTRUCT()
 struct FCGWeaponConfig
