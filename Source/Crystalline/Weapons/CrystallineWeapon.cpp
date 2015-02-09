@@ -210,6 +210,7 @@ bool ACrystallineWeapon::CanFire()
 {
 	return true;
 }
+
 #pragma region Inventory_Related
 
 void ACrystallineWeapon::OnEnterInventory(ACrystallinePlayer* NewOwner)
@@ -253,6 +254,7 @@ void ACrystallineWeapon::SetOwningPawn(ACrystallinePlayer* Owner)
 	}
 }
 
+#pragma endregion
 
 #pragma region ServerFunctions
 
@@ -321,6 +323,7 @@ bool ACrystallineWeapon::ServerStopReload_Validate()
 #pragma endregion
 
 #pragma  region MeshOperations
+
 void ACrystallineWeapon::AttachMeshToPawn()
 {
 	if (OwningPawn)
@@ -351,7 +354,7 @@ void ACrystallineWeapon::DetachMeshFromPawn()
 
 #pragma endregion
 
-
+#pragma region Replication
 
 void ACrystallineWeapon::OnRep_OwningPawn()
 {
@@ -391,6 +394,7 @@ void ACrystallineWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	DOREPLIFETIME(ACrystallineWeapon, OwningPawn);
 
 }
+#pragma endregion
 
 float ACrystallineWeapon::GetClipPercent() const
 {

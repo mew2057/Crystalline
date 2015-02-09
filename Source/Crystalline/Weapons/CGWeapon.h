@@ -123,6 +123,11 @@ struct FCGWeaponFXData
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UParticleSystem* WeaponTrail;
 
+	// TODO impact.
+
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	TSubclassOf<UCameraShake> CameraShake;
+	
 
 	////////////////////////////
 	// SFX
@@ -248,6 +253,8 @@ public:
 	UPROPERTY(Transient, ReplicatedUsing=OnRep_BurstCount)
 	int32 BurstCount;
 	
+	// TODO track ammo, but only replicate to owner.
+
 	/** The time of the last shot by the weapon.*/
 	UPROPERTY()
 	float LastFireTime;
@@ -262,9 +269,14 @@ public:
 	UPROPERTY(Transient)
 	UParticleSystemComponent* MuzzleFlashComp;
 
+	UPROPERTY(Transient)
+	UParticleSystemComponent* TrailPSC;
+
 	/** Used to manage audio playback. */
 	UPROPERTY(Transient)
 	UAudioComponent* FireAudioComponent;
+
+
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
@@ -314,7 +326,7 @@ public:
 
 #pragma region Projectile
 
-	virtual void FireProjectile();
+	void FireProjectile();
 
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerFireProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
@@ -323,8 +335,13 @@ public:
 
 #pragma region Hit Scan
 
-	virtual void FireHitScan();
+	void FireHitScan();
 
+
+	void SpawnTrailEffect(const FVector& EndPoint);
+
+	// TODO
+	void SpawnHitEffect(const FHitResult& Impact);
 #pragma endregion
 
 	virtual void UseAmmo();

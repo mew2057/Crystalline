@@ -260,6 +260,16 @@ void ACGWeapon::StartWeaponFireSimulation()
 		MuzzleFlashComp->bOwnerNoSee = false;
 		MuzzleFlashComp->bOnlyOwnerSee = false;
 	}
+
+	APlayerController* CGController = Cast<APlayerController>(CGOwner->GetController());
+
+	if (CGController != NULL && CGController->IsLocalController())
+	{
+		if (WeaponFXConfig.CameraShake != NULL)
+		{
+			CGController->ClientPlayCameraShake(WeaponFXConfig.CameraShake, 1);
+		}
+	}
 	
 }
 
@@ -363,12 +373,12 @@ void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQ
 
 #pragma endregion
 
+#pragma region HitScan
 void ACGWeapon::FireHitScan()
 {
 	// My old nemesis
 	int32 FireSeed = FMath::Rand();
 	FRandomStream WeaponRandomStream(FireSeed);
-
 
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
@@ -376,14 +386,47 @@ void ACGWeapon::FireHitScan()
 	const FVector AimDir = GetCameraAim();
 
 	// Adds variation to the bullet.
-	//FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, HSpreadCurrent, VSpreadCurrent);
+	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, CurrentSpread);
 
 	// Specify the end point for the weapon's fire.
 	FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
+
+	SpawnTrailEffect(Impact.ImpactPoint);
+	SpawnHitEffect(Impact);
+
+	// Call Server
+
+	CurrentSpread = FMath::Min(HitScanConfig.MaxSpread, CurrentSpread + HitScanConfig.SpreadPerShot);
+
 }
+
+
+void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
+{
+	if (WeaponFXConfig.WeaponTrail)
+	{
+		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(
+			this,
+			WeaponFXConfig.WeaponTrail,
+			GetMuzzleLocation());
+
+		if (TrailPSC)
+		{
+			// Set the vector for the particle.
+			TrailPSC->SetVectorParameter(WeaponFXConfig.TrailTargetParam, EndPoint);
+		}
+	}
+}
+
+// TODO
+void ACGWeapon::SpawnHitEffect(const FHitResult& Impact)
+{
+}
+
+#pragma endregion
 
 void ACGWeapon::UseAmmo()
 {
