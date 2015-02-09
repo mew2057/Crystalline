@@ -49,9 +49,13 @@ public:
 	virtual void StartReload()
 	{}
 
+	/** Override if firing is not legal from that state. */
 	virtual void StartFire()
-	{}
+	{
+		GetOuterACGWeapon()->GotoFiringState();
+	}
 
+	// ONLY firing states should hit this.
 	virtual void StopFire()
 	{}
 	

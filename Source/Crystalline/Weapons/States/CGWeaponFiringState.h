@@ -13,11 +13,25 @@ class UCGWeaponFiringState : public UCGWeaponState
 {
 	GENERATED_BODY()
 
+protected:
+	// Set when the state is entered.
+	/*
+	uint32 bRefires : 1;
+	float TimeBetweenShots
+	*/
+
 public:
 	UCGWeaponFiringState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 	{}
 
-	
+	virtual void EnterState() override;
+
+	virtual void EndState() override;
+
+	virtual void StopFire() override;
+
+	// Fires what's constituted as a "shot", Different implementations of this state may differ.
+	void FireShot();
 	
 	
 };

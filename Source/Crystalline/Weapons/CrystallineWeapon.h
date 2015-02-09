@@ -214,7 +214,7 @@ struct FProjectileData
 
 	/** The life span of the projectile before despawning. */
 	UPROPERTY(EditDefaultsOnly)
-		float ProjectileLife;
+	float ProjectileLife;
 
 	/** The damage caused by the projectile. */
 	UPROPERTY(EditDefaultsOnly)

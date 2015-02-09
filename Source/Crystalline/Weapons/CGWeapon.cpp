@@ -19,7 +19,7 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 	Mesh1P->bChartDistanceFactor = false;                        // prevents the mesh from being added to the gloabal chart
 	Mesh1P->bReceivesDecals = false;                             // Prevents decals from spawning on the gun.
 	Mesh1P->CastShadow = false;                                  // Hides the shadow.
-	Mesh1P->bOnlyOwnerSee = true;
+	Mesh1P->bOnlyOwnerSee = false;
 	Mesh1P->bOwnerNoSee = false;
 	Mesh1P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
@@ -149,17 +149,13 @@ void ACGWeapon::StartFire()
 {
 	// Verify we can fire.
 
-
+	// Tell the server to start firing.
 	if (Role < ROLE_Authority)
 	{
 		ServerStartFire();
 	}
 
-	StartFiring();
-}
-
-void ACGWeapon::StartFiring()
-{
+	// Begin firing locally.
 	CurrentState->StartFire();
 }
 
@@ -170,11 +166,17 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
-	StartFiring();
+	CurrentState->StartFire();
 }
 
 void ACGWeapon::StopFire()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerStopFire();
+	}
+
+	// TODO make a function?
 	CurrentState->StopFire();
 }
 
@@ -185,8 +187,68 @@ bool ACGWeapon::ServerStopFire_Validate()
 
 void ACGWeapon::ServerStopFire_Implementation()
 {
-	//
+	CurrentState->StopFire();
 }
+
+
+void ACGWeapon::StartFiring()
+{
+	StartWeaponFireSimulation();
+}
+
+void ACGWeapon::StopFiring()
+{
+	// Clean up
+	StopWeaponFireSimulation();
+}
+
+void ACGWeapon::StartWeaponFireSimulation()
+{
+	// EARLY RETURN: The Server shouldn't play these effects, if it isn't firing (You misread this one john).
+	/*if(Role == ROLE_Authority )
+	{
+	return;
+	}
+	*/
+	
+	// The sound effect.
+	if (WeaponFXConfig.FireSound)
+	{
+		FireAudioComponent = UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
+	}
+
+	// Muzzle Flash
+	if (WeaponFXConfig.MuzzleFlash)
+	{
+		const FVector FlashPoint = Mesh1P->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
+
+		MuzzleFlashComp = UGameplayStatics::SpawnEmitterAttached(WeaponFXConfig.MuzzleFlash, Mesh1P, WeaponFXConfig.MuzzleSocket);
+		// TODO CONFIGURE THIS!		
+		MuzzleFlashComp->bOwnerNoSee = false;
+		MuzzleFlashComp->bOnlyOwnerSee = false;
+	}
+	
+}
+
+void ACGWeapon::StopWeaponFireSimulation()
+{ 
+	/*
+	// Clean up the components.
+	if (MuzzleFlashComp != NULL)
+	{
+		MuzzleFlashComp->DeactivateSystem();
+		MuzzleFlashComp = NULL;
+	}*/
+
+	// TODO Configure this more when we actually have audio.
+	/*
+	if (FireAudioComponent)
+	{
+		FireAudioComponent->FadeOut(0.1f, 0.0f);
+		FireAudioComponent = NULL;
+	}*/
+}
+
 
 #pragma endregion
 
@@ -215,7 +277,7 @@ void ACGWeapon::GotoState(UCGWeaponState* NewState)
 
 void ACGWeapon::GotoFiringState()
 {
-	// TODO Checks.
+	// TODO Checks, if ammo < AmmoPerShot, enter reload state.
 	GotoState(FiringState);
 }
 

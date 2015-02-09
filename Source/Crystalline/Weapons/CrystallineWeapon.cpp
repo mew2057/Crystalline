@@ -14,6 +14,9 @@ ACrystallineWeapon::ACrystallineWeapon(const FObjectInitializer& ObjectInitializ
 	Mesh1P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
+	Mesh1P->bOwnerNoSee = false;     // No Collision response.
+	Mesh1P->bOnlyOwnerSee = true;
+
 	RootComponent = Mesh1P;										 // Makes the first player mesh the root component.
 
 	// Allows weapon to have a tick update (Necessary for some mechanics).
