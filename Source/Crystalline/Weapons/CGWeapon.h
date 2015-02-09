@@ -25,7 +25,10 @@ struct FCGWeaponConfig
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 	uint32 bUsesProjectile : 1;
-
+	
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	TSubclassOf<UDamageType> DamageType;
+	
 	/** The damage caused by a single shot. */
 	UPROPERTY(EditDefaultsOnly, Category=WeaponAttributes)
 	float BaseDamage;
@@ -93,6 +96,21 @@ struct FCGHitScanData
 		BaseSpread    = 0.f;
 		SpreadPerShot = 0.f;
 	}
+};
+
+USTRUCT()
+struct FCGInstantHit
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	FVector Origin;
+
+	UPROPERTY()
+	float Spread;
+
+	UPROPERTY()
+	uint32 RandSeed;
 };
 
 /** VFX and SFX related to the weapon.*/
@@ -262,6 +280,9 @@ public:
 	UPROPERTY()
 	float CurrentSpread;
 
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_HitNotify)
+	FCGInstantHit HitNotify;
+
 	////////////////////////////
 	//  Components
 
@@ -337,11 +358,32 @@ public:
 
 	void FireHitScan();
 
+	void ProcessHitScan(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
+	
+	void ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
+
+	/** server notified of hit from client to verify */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerNotifyHit(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
+
+	/** server notified of miss to show trail FX */
+	UFUNCTION(unreliable, server, WithValidation)
+	void ServerNotifyMiss(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
+
+	UFUNCTION()
+	void OnRep_HitNotify();
+
+	void SimulateHitScan(const FVector& Origin, int32 RandomSeed, float Spread);
 
 	void SpawnTrailEffect(const FVector& EndPoint);
 
 	// TODO
 	void SpawnHitEffect(const FHitResult& Impact);
+
+	bool ShouldDealDamage_Instant(AActor* TestActor) const;
+
+	void DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir);
+
 #pragma endregion
 
 	virtual void UseAmmo();

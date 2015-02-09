@@ -65,17 +65,21 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 
 	BurstCount    = 0;
 	LastFireTime  = 0.f;
-
-	HitScanConfig.MaxSpread     = FMath::DegreesToRadians(HitScanConfig.MaxSpread * 0.5f);
-	HitScanConfig.BaseSpread    = FMath::DegreesToRadians(HitScanConfig.BaseSpread * 0.5f);
-	CurrentSpread				= HitScanConfig.BaseSpread;
-	HitScanConfig.SpreadPerShot = FMath::DegreesToRadians(HitScanConfig.SpreadPerShot * 0.5f);
 }
 
 
 void ACGWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	// Init the spread factors if this is a hitscan gun.
+	if (!WeaponConfig.bUsesProjectile)
+	{
+		HitScanConfig.MaxSpread = FMath::DegreesToRadians(HitScanConfig.MaxSpread * 0.5f);
+		HitScanConfig.BaseSpread = FMath::DegreesToRadians(HitScanConfig.BaseSpread * 0.5f);
+		CurrentSpread = HitScanConfig.BaseSpread;
+		HitScanConfig.SpreadPerShot = FMath::DegreesToRadians(HitScanConfig.SpreadPerShot * 0.5f);
+	}
 
 	if (CurrentState == NULL)
 		GotoState(InactiveState);
@@ -168,7 +172,6 @@ void ACGWeapon::StartFire()
 		ServerStartFire();
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("CurrentState: %s"), *CurrentState->GetName());
 
 	// Begin firing locally.
 	CurrentState->StartFire();
@@ -261,13 +264,17 @@ void ACGWeapon::StartWeaponFireSimulation()
 		MuzzleFlashComp->bOnlyOwnerSee = false;
 	}
 
-	APlayerController* CGController = Cast<APlayerController>(CGOwner->GetController());
 
-	if (CGController != NULL && CGController->IsLocalController())
+	if (CGOwner)
 	{
-		if (WeaponFXConfig.CameraShake != NULL)
+		APlayerController* CGController = Cast<APlayerController>(CGOwner->GetController());
+
+		if (CGController != NULL && CGController->IsLocalController())
 		{
-			CGController->ClientPlayCameraShake(WeaponFXConfig.CameraShake, 1);
+			if (WeaponFXConfig.CameraShake != NULL)
+			{
+				CGController->ClientPlayCameraShake(WeaponFXConfig.CameraShake, 1);
+			}
 		}
 	}
 	
@@ -383,25 +390,144 @@ void ACGWeapon::FireHitScan()
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
 	const FVector StartTrace = GetCameraLocation();
-	const FVector AimDir = GetCameraAim();
+	const FVector AimDir     = GetCameraAim();
 
 	// Adds variation to the bullet.
-	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, CurrentSpread);
+	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, CurrentSpread, CurrentSpread);
 
 	// Specify the end point for the weapon's fire.
-	FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
+	FVector EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
-
-	SpawnTrailEffect(Impact.ImpactPoint);
-	SpawnHitEffect(Impact);
-
-	// Call Server
-
+	
+	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, CurrentSpread);
+	
 	CurrentSpread = FMath::Min(HitScanConfig.MaxSpread, CurrentSpread + HitScanConfig.SpreadPerShot);
-
+	
 }
+
+void ACGWeapon::ProcessHitScan(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread)
+{
+	if (CGOwner && CGOwner->IsLocallyControlled() && GetNetMode() == NM_Client)
+	{
+		// If the actor is controlled by the server notify the server it was hit.
+		if (Impact.GetActor() && Impact.GetActor()->GetRemoteRole() == ROLE_Authority)
+		{
+			ServerNotifyHit(Impact, ShootDir, RandSeed, Spread);
+		}
+		else if (Impact.GetActor() == NULL) // If there is no actor, then check to see if there was a blocking hit.
+		{
+			if (Impact.bBlockingHit)
+			{
+				ServerNotifyHit(Impact, ShootDir, RandSeed, Spread);
+			}
+			else
+			{
+				ServerNotifyMiss(ShootDir, RandSeed, Spread);
+			}
+		}
+	}
+
+	ProcessHitScanConfirmed(Impact, Origin, ShootDir, RandSeed, Spread);
+}
+
+void ACGWeapon::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread)
+{
+	// Deal Damage.
+	if (ShouldDealDamage_Instant(Impact.GetActor()))
+	{
+		DealDamage_Instant(Impact, ShootDir);
+	}
+
+	// This will trigger an OnRep that will prop to remote clients
+	if (Role == ROLE_Authority)
+	{
+		HitNotify.Origin   = Origin;
+		HitNotify.RandSeed = RandSeed;
+		HitNotify.Spread   = Spread;
+	}
+
+
+	// Plays the local FX.
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		FVector EndPoint = Impact.GetActor() ? Impact.ImpactPoint : Origin + ShootDir * WeaponConfig.WeaponRange;
+
+		// Do spawning here.
+		SpawnTrailEffect(EndPoint);
+		SpawnHitEffect(Impact);
+	}
+}
+
+
+bool ACGWeapon::ServerNotifyHit_Validate(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+{
+	return true;
+}
+
+void ACGWeapon::ServerNotifyHit_Implementation(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+{
+	// If the weapon has an instigator and we hit.
+	if (Instigator && Impact.bBlockingHit)
+	{
+		ProcessHitScanConfirmed(Impact, GetMuzzleLocation(), ShootDir, RandomSeed, Spread);
+		// TODO add cheat checking
+	}
+}
+
+
+bool ACGWeapon::ServerNotifyMiss_Validate(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+{
+	return true;
+}
+
+void ACGWeapon::ServerNotifyMiss_Implementation(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+{
+	const FVector Origin = GetMuzzleLocation();
+
+	// play FX on remote clients
+	HitNotify.Origin = Origin;
+	HitNotify.RandSeed = RandomSeed;
+	HitNotify.Spread = Spread;
+
+	// play FX locally (One Player)
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		const FVector EndTrace = Origin + ShootDir * WeaponConfig.WeaponRange;
+		SpawnTrailEffect(EndTrace);
+	}
+}
+
+
+void ACGWeapon::OnRep_HitNotify()
+{
+	SimulateHitScan(HitNotify.Origin, HitNotify.RandSeed, HitNotify.Spread);
+}
+
+void ACGWeapon::SimulateHitScan(const FVector& Origin, int32 RandomSeed, float Spread)
+{
+	FRandomStream WeaponRandomStream(RandomSeed);
+
+	const FVector StartTrace = GetCameraLocation();
+	const FVector AimDir = GetCameraAim();
+	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, Spread);
+	const FVector EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
+
+	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
+	FHitResult Impact = WeaponTrace(Origin, EndTrace);
+
+	if (Impact.bBlockingHit)
+	{
+		SpawnTrailEffect(EndTrace);
+		SpawnHitEffect(Impact);
+	}
+	else
+	{
+		SpawnTrailEffect(EndTrace);
+	}
+}
+
 
 
 void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
@@ -424,6 +550,36 @@ void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
 // TODO
 void ACGWeapon::SpawnHitEffect(const FHitResult& Impact)
 {
+}
+
+
+void ACGWeapon::DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir)
+{
+	FPointDamageEvent PointDmg;
+	PointDmg.DamageTypeClass = WeaponConfig.DamageType;
+	PointDmg.HitInfo = Impact;
+	PointDmg.ShotDirection = ShootDir;
+	PointDmg.Damage = WeaponConfig.BaseDamage;
+
+	Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, CGOwner->Controller, this);
+}
+
+
+bool ACGWeapon::ShouldDealDamage_Instant(AActor* TestActor) const
+{
+	// Only deal damage if the actor exists.
+	if (TestActor)
+	{
+		// If this is the server, or we have authority over the other actor, OR if the actor is not being replicated.
+		if (GetNetMode() != NM_Client ||
+			TestActor->Role == ROLE_Authority ||
+			TestActor->bTearOff)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 #pragma endregion
@@ -587,7 +743,9 @@ void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ACGWeapon, BurstCount, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ACGWeapon, HitNotify,  COND_SkipOwner);
 
+	
 	DOREPLIFETIME(ACGWeapon, CGOwner);
 }
 
