@@ -40,6 +40,7 @@ void UCGWeaponFiringState::StopFire()
 
 void UCGWeaponFiringState::FireShot()
 {
+
 	// Fire the gun.
 	GetOuterACGWeapon()->StartFiring();
 
@@ -47,11 +48,12 @@ void UCGWeaponFiringState::FireShot()
 	if (GetOuterACGWeapon()->WeaponConfig.bAutomaticFire)
 	{
 		GetCGOwner()->GetWorldTimerManager().SetTimer(
-			this, 
-			&UCGWeaponFiringState::FireShot, 
-			GetOuterACGWeapon()->WeaponConfig.TimeBetweenShots, 
+			this,
+			&UCGWeaponFiringState::FireShot,
+			GetOuterACGWeapon()->WeaponConfig.TimeBetweenShots,
 			false);
 	}
+
+
+
 }
-
-

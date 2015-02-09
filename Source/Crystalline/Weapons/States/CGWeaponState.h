@@ -33,6 +33,9 @@ public:
 	
 	virtual void EndState() 
 	{}
+
+	virtual void Tick(float DeltaSecondss)
+	{}
 	
 	// Do Nothing, only inactive/Equipping should process this.
 	virtual void StartEquip() 
@@ -47,7 +50,9 @@ public:
 
 
 	virtual void StartReload()
-	{}
+	{
+		GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->ReloadingState);
+	}
 
 	/** Override if firing is not legal from that state. */
 	virtual void StartFire()

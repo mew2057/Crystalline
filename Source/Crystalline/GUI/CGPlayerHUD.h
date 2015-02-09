@@ -8,6 +8,7 @@
 
 #define TARGET_Y_RESOLUTION 1080.0f
 #define TARGET_X_RESOLUTION 1920.0f
+#define ICON_FUDGE .0001f
 
 /**
  * 

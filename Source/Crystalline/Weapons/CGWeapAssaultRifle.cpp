@@ -5,6 +5,7 @@
 
 ACGWeapAssaultRifle::ACGWeapAssaultRifle(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	WeaponConfig.bUsesProjectile = false;
 
 }
 

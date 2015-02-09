@@ -88,36 +88,26 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	
 		AmmoIcon = WeaponHUDConfig.AmmoGuageBGIcon;
 		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
-		/*
+		
 		AmmoIcon = WeaponHUDConfig.AmmoGuageFGIcon;
 	
-		// If the weapon uses cooldown ammo, then the way the icon is drawn varies.
-		
-		if (CurrentWeapon->WeaponConfig.AmmoType == CrystallineAmmo::Cooldown)
+		const float Percent = CurrentWeapon->GetClipPercent();
+
+		// Determine the appropriate color for the guage.
+
+		if (CurrentWeapon->WeaponConfig.OverHeatWeapon)
 		{
-			const float Percent = CurrentWeapon->GetClipPercent();
-	
-			// Determine the appropriate color for the guage.
 			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
-	
 			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
-			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 		}
 		else
 		{
-			// TODO this is going to need to do some offsetting I think.
-			const float Percent = CurrentWeapon->GetClipPercent();
-	
-			// Determine the appropriate color for the guage.
-			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
-	
-			AmmoIcon.UL = -WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
-	
-			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
-	
+			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.LowAmmoColor, WeaponHUDConfig.FullAmmoColor, Percent));
+			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
 		}
-		*/
-	
+
+		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
+
 		Canvas->SetDrawColor(FColor::White);	
 		Canvas->DrawIcon(WeaponHUDConfig.WeaponIcon, 40, 20, ScaleUIY);
 	}

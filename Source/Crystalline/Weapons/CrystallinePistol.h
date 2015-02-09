@@ -6,7 +6,7 @@
 #include "CrystallinePistol.generated.h"
 
 USTRUCT()
-struct FPistolProjectileData
+struct FOverheatAmmoData
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -27,7 +27,7 @@ struct FPistolProjectileData
 	float OverheatTime;
 
 	/** Sets defaults */
-	FPistolProjectileData()
+	FOverheatAmmoData()
 	{
 		// Heat settings.
 		MaxHeat = 100.f;
@@ -50,7 +50,7 @@ class CRYSTALLINE_API ACrystallinePistol : public ACrystallineWeapon
 	FProjectileData ProjectileConfig;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	FPistolProjectileData PistolConfig;
+		FOverheatAmmoData PistolConfig;
 
 	//TODO this may need some degree of networking.	
 	/** Identifies if the pistol is in the overheated state, no shots are allowed. */

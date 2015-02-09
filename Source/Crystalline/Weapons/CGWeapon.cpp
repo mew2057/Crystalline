@@ -9,9 +9,9 @@
 #include "Weapons/States/CGWeaponReloadingState.h"
 #include "Weapons/States/CGWeaponFiringState.h"
 #include "Projectiles/CGProjectile.h"
-
-
 #include "CGWeapon.h"
+
+#pragma region Initializers
 
 ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -97,6 +97,16 @@ void ACGWeapon::BeginPlay()
 	}
 }
 
+void ACGWeapon::Tick(float DeltaSeconds)
+{
+	if (CurrentState)
+	{
+		CurrentState->Tick(DeltaSeconds); 
+	}
+}
+
+
+#pragma endregion
 
 #pragma region Set Functions
 
@@ -113,7 +123,6 @@ void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 
 
 #pragma endregion
-
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -146,8 +155,6 @@ void ACGWeapon::OnEquip()
 	// Timer and reload.
 	AttachMeshToPawn();	
 
-	// XXX this catches the starting issue wherein the weapon owners haven't been replicated yet.
-	// XXX If anims don't play on start this is likely the source!
 	CurrentState->StartEquip();
 
 
@@ -155,12 +162,38 @@ void ACGWeapon::OnEquip()
 
 void ACGWeapon::OnUnequip()
 {
-	// XXX this catches the starting issue wherein the weapon owners haven't been replicated yet.
-	// XXX If anims don't play on start this is likely the source!
 	CurrentState->StartUnequip();
 }
 
 
+void ACGWeapon::OnStartReload()
+{
+	CurrentState->StartReload();
+}
+
+void ACGWeapon::StopReload()
+{
+	// If firing was pending, continue firing.
+	GotoState(ActiveState);
+}
+
+void ACGWeapon::StartCooldown()
+{
+
+}
+
+void ACGWeapon::EndCooldown()
+{
+
+}
+
+
+
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region Fire Functions
 
 void ACGWeapon::StartFire()
 {
@@ -212,16 +245,18 @@ void ACGWeapon::ServerStopFire_Implementation()
 
 void ACGWeapon::StartFiring()
 {
-	// XXX Must be able to fire.
-
-	// Don't fire if the netmode is dedicated server.
-	if (GetNetMode() != NM_DedicatedServer)
+	// XXX maybe put it in the firing state?
+	// EARLY RETURN! If the gun can't fire goto the reload state.
+	if (!CanFire())
 	{
-		StartWeaponFireSimulation();
+		GotoState(ReloadingState);
+		return;
 	}
 
 	if (CGOwner && CGOwner->IsLocallyControlled())
 	{
+		UseAmmo();
+
 		if (WeaponConfig.bUsesProjectile)
 		{
 			FireProjectile();
@@ -230,7 +265,12 @@ void ACGWeapon::StartFiring()
 		{
 			FireHitScan();
 		}
-		UseAmmo();
+	}
+
+	// Don't fire if the netmode is dedicated server.
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		StartWeaponFireSimulation();
 	}
 
 	// Triggers the OnRep
@@ -299,6 +339,9 @@ void ACGWeapon::StopWeaponFireSimulation()
 		FireAudioComponent = NULL;
 	}*/
 }
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region Projectile Fire
 
@@ -379,6 +422,8 @@ void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQ
 }
 
 #pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region HitScan
 void ACGWeapon::FireHitScan()
@@ -584,10 +629,27 @@ bool ACGWeapon::ShouldDealDamage_Instant(AActor* TestActor) const
 
 #pragma endregion
 
+////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region Ammo
+
 void ACGWeapon::UseAmmo()
 {
-
+	// Consume ammo here In subclasses.          
 }
+
+bool ACGWeapon::CanFire() const
+{	
+	// Determine if the shot would fail in sub classes.
+	return false;
+}
+
+float ACGWeapon::GetClipPercent() const
+{
+	return 1.f;
+}
+
+#pragma endregion
 
 
 void ACGWeapon::OnRep_BurstCount()
@@ -602,7 +664,6 @@ void ACGWeapon::OnRep_BurstCount()
 	}
 }
 
-#pragma endregion
 
 
 #pragma region State Management
@@ -629,8 +690,14 @@ void ACGWeapon::GotoState(UCGWeaponState* NewState)
 
 void ACGWeapon::GotoFiringState()
 {
-	// TODO Checks, if ammo < AmmoPerShot, enter reload state.
-	GotoState(FiringState);
+	if (CanFire())
+	{
+		GotoState(FiringState);
+	}
+	else
+	{
+		GotoState(ReloadingState);
+	}
 }
 
 

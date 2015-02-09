@@ -9,7 +9,7 @@
  * 
  */
 UCLASS(Abstract)
-class CRYSTALLINE_API ACGWeapAssaultRifle : public ACGWeapon
+class CRYSTALLINE_API ACGWeapAssaultRifle : public ACGCrystalGun
 {
 	GENERATED_BODY()
 public:

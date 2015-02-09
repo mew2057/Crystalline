@@ -80,7 +80,7 @@ void ACrystallineHUD::DrawWeaponHUD()
 			// Determine the appropriate color for the guage.
 			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
 
-			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
+			//AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
 			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 		}
 		else
@@ -91,7 +91,7 @@ void ACrystallineHUD::DrawWeaponHUD()
 			// Determine the appropriate color for the guage.
 			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
 
-			AmmoIcon.UL = -WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
+			//AmmoIcon.UL = -WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
 
 			Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
 
