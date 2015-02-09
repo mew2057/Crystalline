@@ -307,12 +307,12 @@ public :
 	/**Switches the weapon to the firing state, Checks Ammo, Overheat, etc. May be overridem for this reason.*/
 	virtual void GotoFiringState();
 
-	/**Switches the weapon to the unequipping state.*/
-	void GotoUnequippingState();
-
-protected:
+public:
 	UPROPERTY(BlueprintReadOnly)
 	UCGWeaponState* CurrentState;
+
+protected:
+	
 
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadWrite, Category = "States")
 	UCGWeaponState* ActiveState;

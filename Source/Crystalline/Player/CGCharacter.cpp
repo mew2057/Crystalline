@@ -229,7 +229,6 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 	if (LocalLastWeapon != NULL && NewWeapon != NULL)
 	{
 		PendingWeapon = NewWeapon;
-
 		// This may need something to prevent issues.
 		// Add a check to see this is a legal operation.
 		LocalLastWeapon->OnUnequip();

@@ -42,7 +42,7 @@ public:
 
 	virtual void StartUnequip()
 	{
-		GetOuterACGWeapon()->GotoUnequippingState();
+		GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->UnequippingState);
 	}
 
 

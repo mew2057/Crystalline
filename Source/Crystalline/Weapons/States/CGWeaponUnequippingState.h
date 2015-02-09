@@ -40,5 +40,6 @@ public:
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(this, &UCGWeaponUnequippingState::UnequipFinished);
 	}
 
-	
+	virtual void StartFire() override {}
+
 };

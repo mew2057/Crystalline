@@ -67,6 +67,8 @@ void ACGWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	if (CurrentState == NULL)
+		GotoState(InactiveState);
 	
 }
 
@@ -130,8 +132,8 @@ void ACGWeapon::OnEquip()
 
 	// XXX this catches the starting issue wherein the weapon owners haven't been replicated yet.
 	// XXX If anims don't play on start this is likely the source!
-	if (CurrentState)
-		CurrentState->StartEquip();
+	CurrentState->StartEquip();
+
 
 }
 
@@ -139,8 +141,7 @@ void ACGWeapon::OnUnequip()
 {
 	// XXX this catches the starting issue wherein the weapon owners haven't been replicated yet.
 	// XXX If anims don't play on start this is likely the source!
-	if (CurrentState)
-		CurrentState->StartUnequip();
+	CurrentState->StartUnequip();
 }
 
 
@@ -154,6 +155,8 @@ void ACGWeapon::StartFire()
 	{
 		ServerStartFire();
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("CurrentState: %s"), *CurrentState->GetName());
 
 	// Begin firing locally.
 	CurrentState->StartFire();
@@ -288,10 +291,6 @@ void ACGWeapon::GotoEquippingState()
 	GotoState(EquippingState);
 }
 
-void ACGWeapon::GotoUnequippingState()
-{
-	GotoState(UnequippingState);
-}
 
 #pragma endregion
 

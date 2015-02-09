@@ -36,6 +36,9 @@ public:
 
 	}
 
+	virtual void StartFire() override {}
+	
+
 	virtual void EndState() override
 	{
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(this, &UCGWeaponEquippingState::EquipFinished);

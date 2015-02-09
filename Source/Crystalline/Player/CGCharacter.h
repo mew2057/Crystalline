@@ -63,9 +63,11 @@ protected:
 	/** Begin the shield regeneration and set the player's CurrentHealth to max.*/
 	void StartShieldRegen();
 
+
 public:
 
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
+
 
 #pragma region Movement
 
@@ -162,6 +164,8 @@ public:
 	* @param NewWeapon The Weapon that is equipped.
 	*/
 	void SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon = NULL);
+
+	FORCEINLINE ACGWeapon*  GetCurrentWeapon() const { return CurrentWeapon; };
 
 	/*
 	 * Invoked when the weapon has been changed, the character performs the actual equip call.
