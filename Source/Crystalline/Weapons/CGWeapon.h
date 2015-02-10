@@ -165,6 +165,7 @@ struct FCGHitScanData
 	}
 };
 
+//FIXME this can be done with the seed and spread.
 USTRUCT()
 struct FCGInstantHit
 {
@@ -174,10 +175,7 @@ struct FCGInstantHit
 	FVector Origin;
 
 	UPROPERTY()
-	float Spread;
-
-	UPROPERTY()
-	uint32 RandSeed;
+	FVector Direction;
 };
 
 /** VFX and SFX related to the weapon.*/
@@ -468,7 +466,7 @@ public:
 	UFUNCTION()
 	void OnRep_HitNotify();
 
-	void SimulateHitScan(const FVector& Origin, int32 RandomSeed, float Spread);
+	void SimulateHitScan(const FVector& Origin, const FVector& ShotDir);
 
 	void SpawnTrailEffect(const FVector& EndPoint);
 

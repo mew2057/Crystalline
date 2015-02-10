@@ -156,8 +156,6 @@ void ACGWeapon::OnEquip()
 	AttachMeshToPawn();	
 
 	CurrentState->StartEquip();
-
-
 }
 
 void ACGWeapon::OnUnequip()
@@ -173,8 +171,8 @@ void ACGWeapon::OnStartReload()
 
 void ACGWeapon::StopReload()
 {
-	// If firing was pending, continue firing.
-	if (CGOwner->bWantsToFire)
+	// If firing was pending, continue firing if the gun can fire.
+	if (CGOwner->bWantsToFire && CanFire())
 	{
 		GotoState(FiringState);
 	}
@@ -267,8 +265,6 @@ bool ACGWeapon::StartFiring()
 
 	if (CGOwner && CGOwner->IsLocallyControlled())
 	{
-		UseAmmo();
-
 		if (WeaponConfig.bUsesProjectile)
 		{
 			FireProjectile();
@@ -300,7 +296,7 @@ void ACGWeapon::StopFiring()
 }
 
 void ACGWeapon::StartWeaponFireSimulation()
-{  
+{
 	// The sound effect.
 	if (WeaponFXConfig.FireSound)
 	{
@@ -503,8 +499,7 @@ void ACGWeapon::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector&
 	if (Role == ROLE_Authority)
 	{
 		HitNotify.Origin   = Origin;
-		HitNotify.RandSeed = RandSeed;
-		HitNotify.Spread   = Spread;
+		HitNotify.Direction = ShootDir;
 	}
 
 
@@ -547,8 +542,7 @@ void ACGWeapon::ServerNotifyMiss_Implementation(FVector_NetQuantizeNormal ShootD
 
 	// play FX on remote clients
 	HitNotify.Origin = Origin;
-	HitNotify.RandSeed = RandomSeed;
-	HitNotify.Spread = Spread;
+	HitNotify.Direction = ShootDir;
 
 	// play FX locally (One Player)
 	if (GetNetMode() != NM_DedicatedServer)
@@ -561,17 +555,13 @@ void ACGWeapon::ServerNotifyMiss_Implementation(FVector_NetQuantizeNormal ShootD
 
 void ACGWeapon::OnRep_HitNotify()
 {
-	SimulateHitScan(HitNotify.Origin, HitNotify.RandSeed, HitNotify.Spread);
+	SimulateHitScan(HitNotify.Origin, HitNotify.Direction);
 }
 
-void ACGWeapon::SimulateHitScan(const FVector& Origin, int32 RandomSeed, float Spread)
+void ACGWeapon::SimulateHitScan(const FVector& Origin, const FVector& ShotDir)
 {
-	FRandomStream WeaponRandomStream(RandomSeed);
-
 	const FVector StartTrace = Origin;
-	const FVector AimDir = GetCameraAim(); // Fails here!
-	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, Spread, Spread);
-	const FVector EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
+	const FVector EndTrace = StartTrace + ShotDir * WeaponConfig.WeaponRange;
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);

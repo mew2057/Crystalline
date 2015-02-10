@@ -23,6 +23,7 @@ public:
 		// Stop reloading if it's not possible.
 		if (!GetOuterACGWeapon()->GetCanReload())
 		{
+			// The owner can't fire so tell it to stop firing.
 			GetOuterACGWeapon()->StopReload();
 			return;
 		}

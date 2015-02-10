@@ -40,7 +40,6 @@ float ACGCrystalGun::GetReloadTime() const
 	return AmmoConfig.ReloadTime;
 }
 
-
 bool ACGCrystalGun::GetCanReload() const
 {
 	return Ammo > 0;

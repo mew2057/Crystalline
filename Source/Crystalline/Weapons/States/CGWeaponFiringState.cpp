@@ -44,6 +44,7 @@ void UCGWeaponFiringState::FireShot()
 	// If the gun has automatic fire, set a timer to continue firing, IFF the fire was successful
 	if (GetOuterACGWeapon()->StartFiring() && GetOuterACGWeapon()->WeaponConfig.bAutomaticFire)
 	{
+		GetOuterACGWeapon()->UseAmmo();
 		GetCGOwner()->GetWorldTimerManager().SetTimer(
 			this,
 			&UCGWeaponFiringState::FireShot,

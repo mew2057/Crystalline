@@ -246,8 +246,6 @@ void ACGCharacter::WeaponChanged()
 	if (PendingWeapon != NULL)
 	{
 		CurrentWeapon = PendingWeapon;
-		UE_LOG(LogTemp, Log, TEXT("Weapon Changed"));
-
 		PendingWeapon = NULL;
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();
@@ -351,7 +349,7 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 void ACGCharacter::StartFire()
 {
 	// TODO make sure bWantsToFire works.
-	if (IsLocallyControlled() && CurrentWeapon != NULL && !bWantsToFire)
+	if (IsLocallyControlled() && CurrentWeapon != NULL && CurrentWeapon->CanFire() && !bWantsToFire)
 	{
 		bWantsToFire = true;
 		CurrentWeapon->StartFire();
