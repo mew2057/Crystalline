@@ -396,7 +396,10 @@ public:
 	virtual void OnUnequip();
 
 	virtual void OnStartReload();
-
+	
+	UFUNCTION(server, reliable, WithValidation)
+	void ServerStartReload();
+	
 	void StopReload();
 
 	// This is managed by the weapon, not the state at the present.

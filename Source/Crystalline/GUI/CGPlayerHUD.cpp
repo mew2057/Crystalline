@@ -147,8 +147,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		Canvas->DrawIcon(WeaponIcon, 40, 60, ScaleUIY);
 	
 		// Output the icon.
-		// NOTE: Don't include ammunition on this one.
-	
+		// NOTE: Don't include ammunition on this one.	
 	}
 	*/
 }

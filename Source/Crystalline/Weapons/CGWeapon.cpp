@@ -167,6 +167,11 @@ void ACGWeapon::OnUnequip()
 void ACGWeapon::OnStartReload()
 {
 	CurrentState->StartReload();
+
+	if (Role < ROLE_Authority)
+	{
+		ServerStartReload();
+	}
 }
 
 void ACGWeapon::StopReload()
@@ -180,6 +185,17 @@ void ACGWeapon::StopReload()
 	{
 		GotoState(ActiveState);
 	}
+}
+
+bool ACGWeapon::ServerStartReload_Validate()
+{
+	return true;
+}
+
+void ACGWeapon::ServerStartReload_Implementation()
+{
+	// Make sure the server Ammo is updated properly.
+	OnStartReload();
 }
 
 void ACGWeapon::StartOverheat(){ }
@@ -198,6 +214,7 @@ void ACGWeapon::ApplyReload()
 {
 
 }
+
 
 #pragma endregion
 
