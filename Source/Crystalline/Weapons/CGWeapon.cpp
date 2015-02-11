@@ -656,7 +656,7 @@ void ACGWeapon::UseAmmo()
 	// Consume ammo here In subclasses.          
 }
 
-bool ACGWeapon::CanFire() const
+bool ACGWeapon::CanFire(bool InitFireCheck) const
 {	
 	// Determine if the shot would fail in sub classes.
 	return false;

@@ -37,7 +37,7 @@ void ACGWeapPistol::UseAmmo()
 	WeaponHeat = FMath::Min(WeaponHeat + OverheatConfig.HeatPerShot, OverheatConfig.MaxHeat);
 }
 
-bool ACGWeapPistol::CanFire() const
+bool ACGWeapPistol::CanFire(bool InitFireCheck) const
 {
 	// TODO is this a good check?
 	if (CurrentState == ReloadingState)
@@ -46,7 +46,8 @@ bool ACGWeapPistol::CanFire() const
 	}
 	else
 	{
-		return WeaponHeat + OverheatConfig.HeatPerShot <= OverheatConfig.MaxHeat;
+		// XXX find a better way!
+		return WeaponHeat + OverheatConfig.HeatPerShot <= OverheatConfig.MaxHeat || InitFireCheck;
 	}	
 }
 

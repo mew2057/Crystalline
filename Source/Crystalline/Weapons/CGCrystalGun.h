@@ -23,7 +23,7 @@ public:
 
 	virtual void UseAmmo() override;
 
-	virtual bool CanFire() const override;
+	virtual bool CanFire(bool InitFireCheck) const override;
 
 	virtual float GetClipPercent() const override;
 
@@ -45,10 +45,10 @@ protected:
 
 	/**This is the ammo in addition to the ammo in the clip.*/
 	UPROPERTY(Transient, Replicated)
-	float Ammo;
+	int32 Ammo;
 	
 	UPROPERTY(Transient, Replicated)
-	float AmmoInClip;
+	int32 AmmoInClip;
 	
 	
 };

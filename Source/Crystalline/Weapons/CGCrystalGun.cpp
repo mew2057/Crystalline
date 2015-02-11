@@ -25,14 +25,14 @@ void ACGCrystalGun::UseAmmo()
 	AmmoInClip = AmmoInClip - AmmoConfig.AmmoPerShot;
 }
 
-bool ACGCrystalGun::CanFire() const
+bool ACGCrystalGun::CanFire(bool InitFireCheck) const
 {
 	return AmmoInClip - AmmoConfig.AmmoPerShot >= 0;
 }
 
 float ACGCrystalGun::GetClipPercent() const
 {
-	return AmmoInClip / AmmoConfig.ClipSize;
+	return (float)AmmoInClip / AmmoConfig.ClipSize;
 }
 
 float ACGCrystalGun::GetReloadTime() const

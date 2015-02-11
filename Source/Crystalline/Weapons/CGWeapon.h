@@ -486,7 +486,8 @@ public:
 
 	virtual void UseAmmo();
 
-	virtual bool CanFire() const;
+	// If set to false it's a check by something like CGCharacter.
+	virtual bool CanFire(bool InitFireCheck = false) const;
 
 	virtual float GetClipPercent() const;
 

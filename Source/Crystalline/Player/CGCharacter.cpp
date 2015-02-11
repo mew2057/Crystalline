@@ -349,7 +349,7 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 void ACGCharacter::StartFire()
 {
 	// TODO make sure bWantsToFire works.
-	if (IsLocallyControlled() && CurrentWeapon != NULL && CurrentWeapon->CanFire() && !bWantsToFire)
+	if (IsLocallyControlled() && CurrentWeapon != NULL && CurrentWeapon->CanFire( true ) && !bWantsToFire)
 	{
 		bWantsToFire = true;
 		CurrentWeapon->StartFire();
