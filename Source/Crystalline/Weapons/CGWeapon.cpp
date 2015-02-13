@@ -72,14 +72,12 @@ void ACGWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// Init the spread factors if this is a hitscan gun.
-	if (!WeaponConfig.bUsesProjectile)
-	{
-		HitScanConfig.MaxSpread = FMath::DegreesToRadians(HitScanConfig.MaxSpread * 0.5f);
-		HitScanConfig.BaseSpread = FMath::DegreesToRadians(HitScanConfig.BaseSpread * 0.5f);
-		CurrentSpread = HitScanConfig.BaseSpread;
-		HitScanConfig.SpreadPerShot = FMath::DegreesToRadians(HitScanConfig.SpreadPerShot * 0.5f);
-	}
+	// Init the spread factors, even if it's not used.
+	SpreadConfig.MaxSpread = FMath::DegreesToRadians(SpreadConfig.MaxSpread * 0.5f);
+	SpreadConfig.BaseSpread = FMath::DegreesToRadians(SpreadConfig.BaseSpread * 0.5f);
+	CurrentSpread = SpreadConfig.BaseSpread;
+	SpreadConfig.SpreadPerShot = FMath::DegreesToRadians(SpreadConfig.SpreadPerShot * 0.5f);
+	
 
 	if (CurrentState == NULL)
 		GotoState(InactiveState);
@@ -434,7 +432,13 @@ bool ACGWeapon::ServerFireProjectile_Validate(FVector Origin, FVector_NetQuantiz
 void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal ShootDir)
 {
 	// Determine the spawn point and create a bullet to fire.
-	FTransform BulletSpawn(ShootDir.Rotation(), Origin);
+	SpawnProjectile(Origin, ShootDir);
+}
+
+void ACGWeapon::SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir)
+{
+	const FTransform BulletSpawn(ShootDir.Rotation(), Origin);
+
 	ACGProjectile* Bullet = Cast<ACGProjectile>(
 		UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn));
 
@@ -447,6 +451,7 @@ void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQ
 		UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);
 	}
 }
+
 
 #pragma endregion
 
@@ -475,7 +480,7 @@ void ACGWeapon::FireHitScan()
 	
 	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, CurrentSpread);
 	
-	CurrentSpread = FMath::Min(HitScanConfig.MaxSpread, CurrentSpread + HitScanConfig.SpreadPerShot);
+	CurrentSpread = FMath::Min(SpreadConfig.MaxSpread, CurrentSpread + SpreadConfig.SpreadPerShot);
 	
 }
 

@@ -47,13 +47,13 @@ void ACGProjectile::PostInitializeComponents()
 
 	MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
-
-	SetLifeSpan(3.f);
 }
 
 
 void ACGProjectile::OnImpact(const FHitResult& Hit)
 {
+	UE_LOG(LogTemp, Log, TEXT("IMPACT!"));
+
 	if (Role == ROLE_Authority)
 	{
 		ProcessImpact(Hit);

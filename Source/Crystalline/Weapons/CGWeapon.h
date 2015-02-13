@@ -141,7 +141,7 @@ struct FCGProjectileData
 };
 
 USTRUCT()
-struct FCGHitScanData
+struct FCGSpreadData
 {
 	GENERATED_USTRUCT_BODY()	
 
@@ -157,7 +157,7 @@ struct FCGHitScanData
 	UPROPERTY(EditDefaultsOnly)
 	float SpreadPerShot;
 
-	FCGHitScanData()
+	FCGSpreadData()
 	{
 		MaxSpread     = 0.f;
 		BaseSpread    = 0.f;
@@ -322,7 +322,7 @@ public:
 	FCGProjectileData ProjectileConfig;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	FCGHitScanData HitScanConfig;
+	FCGSpreadData SpreadConfig;
 
 	/** Generic weapon effect configuration settings.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -447,6 +447,8 @@ public:
 
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerFireProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
+
+	virtual void SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
 
 #pragma endregion
 

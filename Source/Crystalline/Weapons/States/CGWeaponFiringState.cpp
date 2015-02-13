@@ -29,7 +29,7 @@ void UCGWeaponFiringState::EndState()
 	GetCGOwner()->GetWorldTimerManager().ClearAllTimersForObject(this);
 
 	// Reset any spread that may have developed for the gun.
-	GetOuterACGWeapon()->CurrentSpread = GetOuterACGWeapon()->HitScanConfig.BaseSpread;
+	GetOuterACGWeapon()->CurrentSpread = GetOuterACGWeapon()->SpreadConfig.BaseSpread;
 
 	GetOuterACGWeapon()->StopFiring();
 }

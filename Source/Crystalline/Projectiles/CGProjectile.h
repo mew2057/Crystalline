@@ -12,11 +12,11 @@ UCLASS(Abstract, config = Game)
 class CRYSTALLINE_API ACGProjectile : public AActor
 {
 	GENERATED_BODY()
+public:
 
-	ACGProjectile(const FObjectInitializer& ObjectInitializer);
-
+protected:
 	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UPROPERTY( EditDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp;
 
 	/** Projectile movement component */
@@ -30,6 +30,8 @@ class CRYSTALLINE_API ACGProjectile : public AActor
 public:
 	UPROPERTY()
 	float ImpactDamage;
+
+	ACGProjectile(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
 
