@@ -39,6 +39,10 @@ public:
 	UFUNCTION()
 	void OnImpact(const FHitResult& Hit);
 
+	UFUNCTION()
+	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
 	/** Sets the velocity of the projectile*/
 	UFUNCTION()
 	void SetVelocity(FVector Direction);

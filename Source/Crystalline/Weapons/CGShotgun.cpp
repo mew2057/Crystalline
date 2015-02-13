@@ -9,24 +9,28 @@ void ACGShotgun :: SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal Sho
 
 	int32 FireSeed = FMath::Rand();
 	FRandomStream WeaponRandomStream(FireSeed);
-	ACGProjectile* Bullet;
-	
+	ACGProjectile* SGBullet;
+
+	/**	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+	*/
 	for (int32 i = 0; i < BulletsPerShot; ++i)
 	{
 		
 		const FVector InitialRotation = WeaponRandomStream.VRandCone(ShootDir, CurrentSpread, CurrentSpread);
 		const FTransform BulletSpawn(InitialRotation.Rotation(), Origin);
 
-		Bullet = Cast<ACGProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn));
+		SGBullet = Cast<ACGProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn, true));
 
-		if (Bullet)
+		if (SGBullet)
 		{
-			Bullet->Instigator = Instigator;
-			Bullet->SetOwner(this);
-			Bullet->SetVelocity(InitialRotation); // This ensures the behavior matches it's intended use case.
-			Bullet->ImpactDamage = WeaponConfig.BaseDamage;
-			UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);
-			Bullet = NULL;
+			SGBullet->Instigator = Instigator;
+			SGBullet->SetOwner(this);
+			SGBullet->SetVelocity(InitialRotation); // This ensures the behavior matches it's intended use case.
+			SGBullet->ImpactDamage = WeaponConfig.BaseDamage;
+			SGBullet->SetLifeSpan(ProjectileConfig.ProjectileLife);
+			UGameplayStatics::FinishSpawningActor(SGBullet, BulletSpawn);
+			SGBullet = NULL;
 		}
 	}
 	

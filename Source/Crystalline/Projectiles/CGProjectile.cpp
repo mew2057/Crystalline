@@ -20,6 +20,8 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+
 	RootComponent = CollisionComp;
 
 	// Use a MovementCompComponent to govern this projectile's movement
@@ -44,11 +46,30 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 void ACGProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnImpact);
+	//MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnImpact);
+	CollisionComp->OnComponentHit.AddDynamic(this, &ACGProjectile::OnHit);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 }
 
+void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	ECollisionResponse temp = OtherComp->GetCollisionResponseToChannel(CollisionComp->GetCollisionObjectType());
+	UE_LOG(LogTemp, Log, TEXT("Collision With "));
+	
+	if (Role == ROLE_Authority)
+	{
+		ProcessImpact(Hit);
+		PrepForDestroy();
+	}
+	/*
+	// Only add impulse and destroy projectile if we hit a physics
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+	{
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+
+		Destroy();
+	}*/
+}
 
 void ACGProjectile::OnImpact(const FHitResult& Hit)
 {
