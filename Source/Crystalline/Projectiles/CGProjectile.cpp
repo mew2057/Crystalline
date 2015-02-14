@@ -49,6 +49,8 @@ void ACGProjectile::PostInitializeComponents()
 	//MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnImpact);
 	CollisionComp->OnComponentHit.AddDynamic(this, &ACGProjectile::OnHit);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
+
+	SpawnTrailParticleSystem();
 }
 
 void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -111,6 +113,17 @@ void ACGProjectile::PrepForDestroy()
 	MovementComp->StopMovementImmediately();
 	Destroy();
 }
+
+void ACGProjectile::SpawnTrailParticleSystem()
+{
+	// TODO Move this to sub classes as needed!
+	if (ProjectileTrail)
+	{
+		TrailPSC = UGameplayStatics::SpawnEmitterAttached(ProjectileTrail, RootComponent);
+	}
+
+}
+
 
 void ACGProjectile::SetVelocity(FVector Direction)
 {

@@ -27,6 +27,14 @@ protected:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Impacted)
 	uint32 bImpacted : 1;
 
+	/** The Weapon trail for the projectile. Each projectile should do this differently. */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UParticleSystem* ProjectileTrail;
+
+	UPROPERTY(Transient)
+	UParticleSystemComponent* TrailPSC;
+
+
 public:
 	UPROPERTY()
 	float ImpactDamage;
@@ -64,6 +72,9 @@ public:
 
 	/** Cleans up the projectile for destruction, default behavior stops then destroys the projectile.*/
 	virtual void PrepForDestroy();
+
+	/**Spawns the trail for the projectile.*/
+	virtual void SpawnTrailParticleSystem();
 
 	////////////////////////////////////////////////////////
 	// Replication
