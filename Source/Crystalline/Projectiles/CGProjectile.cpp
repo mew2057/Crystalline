@@ -40,6 +40,8 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	bReplicates = true;
 	bReplicateInstigator = true;
 	bReplicateMovement = true;
+
+	bExplodes = false;
 }
 
 
@@ -91,9 +93,8 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 		FPointDamageEvent PointDmg;
 		//PointDmg.DamageTypeClass = WeaponConfig.DamageType;
 		PointDmg.HitInfo = Hit;
-		//PointDmg.ShotDirection = ShootDir;
+		PointDmg.ShotDirection = Hit.ImpactNormal;
 		PointDmg.Damage = ImpactDamage; // This needs to move.
-
 
 		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
 	}
@@ -140,6 +141,12 @@ void ACGProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
 		MovementComp->Velocity = NewVelocity;
 	}
 }
+
+void ACGProjectile::Explode()
+{
+	 /// TODO this may work as a simple thing.
+}
+
 
 void ACGProjectile::OnRep_Impacted()
 {

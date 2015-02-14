@@ -4,7 +4,7 @@
 	<ItemGroup>
 		<None Include="..\..\Crystalline.uproject" />
 		<Filter Include="Source">
-			<UniqueIdentifier>{0DE43528-0B36-4131-A0F2-6F71E1D6E115}</UniqueIdentifier>
+			<UniqueIdentifier>{1663DA20-CD38-4D07-AED0-46C1560D007B}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Source\Crystalline.Target.cs">
 			<Filter>Source</Filter>
@@ -13,7 +13,7 @@
 			<Filter>Source</Filter>
 		</None >
 		<Filter Include="Config">
-			<UniqueIdentifier>{F9BC34A8-04A4-4C7E-A872-40B65D490C2B}</UniqueIdentifier>
+			<UniqueIdentifier>{A445D5E4-6D66-42EB-A35B-06A213CB8A02}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Config\DefaultEditor.ini">
 			<Filter>Config</Filter>
@@ -28,7 +28,7 @@
 			<Filter>Config</Filter>
 		</None >
 		<Filter Include="Source\Crystalline">
-			<UniqueIdentifier>{06D02559-5BC4-47D0-8D6F-DFAB5DCA594C}</UniqueIdentifier>
+			<UniqueIdentifier>{9BC594E5-5EAE-4B7D-AC62-E5C5C0A3BF0F}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Source\Crystalline\Crystalline.Build.cs">
 			<Filter>Source\Crystalline</Filter>
@@ -40,7 +40,7 @@
 			<Filter>Source\Crystalline</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\GameModes">
-			<UniqueIdentifier>{FC71F01D-A1FE-4D10-A12A-6FEFEDD63B36}</UniqueIdentifier>
+			<UniqueIdentifier>{8B98A279-8EF9-4CEB-8CE6-04F4B42A389D}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\GameModes\CGBaseGameMode.cpp">
 			<Filter>Source\Crystalline\GameModes</Filter>
@@ -49,7 +49,7 @@
 			<Filter>Source\Crystalline\GameModes</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\GUI">
-			<UniqueIdentifier>{F244BC5E-330E-4A38-ACF8-CA45BD326721}</UniqueIdentifier>
+			<UniqueIdentifier>{0CCF38F5-7F11-4E3A-A1CF-5E3E6B7572A7}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\GUI\CGPlayerHUD.cpp">
 			<Filter>Source\Crystalline\GUI</Filter>
@@ -58,7 +58,7 @@
 			<Filter>Source\Crystalline\GUI</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Pickups">
-			<UniqueIdentifier>{7D06C0BD-0E0A-413B-85A2-8D9DC79B683B}</UniqueIdentifier>
+			<UniqueIdentifier>{8EDE5909-B788-4DB9-B9B5-E1AB0EBA0548}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Pickups\CGCrystal.cpp">
 			<Filter>Source\Crystalline\Pickups</Filter>
@@ -67,7 +67,7 @@
 			<Filter>Source\Crystalline\Pickups</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Player">
-			<UniqueIdentifier>{C72E638C-1BE4-4AF5-B637-77F05C5CE3A8}</UniqueIdentifier>
+			<UniqueIdentifier>{6FF07615-E084-4C9F-992C-8076495F737A}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Player\CGCharacter.cpp">
 			<Filter>Source\Crystalline\Player</Filter>
@@ -88,18 +88,30 @@
 			<Filter>Source\Crystalline\Player</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Private">
-			<UniqueIdentifier>{77544ED4-A3E8-46D1-A29E-59A403B16430}</UniqueIdentifier>
+			<UniqueIdentifier>{6F44F333-8D78-439F-8003-9ECD1F9A6C34}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Private\CrystallineCharacter.cpp">
 			<Filter>Source\Crystalline\Private</Filter>
 		</ClCompile >
 		<Filter Include="Source\Crystalline\Projectiles">
-			<UniqueIdentifier>{CE3CF935-E17F-4B04-92B1-17429901187D}</UniqueIdentifier>
+			<UniqueIdentifier>{49A88252-F064-4F38-8EA5-1C74DDDB9015}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Projectiles\CGProjectile.cpp">
 			<Filter>Source\Crystalline\Projectiles</Filter>
 		</ClCompile >
 		<ClInclude Include="..\..\Source\Crystalline\Projectiles\CGProjectile.h">
+			<Filter>Source\Crystalline\Projectiles</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Projectiles\CGRocket.cpp">
+			<Filter>Source\Crystalline\Projectiles</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Projectiles\CGRocket.h">
+			<Filter>Source\Crystalline\Projectiles</Filter>
+		</ClInclude >
+		<ClCompile Include="..\..\Source\Crystalline\Projectiles\CGRocketProjectile.cpp">
+			<Filter>Source\Crystalline\Projectiles</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Projectiles\CGRocketProjectile.h">
 			<Filter>Source\Crystalline\Projectiles</Filter>
 		</ClInclude >
 		<ClCompile Include="..\..\Source\Crystalline\Projectiles\CGShotgunProjectile.cpp">
@@ -109,22 +121,22 @@
 			<Filter>Source\Crystalline\Projectiles</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Public">
-			<UniqueIdentifier>{75C22D1B-2A9C-46B5-A6DE-130D7339FFCF}</UniqueIdentifier>
+			<UniqueIdentifier>{70625872-EF64-4F56-8B53-8DAD97806102}</UniqueIdentifier>
 		</Filter>
 		<ClInclude Include="..\..\Source\Crystalline\Public\CrystallineCharacter.h">
 			<Filter>Source\Crystalline\Public</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Resources">
-			<UniqueIdentifier>{81EFFBA9-30BC-40BA-9CEB-4D5D01FCAE91}</UniqueIdentifier>
+			<UniqueIdentifier>{A15CF32E-21FC-4861-9C88-92ABECA2155E}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="Source\Crystalline\Resources\Windows">
-			<UniqueIdentifier>{DAF371E0-6810-44C8-A730-AE3EED43D10A}</UniqueIdentifier>
+			<UniqueIdentifier>{14F62263-A8CC-4EFE-9E7F-0E8FA696E28A}</UniqueIdentifier>
 		</Filter>
 		<ResourceCompile Include="..\..\Source\Crystalline\Resources\Windows\Crystalline.rc">
 			<Filter>Source\Crystalline\Resources\Windows</Filter>
 		</ResourceCompile >
 		<Filter Include="Source\Crystalline\Weapons">
-			<UniqueIdentifier>{25DB9269-A125-4533-8134-36EF000CB1FF}</UniqueIdentifier>
+			<UniqueIdentifier>{A31D74AD-495F-408F-A677-D755CD980B49}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Weapons\CGCrystalGun.cpp">
 			<Filter>Source\Crystalline\Weapons</Filter>
@@ -175,7 +187,7 @@
 			<Filter>Source\Crystalline\Weapons</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Weapons\States">
-			<UniqueIdentifier>{96CA15DC-6787-4338-B015-9A778E68F178}</UniqueIdentifier>
+			<UniqueIdentifier>{FA9F71FA-FCCF-4C58-94D9-50E56A22DBC2}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponActiveState.cpp">
 			<Filter>Source\Crystalline\Weapons\States</Filter>

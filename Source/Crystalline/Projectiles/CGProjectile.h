@@ -36,9 +36,22 @@ protected:
 
 
 public:
+#pragma region ReplaceWithStruct
 	UPROPERTY()
 	float ImpactDamage;
+	
+	// TODO assess
+	/////////////////////////////////
+	UPROPERTY()
+	float SplashDamage;
+	
+	UPROPERTY()
+	float SplashRange;
 
+	UPROPERTY()
+	uint32 bExplodes : 1;
+	/////////////////////////////////
+#pragma endregion
 	ACGProjectile(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
@@ -49,7 +62,6 @@ public:
 
 	UFUNCTION()
 	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 
 	/** Sets the velocity of the projectile*/
 	UFUNCTION()
@@ -75,6 +87,9 @@ public:
 
 	/**Spawns the trail for the projectile.*/
 	virtual void SpawnTrailParticleSystem();
+
+	/**Causes the projectile to explode, causing damage.*/
+	virtual void Explode();
 
 	////////////////////////////////////////////////////////
 	// Replication
