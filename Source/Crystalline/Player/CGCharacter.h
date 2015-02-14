@@ -44,6 +44,8 @@ protected:
 
 	/** Tracks when the shield is regenerating for the tick.*/
 	uint32 bShieldRegenerating : 1;
+	
+	float BaseFOV;
 
 	/** The maximum health for the player. This is reset on shield regeneration.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -129,6 +131,13 @@ protected:
 
 	/** Changes the equipped weapon to the previous one in the Inventory Weapon array. */
 	void PreviousWeapon();
+
+	/** Zooms the player's view, may trigger ADS. */
+	void StartZoom();
+
+	/** Unzooms the player's view, may stop ADS. */
+	void StopZoom();
+
 
 #pragma endregion
 

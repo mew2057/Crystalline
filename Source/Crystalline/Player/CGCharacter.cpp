@@ -60,6 +60,9 @@ void ACGCharacter::PostInitializeComponents()
 		SpawnBaseInventory();
 	}
 
+	// XXX is this the best way to do this?
+	BaseFOV = FirstPersonCameraComponent->FieldOfView;
+
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -112,9 +115,10 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ACGCharacter::OnReload);
 
+	InputComponent->BindAction("Zoom", IE_Pressed, this, &ACGCharacter::StartZoom);
+	InputComponent->BindAction("Zoom", IE_Released, this, &ACGCharacter::StopZoom);
 	/* XXX Not implemented!
-	InputComponent->BindAction("AltFire", IE_Pressed,       this, &ACGCharacter::StartAltFire);
-	InputComponent->BindAction("AltFire", IE_Released,      this, &ACGCharacter::StopAltFire);
+
 	InputComponent->BindAction("ToggleRunning", IE_Pressed, this, &ACGCharacter::ToggleRunning);
 	*/
 
@@ -408,6 +412,19 @@ void ACGCharacter::PreviousWeapon()
 
 		EquipWeapon(Weapons[WeaponIndex]);
 	}
+}
+
+/** Zooms the player's view, may trigger ADS. */
+void ACGCharacter::StartZoom()
+{
+	// TODO Make me smoother. Add to tick?
+	FirstPersonCameraComponent->FieldOfView = 30;
+}
+
+/** Unzooms the player's view, may stop ADS. */
+void ACGCharacter::StopZoom()
+{
+	FirstPersonCameraComponent->FieldOfView = BaseFOV;
 }
 
 #pragma endregion
