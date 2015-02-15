@@ -529,8 +529,7 @@ void ACGWeapon::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector&
 	// Plays the local FX.
 	if (GetNetMode() != NM_DedicatedServer)
 	{
-		FVector EndPoint = Impact.GetActor() ? Impact.ImpactPoint : Origin + ShootDir * WeaponConfig.WeaponRange;
-
+		FVector EndPoint = Impact.bBlockingHit ? Impact.ImpactPoint : Origin + ShootDir * WeaponConfig.WeaponRange;
 		// Do spawning here.
 		SpawnTrailEffect(EndPoint);
 		SpawnHitEffect(Impact);
