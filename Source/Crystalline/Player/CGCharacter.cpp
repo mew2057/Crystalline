@@ -42,6 +42,8 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	TimeToRegen			= 2.f;
 	bShieldRegenerating  = false;
 
+	bZooming	  = false;
+	bZoomed       = false;
 	MaxHealth     = 10.0f;
 	CurrentHealth = MaxHealth;
 	PendingWeapon = NULL;
@@ -58,11 +60,13 @@ void ACGCharacter::PostInitializeComponents()
 		CurrentShield = MaxShield;
 		CurrentHealth = MaxHealth;
 		SpawnBaseInventory();
+		
 	}
-
-	// XXX is this the best way to do this?
-	BaseFOV = FirstPersonCameraComponent->FieldOfView;
-
+	
+	// XXX ZOOM
+	// Init the Zoom to be sure.
+	CurrentZoom.InitZoom();
+	FirstPersonCameraComponent->FieldOfView = FOVDefault;
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -75,6 +79,22 @@ void ACGCharacter::Tick(float DeltaSeconds)
 
 		// The Shield is regenerating while this is true.
 		bShieldRegenerating = CurrentShield < MaxShield;
+	}
+
+	// XXX ZOOM ZOOM ZOOM
+	if (IsLocallyControlled() && bZooming)
+	{
+		float CurrentFOV = FirstPersonCameraComponent->FieldOfView;
+		//
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, CurrentZoom.TargetZoom, DeltaSeconds, CurrentZoom.ZoomSpeed);
+		
+		if (FMath::Abs(CurrentFOV - CurrentZoom.TargetZoom) < 1.f)
+		{
+			bZooming = false;
+			CurrentFOV = CurrentZoom.TargetZoom;
+		}
+
+		FirstPersonCameraComponent->FieldOfView = CurrentFOV;
 	}
 }
 
@@ -253,11 +273,13 @@ void ACGCharacter::WeaponChanged()
 		PendingWeapon = NULL;
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();
+		CurrentZoom = CurrentWeapon->WeaponZoomConfig; // Change the zoom on weapon change.
 	}
 	else if (CurrentWeapon != NULL)
 	{
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();
+		CurrentZoom = CurrentWeapon->WeaponZoomConfig; // Change the zoom on weapon change.
 	}
 }
 
@@ -414,17 +436,21 @@ void ACGCharacter::PreviousWeapon()
 	}
 }
 
+// TODO make sure that if this gets interrupted the player will always return to their default zoom.
 /** Zooms the player's view, may trigger ADS. */
 void ACGCharacter::StartZoom()
 {
-	// TODO Make me smoother. Add to tick?
-	FirstPersonCameraComponent->FieldOfView = 30;
+	bZoomed = !bZoomed;
+	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
+	bZooming = true;
 }
 
 /** Unzooms the player's view, may stop ADS. */
 void ACGCharacter::StopZoom()
 {
-	FirstPersonCameraComponent->FieldOfView = BaseFOV;
+	bZoomed = !bZoomed;
+	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
+	bZooming = true;
 }
 
 #pragma endregion

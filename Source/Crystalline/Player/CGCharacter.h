@@ -5,6 +5,48 @@
 #include "GameFramework/Character.h"
 #include "CGCharacter.generated.h"
 
+
+USTRUCT()
+struct FCGZoom
+{
+	GENERATED_USTRUCT_BODY()
+		/** The factor that this zoom.*/
+		UPROPERTY(EditDefaultsOnly)
+		float ZoomFactor;
+
+
+	/**Speed of the interpolation from zoomed to zoomed out and vice versa. TODO make this seconds!*/
+	UPROPERTY(EditDefaultsOnly)
+		float ZoomSpeed;
+
+	// Used in the zoom operation.
+	///////////////////////////////////////////
+	UPROPERTY(Transient)
+		float TargetZoom;
+	///////////////////////////////////////////
+
+	FCGZoom()
+	{
+		ZoomFactor = 1.5f;
+		ZoomSpeed = 20.f;
+	}
+
+public:
+	/** Preps the variables of the struct for use. */
+	void InitZoom()
+	{
+		ZoomFactor = 1 / ZoomFactor;
+	}
+
+	/** Sets the target zoom and start zoom up properly. Reduces the number of if statements per.*/
+	void BeginZoom(float BaseFOV, bool bZoomIn)
+	{
+		TargetZoom = bZoomIn ? BaseFOV * ZoomFactor : BaseFOV;
+	}
+
+};
+
+
 /**
  * 
  */
@@ -45,7 +87,7 @@ protected:
 	/** Tracks when the shield is regenerating for the tick.*/
 	uint32 bShieldRegenerating : 1;
 	
-	float BaseFOV;
+	
 
 	/** The maximum health for the player. This is reset on shield regeneration.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -68,6 +110,26 @@ protected:
 
 
 public:
+
+	//FIXME move these variables back to private!
+	///////////////////////////////////////////////////////////
+	// Zoom
+	// FIXME this may not work with the network!
+	/** Tracks whether or not the weapon is currently zoomed.*/
+	UPROPERTY(Transient, Replicated)
+		uint32 bZoomed : 1;
+
+	UPROPERTY(Transient)
+		uint32 bZooming : 1;
+
+	/** Defines the zoom factor for the weapon. */
+	UPROPERTY(Transient)
+		FCGZoom CurrentZoom;
+
+	/** The FOV in the general case for the player.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+		float FOVDefault;
+	///////////////////////////////////////////////////////////
 
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	FORCEINLINE float GeCurrentShield() const { return CurrentShield; }

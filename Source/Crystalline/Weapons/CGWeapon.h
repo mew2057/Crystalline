@@ -332,6 +332,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FCGWeaponHUDData WeaponHUDConfig;
 	
+	/**Defines the zoom factor for the weapon.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FCGZoom WeaponZoomConfig;
+	
 
 	////////////////////////////
 	// Mutable weapon fields
@@ -339,8 +343,6 @@ public:
 	// Keeps track of the current burst. Ammo Doesn't need to be replicated.
 	UPROPERTY(Transient, ReplicatedUsing=OnRep_BurstCount)
 	int32 BurstCount;
-	
-	// TODO track ammo, but only replicate to owner.
 
 	/** The time of the last shot by the weapon.*/
 	UPROPERTY()
@@ -365,8 +367,6 @@ public:
 	/** Used to manage audio playback. */
 	UPROPERTY(Transient)
 	UAudioComponent* FireAudioComponent;
-
-
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };

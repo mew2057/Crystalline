@@ -72,6 +72,9 @@ void ACGWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	// XXX does the weapon need this?
+	WeaponZoomConfig.InitZoom();
+
 	// Init the spread factors, even if it's not used.
 	SpreadConfig.MaxSpread = FMath::DegreesToRadians(SpreadConfig.MaxSpread * 0.5f);
 	SpreadConfig.BaseSpread = FMath::DegreesToRadians(SpreadConfig.BaseSpread * 0.5f);
