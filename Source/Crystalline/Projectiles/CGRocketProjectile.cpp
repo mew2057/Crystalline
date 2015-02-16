@@ -19,19 +19,28 @@ void ACGRocketProjectile::ProcessImpact(const FHitResult& Hit)
 	FVector ExplosionPoint = Hit.ImpactPoint + Hit.ImpactNormal * 10.f;
 
 	// Apply radial damage at the impact point.
-	Explode(ExplosionPoint);
+	Explode(ExplosionPoint, SplashRange);
 }
 
-
-void ACGRocketProjectile::Explode(const FVector& Epicenter)
+void ACGRocketProjectile::Explode(const FVector& Epicenter,float Range)
 {
 	// TODO DamageType!
 	UGameplayStatics::ApplyRadialDamage(this, 
-		ImpactDamage, Epicenter, SplashRange, NULL, TArray<AActor*>(), this, GetInstigatorController());
+		ImpactDamage, Epicenter, Range, NULL, TArray<AActor*>(), this, GetInstigatorController());
 
 	// TODO  Add Impulse!
 
 	// TODO Play Effect!
 
 
+}
+
+void ACGRocketProjectile::PlannedExplosion()
+{
+	// Only the Authority can trigger a planned explosion.
+	if (Role == ROLE_Authority)
+	{
+		Explode(GetActorLocation, SplashRange * 2);
+		PrepForDestroy();
+	}
 }

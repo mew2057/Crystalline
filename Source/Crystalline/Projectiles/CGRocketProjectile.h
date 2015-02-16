@@ -19,21 +19,15 @@ public:
 
 	/** Processes the impact with projectile specific implementation details. */
 	virtual void ProcessImpact(const FHitResult& Hit) override;
-
-	/**Damage ratio relative to the Impact damage. (.5 is half the damage of the supplied impact.*/
-	/*UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	float SplashDamageRatio;
-	*/
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	float SplashRange;
-
+	
 protected:
 
 	/**Spawns the radial damagae event. Plays visuals of the explosion.*/
-	void Explode(const FVector& Epicenter);
+	void Explode(const FVector& Epicenter, float Range);
 
-	
-	
-	
+	/** Premature explosion, occurs at double the effective range, but commits the user to one shot.*/
+	void PlannedExplosion(const FVector& Epicenter);	
 };

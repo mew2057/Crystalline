@@ -76,8 +76,6 @@ void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FV
 
 void ACGProjectile::OnImpact(const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Log, TEXT("IMPACT!"));
-
 	if (Role == ROLE_Authority)
 	{
 		ProcessImpact(Hit);
