@@ -22,7 +22,7 @@ void ACGRocketProjectile::ProcessImpact(const FHitResult& Hit)
 	Explode(ExplosionPoint, SplashRange);
 }
 
-void ACGRocketProjectile::Explode(const FVector& Epicenter,float Range)
+void ACGRocketProjectile::Explode(const FVector& Epicenter, float Range)
 {
 	// TODO DamageType!
 	UGameplayStatics::ApplyRadialDamage(this, 
@@ -32,7 +32,6 @@ void ACGRocketProjectile::Explode(const FVector& Epicenter,float Range)
 
 	// TODO Play Effect!
 
-
 }
 
 void ACGRocketProjectile::PlannedExplosion()
@@ -40,7 +39,7 @@ void ACGRocketProjectile::PlannedExplosion()
 	// Only the Authority can trigger a planned explosion.
 	if (Role == ROLE_Authority)
 	{
-		Explode(GetActorLocation, SplashRange * 2);
+		Explode(GetActorLocation(), SplashRange * 2);
 		PrepForDestroy();
 	}
 }

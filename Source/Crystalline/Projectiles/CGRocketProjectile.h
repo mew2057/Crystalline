@@ -29,5 +29,5 @@ protected:
 	void Explode(const FVector& Epicenter, float Range);
 
 	/** Premature explosion, occurs at double the effective range, but commits the user to one shot.*/
-	void PlannedExplosion(const FVector& Epicenter);	
+	void PlannedExplosion();	
 };
