@@ -354,6 +354,10 @@ public:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_HitNotify)
 	FCGInstantHit HitNotify;
 
+	/**The percentage of the clip fired by a single shot.*/
+	UPROPERTY()
+	float ClipPercentPerShot;
+
 	////////////////////////////
 	//  Components
 
@@ -493,7 +497,10 @@ public:
 
 	virtual float GetClipPercent() const;
 
+	float GetPercentPerShot() const { return ClipPercentPerShot; }
+
 	virtual int32 GetAmmo() const { return 0; }
+
 
 	virtual int32 GetAmmoInClip() const { return 0; }
 

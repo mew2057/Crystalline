@@ -29,6 +29,7 @@ public:
 
 	virtual float GetClipPercent() const override;
 
+
 	virtual void StartOverheat() override;
 
 	void BeginCooldown();

@@ -17,6 +17,7 @@ void ACGWeapPistol::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	
 	WeaponHeat = 0;
+	ClipPercentPerShot = OverheatConfig.HeatPerShot / OverheatConfig.MaxHeat;
 }
 
 
@@ -55,6 +56,7 @@ float ACGWeapPistol::GetClipPercent() const
 {
 	return  WeaponHeat / OverheatConfig.MaxHeat;
 }
+
 
 void ACGWeapPistol::StartOverheat()
 {

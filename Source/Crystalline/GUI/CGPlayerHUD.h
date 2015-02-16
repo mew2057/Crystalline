@@ -36,8 +36,14 @@ public:
 	/** Draws Information regarding the current game type.*/
 	void DrawGameInfo();
 
+
+	/** Draws the prompt message.*/
+	void DrawPrompt();
+
+	void SetPromptMessage(const FString& Message);
+
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-	UFont* BigFont;
+		UFont* BigFont;
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/

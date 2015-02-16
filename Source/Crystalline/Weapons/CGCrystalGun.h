@@ -27,6 +27,7 @@ public:
 
 	virtual float GetClipPercent() const override;
 
+
 	virtual float GetReloadTime() const override;
 
 	virtual bool GetCanReload() const override;

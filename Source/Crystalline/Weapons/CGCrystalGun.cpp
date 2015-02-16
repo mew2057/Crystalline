@@ -13,9 +13,9 @@ ACGCrystalGun::ACGCrystalGun(const FObjectInitializer& ObjectInitializer) :Super
 void ACGCrystalGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
 	Ammo = AmmoConfig.AmmoCapacity;
 	AmmoInClip = AmmoConfig.ClipSize;
+	ClipPercentPerShot = AmmoConfig.AmmoPerShot / AmmoConfig.ClipSize;
 }
 
 #pragma region Ammo

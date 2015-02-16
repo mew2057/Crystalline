@@ -65,6 +65,7 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 
 	BurstCount    = 0;
 	LastFireTime  = 0.f;
+	ClipPercentPerShot = 0.f;
 }
 
 
