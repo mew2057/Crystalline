@@ -29,7 +29,7 @@ void UCGWeaponFiringState::EndState()
 	GetCGOwner()->GetWorldTimerManager().ClearAllTimersForObject(this);
 
 	// Reset any spread that may have developed for the gun.
-	GetOuterACGWeapon()->CurrentSpread = GetOuterACGWeapon()->HitScanConfig.BaseSpread;
+	GetOuterACGWeapon()->CurrentSpread = GetOuterACGWeapon()->SpreadConfig.BaseSpread;
 
 	GetOuterACGWeapon()->StopFiring();
 }
@@ -41,16 +41,21 @@ void UCGWeaponFiringState::StopFire()
 
 void UCGWeaponFiringState::FireShot()
 {
-	// If the gun has automatic fire, set a timer to continue firing, IFF the fire was successful
-	if (GetOuterACGWeapon()->StartFiring() && GetOuterACGWeapon()->WeaponConfig.bAutomaticFire)
+	if (GetOuterACGWeapon()->StartFiring())
 	{
 		GetOuterACGWeapon()->UseAmmo();
-		GetCGOwner()->GetWorldTimerManager().SetTimer(
-			this,
-			&UCGWeaponFiringState::FireShot,
-			GetOuterACGWeapon()->WeaponConfig.TimeBetweenShots,
-			false);
+
+		// If the gun has automatic fire, set a timer to continue firing, IFF the fire was successful
+		if (GetOuterACGWeapon()->WeaponConfig.bAutomaticFire)
+		{
+			GetCGOwner()->GetWorldTimerManager().SetTimer(
+				this,
+				&UCGWeaponFiringState::FireShot,
+				GetOuterACGWeapon()->WeaponConfig.TimeBetweenShots,
+				false);
+		}
 	}
+	
 
 
 

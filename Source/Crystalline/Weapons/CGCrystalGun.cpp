@@ -13,9 +13,9 @@ ACGCrystalGun::ACGCrystalGun(const FObjectInitializer& ObjectInitializer) :Super
 void ACGCrystalGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
 	Ammo = AmmoConfig.AmmoCapacity;
 	AmmoInClip = AmmoConfig.ClipSize;
+	ClipPercentPerShot = AmmoConfig.AmmoPerShot / AmmoConfig.ClipSize;
 }
 
 #pragma region Ammo
@@ -25,14 +25,14 @@ void ACGCrystalGun::UseAmmo()
 	AmmoInClip = AmmoInClip - AmmoConfig.AmmoPerShot;
 }
 
-bool ACGCrystalGun::CanFire() const
+bool ACGCrystalGun::CanFire(bool InitFireCheck) const
 {
 	return AmmoInClip - AmmoConfig.AmmoPerShot >= 0;
 }
 
 float ACGCrystalGun::GetClipPercent() const
 {
-	return AmmoInClip / AmmoConfig.ClipSize;
+	return (float)AmmoInClip / AmmoConfig.ClipSize;
 }
 
 float ACGCrystalGun::GetReloadTime() const
@@ -42,7 +42,8 @@ float ACGCrystalGun::GetReloadTime() const
 
 bool ACGCrystalGun::GetCanReload() const
 {
-	return Ammo > 0;
+	// If we have ammo and we've actually fired something.
+	return Ammo > 0 && AmmoInClip < AmmoConfig.ClipSize;
 }
 
 void ACGCrystalGun::ApplyReload()

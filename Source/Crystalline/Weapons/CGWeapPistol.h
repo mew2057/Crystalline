@@ -25,9 +25,10 @@ public:
 
 	virtual void UseAmmo() override;
 
-	virtual bool CanFire() const override;
+	virtual bool CanFire(bool InitFireCheck) const override;
 
 	virtual float GetClipPercent() const override;
+
 
 	virtual void StartOverheat() override;
 

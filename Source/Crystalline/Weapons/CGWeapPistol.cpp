@@ -17,6 +17,7 @@ void ACGWeapPistol::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	
 	WeaponHeat = 0;
+	ClipPercentPerShot = OverheatConfig.HeatPerShot / OverheatConfig.MaxHeat;
 }
 
 
@@ -37,7 +38,7 @@ void ACGWeapPistol::UseAmmo()
 	WeaponHeat = FMath::Min(WeaponHeat + OverheatConfig.HeatPerShot, OverheatConfig.MaxHeat);
 }
 
-bool ACGWeapPistol::CanFire() const
+bool ACGWeapPistol::CanFire(bool InitFireCheck) const
 {
 	// TODO is this a good check?
 	if (CurrentState == ReloadingState)
@@ -46,7 +47,8 @@ bool ACGWeapPistol::CanFire() const
 	}
 	else
 	{
-		return WeaponHeat + OverheatConfig.HeatPerShot <= OverheatConfig.MaxHeat;
+		// XXX find a better way!
+		return WeaponHeat + OverheatConfig.HeatPerShot <= OverheatConfig.MaxHeat || InitFireCheck;
 	}	
 }
 
@@ -54,6 +56,7 @@ float ACGWeapPistol::GetClipPercent() const
 {
 	return  WeaponHeat / OverheatConfig.MaxHeat;
 }
+
 
 void ACGWeapPistol::StartOverheat()
 {

@@ -20,6 +20,8 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+
 	RootComponent = CollisionComp;
 
 	// Use a MovementCompComponent to govern this projectile's movement
@@ -44,13 +46,33 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 void ACGProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnImpact);
+	//MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnImpact);
+	CollisionComp->OnComponentHit.AddDynamic(this, &ACGProjectile::OnHit);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 
-	SetLifeSpan(3.f);
+	SpawnTrailParticleSystem();
 }
 
+void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	ECollisionResponse temp = OtherComp->GetCollisionResponseToChannel(CollisionComp->GetCollisionObjectType());
+	UE_LOG(LogTemp, Log, TEXT("Collision With "));
+	
+	if (Role == ROLE_Authority)
+	{
+		ProcessImpact(Hit);
+		PrepForDestroy();
+	}
+
+	/*
+	// Only add impulse and destroy projectile if we hit a physics
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+	{
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+
+		Destroy();
+	}*/
+}
 
 void ACGProjectile::OnImpact(const FHitResult& Hit)
 {
@@ -68,14 +90,13 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 		FPointDamageEvent PointDmg;
 		//PointDmg.DamageTypeClass = WeaponConfig.DamageType;
 		PointDmg.HitInfo = Hit;
-		//PointDmg.ShotDirection = ShootDir;
+		PointDmg.ShotDirection = Hit.ImpactNormal;
 		PointDmg.Damage = ImpactDamage; // This needs to move.
-
 
 		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
 	}
-	//GameplayStatics::ApplyRadialDamage(this, WeaponConfig.ExplosionDamage, NudgedImpactLocation, WeaponConfig.ExplosionRadius, WeaponConfig.DamageType, TArray<AActor*>(), this, MyController.Get());
 
+	// TODO  Add Impulse!
 	// Only add impulse and destroy projectile if we hit a physics
 	/*if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
@@ -89,6 +110,16 @@ void ACGProjectile::PrepForDestroy()
 {
 	MovementComp->StopMovementImmediately();
 	Destroy();
+}
+
+void ACGProjectile::SpawnTrailParticleSystem()
+{
+	// TODO Move this to sub classes as needed!
+	if (ProjectileTrail)
+	{
+		TrailPSC = UGameplayStatics::SpawnEmitterAttached(ProjectileTrail, RootComponent);
+	}
+
 }
 
 void ACGProjectile::SetVelocity(FVector Direction)
@@ -106,6 +137,8 @@ void ACGProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
 		MovementComp->Velocity = NewVelocity;
 	}
 }
+
+
 
 void ACGProjectile::OnRep_Impacted()
 {

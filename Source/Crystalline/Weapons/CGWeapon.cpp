@@ -65,6 +65,7 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 
 	BurstCount    = 0;
 	LastFireTime  = 0.f;
+	ClipPercentPerShot = 0.f;
 }
 
 
@@ -72,14 +73,15 @@ void ACGWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	// Init the spread factors if this is a hitscan gun.
-	if (!WeaponConfig.bUsesProjectile)
-	{
-		HitScanConfig.MaxSpread = FMath::DegreesToRadians(HitScanConfig.MaxSpread * 0.5f);
-		HitScanConfig.BaseSpread = FMath::DegreesToRadians(HitScanConfig.BaseSpread * 0.5f);
-		CurrentSpread = HitScanConfig.BaseSpread;
-		HitScanConfig.SpreadPerShot = FMath::DegreesToRadians(HitScanConfig.SpreadPerShot * 0.5f);
-	}
+	// XXX does the weapon need this?
+	WeaponZoomConfig.InitZoom();
+
+	// Init the spread factors, even if it's not used.
+	SpreadConfig.MaxSpread = FMath::DegreesToRadians(SpreadConfig.MaxSpread * 0.5f);
+	SpreadConfig.BaseSpread = FMath::DegreesToRadians(SpreadConfig.BaseSpread * 0.5f);
+	CurrentSpread = SpreadConfig.BaseSpread;
+	SpreadConfig.SpreadPerShot = FMath::DegreesToRadians(SpreadConfig.SpreadPerShot * 0.5f);
+	
 
 	if (CurrentState == NULL)
 		GotoState(InactiveState);
@@ -167,6 +169,11 @@ void ACGWeapon::OnUnequip()
 void ACGWeapon::OnStartReload()
 {
 	CurrentState->StartReload();
+
+	if (Role < ROLE_Authority)
+	{
+		ServerStartReload();
+	}
 }
 
 void ACGWeapon::StopReload()
@@ -180,6 +187,17 @@ void ACGWeapon::StopReload()
 	{
 		GotoState(ActiveState);
 	}
+}
+
+bool ACGWeapon::ServerStartReload_Validate()
+{
+	return true;
+}
+
+void ACGWeapon::ServerStartReload_Implementation()
+{
+	// Make sure the server Ammo is updated properly.
+	OnStartReload();
 }
 
 void ACGWeapon::StartOverheat(){ }
@@ -198,6 +216,7 @@ void ACGWeapon::ApplyReload()
 {
 
 }
+
 
 #pragma endregion
 
@@ -417,7 +436,13 @@ bool ACGWeapon::ServerFireProjectile_Validate(FVector Origin, FVector_NetQuantiz
 void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal ShootDir)
 {
 	// Determine the spawn point and create a bullet to fire.
-	FTransform BulletSpawn(ShootDir.Rotation(), Origin);
+	SpawnProjectile(Origin, ShootDir);
+}
+
+void ACGWeapon::SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir)
+{
+	const FTransform BulletSpawn(ShootDir.Rotation(), Origin);
+
 	ACGProjectile* Bullet = Cast<ACGProjectile>(
 		UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn));
 
@@ -427,9 +452,11 @@ void ACGWeapon::ServerFireProjectile_Implementation(FVector Origin, FVector_NetQ
 		Bullet->SetOwner(this);
 		Bullet->SetVelocity(ShootDir); // This ensures the behavior matches it's intended use case.
 		Bullet->ImpactDamage = WeaponConfig.BaseDamage;
+		Bullet->SetLifeSpan(ProjectileConfig.ProjectileLife);
 		UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);
 	}
 }
+
 
 #pragma endregion
 
@@ -458,7 +485,7 @@ void ACGWeapon::FireHitScan()
 	
 	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, CurrentSpread);
 	
-	CurrentSpread = FMath::Min(HitScanConfig.MaxSpread, CurrentSpread + HitScanConfig.SpreadPerShot);
+	CurrentSpread = FMath::Min(SpreadConfig.MaxSpread, CurrentSpread + SpreadConfig.SpreadPerShot);
 	
 }
 
@@ -506,8 +533,7 @@ void ACGWeapon::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector&
 	// Plays the local FX.
 	if (GetNetMode() != NM_DedicatedServer)
 	{
-		FVector EndPoint = Impact.GetActor() ? Impact.ImpactPoint : Origin + ShootDir * WeaponConfig.WeaponRange;
-
+		FVector EndPoint = Impact.bBlockingHit ? Impact.ImpactPoint : Origin + ShootDir * WeaponConfig.WeaponRange;
 		// Do spawning here.
 		SpawnTrailEffect(EndPoint);
 		SpawnHitEffect(Impact);
@@ -639,7 +665,7 @@ void ACGWeapon::UseAmmo()
 	// Consume ammo here In subclasses.          
 }
 
-bool ACGWeapon::CanFire() const
+bool ACGWeapon::CanFire(bool InitFireCheck) const
 {	
 	// Determine if the shot would fail in sub classes.
 	return false;

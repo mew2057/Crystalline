@@ -141,7 +141,7 @@ struct FCGProjectileData
 };
 
 USTRUCT()
-struct FCGHitScanData
+struct FCGSpreadData
 {
 	GENERATED_USTRUCT_BODY()	
 
@@ -157,7 +157,7 @@ struct FCGHitScanData
 	UPROPERTY(EditDefaultsOnly)
 	float SpreadPerShot;
 
-	FCGHitScanData()
+	FCGSpreadData()
 	{
 		MaxSpread     = 0.f;
 		BaseSpread    = 0.f;
@@ -199,9 +199,6 @@ struct FCGWeaponFXData
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	FName TrailTargetParam;
 
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	uint32 bDrawWeaponTrail : 1;
-
 	/** The Weapon trail for the bullet. Typically only used by hit scan weapons. */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UParticleSystem* WeaponTrail;
@@ -225,7 +222,6 @@ struct FCGWeaponFXData
 		/** The default name of the Muzzle socket. */
 		MuzzleSocket = TEXT("MuzzleFlashSocket");
 		TrailTargetParam = TEXT("TrailEnd");
-		bDrawWeaponTrail = false;
 
 	}
 };
@@ -322,7 +318,7 @@ public:
 	FCGProjectileData ProjectileConfig;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	FCGHitScanData HitScanConfig;
+	FCGSpreadData SpreadConfig;
 
 	/** Generic weapon effect configuration settings.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -332,6 +328,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FCGWeaponHUDData WeaponHUDConfig;
 	
+	/**Defines the zoom factor for the weapon.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FCGZoom WeaponZoomConfig;
+	
 
 	////////////////////////////
 	// Mutable weapon fields
@@ -339,8 +339,6 @@ public:
 	// Keeps track of the current burst. Ammo Doesn't need to be replicated.
 	UPROPERTY(Transient, ReplicatedUsing=OnRep_BurstCount)
 	int32 BurstCount;
-	
-	// TODO track ammo, but only replicate to owner.
 
 	/** The time of the last shot by the weapon.*/
 	UPROPERTY()
@@ -351,6 +349,10 @@ public:
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_HitNotify)
 	FCGInstantHit HitNotify;
+
+	/**The percentage of the clip fired by a single shot.*/
+	UPROPERTY()
+	float ClipPercentPerShot;
 
 	////////////////////////////
 	//  Components
@@ -365,8 +367,6 @@ public:
 	/** Used to manage audio playback. */
 	UPROPERTY(Transient)
 	UAudioComponent* FireAudioComponent;
-
-
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
@@ -396,7 +396,10 @@ public:
 	virtual void OnUnequip();
 
 	virtual void OnStartReload();
-
+	
+	UFUNCTION(server, reliable, WithValidation)
+	void ServerStartReload();
+	
 	void StopReload();
 
 	// This is managed by the weapon, not the state at the present.
@@ -445,6 +448,8 @@ public:
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerFireProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
 
+	virtual void SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
+
 #pragma endregion
 
 #pragma region Hit Scan
@@ -483,11 +488,15 @@ public:
 
 	virtual void UseAmmo();
 
-	virtual bool CanFire() const;
+	// If set to false it's a check by something like CGCharacter.
+	virtual bool CanFire(bool InitFireCheck = false) const;
 
 	virtual float GetClipPercent() const;
 
+	float GetPercentPerShot() const { return ClipPercentPerShot; }
+
 	virtual int32 GetAmmo() const { return 0; }
+
 
 	virtual int32 GetAmmoInClip() const { return 0; }
 

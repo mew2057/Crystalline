@@ -12,11 +12,11 @@ UCLASS(Abstract, config = Game)
 class CRYSTALLINE_API ACGProjectile : public AActor
 {
 	GENERATED_BODY()
+public:
 
-	ACGProjectile(const FObjectInitializer& ObjectInitializer);
-
+protected:
 	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UPROPERTY( EditDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp;
 
 	/** Projectile movement component */
@@ -27,15 +27,33 @@ class CRYSTALLINE_API ACGProjectile : public AActor
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Impacted)
 	uint32 bImpacted : 1;
 
+	/** The Weapon trail for the projectile. Each projectile should do this differently. */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UParticleSystem* ProjectileTrail;
+
+	UPROPERTY(Transient)
+	UParticleSystemComponent* TrailPSC;
+
 public:
+
+	//TODO
+#pragma region ReplaceWithStruct
 	UPROPERTY()
 	float ImpactDamage;
+	
+
+#pragma endregion
+
+	ACGProjectile(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
 
 	/** Called when projectile hits something */
 	UFUNCTION()
 	void OnImpact(const FHitResult& Hit);
+
+	UFUNCTION()
+	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	/** Sets the velocity of the projectile*/
 	UFUNCTION()
@@ -48,7 +66,7 @@ public:
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return MovementComp; }
 
 	////////////////////////////////////////////////////////
-	// Functions expected to be overrided
+	// Functions expected to be overriden
 
 	/** Update velocity on client */
 	virtual void PostNetReceiveVelocity(const FVector& NewVelocity) override;
@@ -58,6 +76,10 @@ public:
 
 	/** Cleans up the projectile for destruction, default behavior stops then destroys the projectile.*/
 	virtual void PrepForDestroy();
+
+	/**Spawns the trail for the projectile.*/
+	virtual void SpawnTrailParticleSystem();
+
 
 	////////////////////////////////////////////////////////
 	// Replication

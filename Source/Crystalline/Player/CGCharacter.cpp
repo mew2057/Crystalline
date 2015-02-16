@@ -42,6 +42,8 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	TimeToRegen			= 2.f;
 	bShieldRegenerating  = false;
 
+	bZooming	  = false;
+	bZoomed       = false;
 	MaxHealth     = 10.0f;
 	CurrentHealth = MaxHealth;
 	PendingWeapon = NULL;
@@ -58,8 +60,13 @@ void ACGCharacter::PostInitializeComponents()
 		CurrentShield = MaxShield;
 		CurrentHealth = MaxHealth;
 		SpawnBaseInventory();
+		
 	}
-
+	
+	// XXX ZOOM
+	// Init the Zoom to be sure.
+	CurrentZoom.InitZoom();
+	FirstPersonCameraComponent->FieldOfView = FOVDefault;
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -72,6 +79,22 @@ void ACGCharacter::Tick(float DeltaSeconds)
 
 		// The Shield is regenerating while this is true.
 		bShieldRegenerating = CurrentShield < MaxShield;
+	}
+
+	// XXX ZOOM ZOOM ZOOM
+	if (IsLocallyControlled() && bZooming)
+	{
+		float CurrentFOV = FirstPersonCameraComponent->FieldOfView;
+		//
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, CurrentZoom.TargetZoom, DeltaSeconds, CurrentZoom.ZoomSpeed);
+		
+		if (FMath::Abs(CurrentFOV - CurrentZoom.TargetZoom) < 1.f)
+		{
+			bZooming = false;
+			CurrentFOV = CurrentZoom.TargetZoom;
+		}
+
+		FirstPersonCameraComponent->FieldOfView = CurrentFOV;
 	}
 }
 
@@ -112,9 +135,10 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ACGCharacter::OnReload);
 
+	InputComponent->BindAction("Zoom", IE_Pressed, this, &ACGCharacter::StartZoom);
+	InputComponent->BindAction("Zoom", IE_Released, this, &ACGCharacter::StopZoom);
 	/* XXX Not implemented!
-	InputComponent->BindAction("AltFire", IE_Pressed,       this, &ACGCharacter::StartAltFire);
-	InputComponent->BindAction("AltFire", IE_Released,      this, &ACGCharacter::StopAltFire);
+
 	InputComponent->BindAction("ToggleRunning", IE_Pressed, this, &ACGCharacter::ToggleRunning);
 	*/
 
@@ -249,11 +273,13 @@ void ACGCharacter::WeaponChanged()
 		PendingWeapon = NULL;
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();
+		CurrentZoom = CurrentWeapon->WeaponZoomConfig; // Change the zoom on weapon change.
 	}
 	else if (CurrentWeapon != NULL)
 	{
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();
+		CurrentZoom = CurrentWeapon->WeaponZoomConfig; // Change the zoom on weapon change.
 	}
 }
 
@@ -349,10 +375,17 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 void ACGCharacter::StartFire()
 {
 	// TODO make sure bWantsToFire works.
-	if (IsLocallyControlled() && CurrentWeapon != NULL && CurrentWeapon->CanFire() && !bWantsToFire)
+	if (IsLocallyControlled() && CurrentWeapon != NULL )
 	{
-		bWantsToFire = true;
-		CurrentWeapon->StartFire();
+		if (CurrentWeapon->CanFire(true) && !bWantsToFire)
+		{
+			bWantsToFire = true;
+			CurrentWeapon->StartFire();
+		}
+		else
+		{
+			CurrentWeapon->OnStartReload();
+		}
 	}
 }
 
@@ -401,6 +434,23 @@ void ACGCharacter::PreviousWeapon()
 
 		EquipWeapon(Weapons[WeaponIndex]);
 	}
+}
+
+// TODO make sure that if this gets interrupted the player will always return to their default zoom.
+/** Zooms the player's view, may trigger ADS. */
+void ACGCharacter::StartZoom()
+{
+	bZoomed = !bZoomed;
+	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
+	bZooming = true;
+}
+
+/** Unzooms the player's view, may stop ADS. */
+void ACGCharacter::StopZoom()
+{
+	bZoomed = !bZoomed;
+	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
+	bZooming = true;
 }
 
 #pragma endregion
