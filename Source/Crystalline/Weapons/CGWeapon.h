@@ -199,9 +199,6 @@ struct FCGWeaponFXData
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	FName TrailTargetParam;
 
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	uint32 bDrawWeaponTrail : 1;
-
 	/** The Weapon trail for the bullet. Typically only used by hit scan weapons. */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UParticleSystem* WeaponTrail;
@@ -225,7 +222,6 @@ struct FCGWeaponFXData
 		/** The default name of the Muzzle socket. */
 		MuzzleSocket = TEXT("MuzzleFlashSocket");
 		TrailTargetParam = TEXT("TrailEnd");
-		bDrawWeaponTrail = false;
 
 	}
 };
