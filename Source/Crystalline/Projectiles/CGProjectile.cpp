@@ -40,8 +40,6 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	bReplicates = true;
 	bReplicateInstigator = true;
 	bReplicateMovement = true;
-
-	bExplodes = false;
 }
 
 
@@ -65,6 +63,7 @@ void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FV
 		ProcessImpact(Hit);
 		PrepForDestroy();
 	}
+
 	/*
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
@@ -98,8 +97,8 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 
 		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
 	}
-	//GameplayStatics::ApplyRadialDamage(this, WeaponConfig.ExplosionDamage, NudgedImpactLocation, WeaponConfig.ExplosionRadius, WeaponConfig.DamageType, TArray<AActor*>(), this, MyController.Get());
 
+	// TODO  Add Impulse!
 	// Only add impulse and destroy projectile if we hit a physics
 	/*if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
@@ -125,7 +124,6 @@ void ACGProjectile::SpawnTrailParticleSystem()
 
 }
 
-
 void ACGProjectile::SetVelocity(FVector Direction)
 {
 	if (MovementComp)
@@ -142,10 +140,6 @@ void ACGProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
 	}
 }
 
-void ACGProjectile::Explode()
-{
-	 /// TODO this may work as a simple thing.
-}
 
 
 void ACGProjectile::OnRep_Impacted()

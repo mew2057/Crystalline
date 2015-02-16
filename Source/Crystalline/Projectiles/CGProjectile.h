@@ -34,24 +34,16 @@ protected:
 	UPROPERTY(Transient)
 	UParticleSystemComponent* TrailPSC;
 
-
 public:
+
+	//TODO
 #pragma region ReplaceWithStruct
 	UPROPERTY()
 	float ImpactDamage;
 	
-	// TODO assess
-	/////////////////////////////////
-	UPROPERTY()
-	float SplashDamage;
-	
-	UPROPERTY()
-	float SplashRange;
 
-	UPROPERTY()
-	uint32 bExplodes : 1;
-	/////////////////////////////////
 #pragma endregion
+
 	ACGProjectile(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
@@ -74,7 +66,7 @@ public:
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return MovementComp; }
 
 	////////////////////////////////////////////////////////
-	// Functions expected to be overrided
+	// Functions expected to be overriden
 
 	/** Update velocity on client */
 	virtual void PostNetReceiveVelocity(const FVector& NewVelocity) override;
@@ -88,8 +80,6 @@ public:
 	/**Spawns the trail for the projectile.*/
 	virtual void SpawnTrailParticleSystem();
 
-	/**Causes the projectile to explode, causing damage.*/
-	virtual void Explode();
 
 	////////////////////////////////////////////////////////
 	// Replication

@@ -3,24 +3,35 @@
 #include "Crystalline.h"
 #include "CGRocketProjectile.h"
 
+ACGRocketProjectile::ACGRocketProjectile(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	SplashRange = 500.f;
+}
 
 
 
 void ACGRocketProjectile::ProcessImpact(const FHitResult& Hit)
 {
-	// Radial Damage needs to be applied.
-	/*
-	if (Hit.GetActor())
-	{
-		FPointDamageEvent PointDmg;
-		//PointDmg.DamageTypeClass = WeaponConfig.DamageType;
-		PointDmg.HitInfo = Hit;		
-		PointDmg.ShotDirection = Hit.ImpactNormal;
-		PointDmg.Damage = ImpactDamage; // This needs to move.
+//	Super::ProcessImpact(const FHitResult& Hit);
+
+	// Moves the origin of the explosion out of the wall.
+	FVector ExplosionPoint = Hit.ImpactPoint + Hit.ImpactNormal * 10.f;
+
+	// Apply radial damage at the impact point.
+	Explode(ExplosionPoint);
+}
 
 
-		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
+void ACGRocketProjectile::Explode(const FVector& Epicenter)
+{
+	// TODO DamageType!
+	UGameplayStatics::ApplyRadialDamage(this, 
+		ImpactDamage, Epicenter, SplashRange, NULL, TArray<AActor*>(), this, GetInstigatorController());
 
-		FPointDamageEvent RadialDamage;
-	}*/
+	// TODO  Add Impulse!
+
+	// TODO Play Effect!
+
+
 }
