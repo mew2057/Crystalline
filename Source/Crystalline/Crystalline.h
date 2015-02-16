@@ -6,9 +6,10 @@
 #include "Engine.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
-#include "Player/CrystallinePlayer.h"
-#include "Projectiles/CrystallineProjectile.h"
-#include "Weapons/CrystallineWeapon.h"
+#include "Player/CGCharacter.h"
+#include "Weapons/CGWeapon.h"
+#include "Weapons/CGCrystalGun.h"
+
 
 
 #define COLLISION_PROJECTILE ECC_GameTraceChannel1
