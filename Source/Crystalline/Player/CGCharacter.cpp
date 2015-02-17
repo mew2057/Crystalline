@@ -213,11 +213,14 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 		HUD->SetPromptMessage(TEXT(""));
 	}
 	// Once the Pawn is destroyed the playercontroller will spawn a new pawn, see UnFreeze() 
+
+	// TODO Ragdoll
+	SetLifeSpan(2.f);
 }
 
 void ACGCharacter::TornOff()
 {
-	SetLifeSpan(5.f);
+	SetLifeSpan(2.f);
 }
 
 void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
