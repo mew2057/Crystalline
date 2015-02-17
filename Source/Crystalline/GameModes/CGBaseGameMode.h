@@ -23,11 +23,14 @@ public:
 
 	/**Informs the game state that a kill occured.*/
 	virtual void Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
+	
+	int32 GetRoundTime() const { return RoundTime; }
+
+	int32 GetScoreToWin() const { return ScoreToWin; }
 
 
 protected:
-
-
+	
 	/**Invoked when the game enters the In Progress State.*/
 	virtual void HandleMatchHasStarted() override;
 
@@ -50,7 +53,6 @@ protected:
 	/**Time in seconds for a single round*/
 	UPROPERTY(EditDefaultsOnly, Category=Config)
 	int32 RoundTime;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 ScoreToWin;

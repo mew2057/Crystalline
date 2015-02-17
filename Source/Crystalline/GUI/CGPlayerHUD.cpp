@@ -7,6 +7,7 @@
 #include "CanvasItem.h"
 #include "GameModes/CGGameState.h"
 #include "GameModes/CGPlayerState.h"
+#include "GameModes/CGBaseGameMode.h"
 
 #include "Weapons/States/CGWeaponState.h"
 
@@ -197,7 +198,7 @@ void ACGPlayerHUD::DrawGameInfo()
 	{
 
 		float SizeX, SizeY;
-		FString Text = TEXT("Time Remaining: " + FString::SanitizeFloat(CGGameState->RemainingTime));
+		FString Text = TEXT("Time: " + FString::SanitizeFloat(CGGameState->RemainingTime));
 
 		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
 		TextItem.EnableShadow(FLinearColor::Black);
@@ -218,13 +219,10 @@ void ACGPlayerHUD::DrawGameInfo()
 
 			Text = TEXT("Kills: "   + FString::SanitizeFloat(PlayerState->GetNumKills()) + 
 						" Deaths: " + FString::SanitizeFloat(PlayerState->GetNumDeaths())+
-						" Score: " + FString::SanitizeFloat(PlayerState->Score) + " / " 
-						);
+						" Score: "  + FString::SanitizeFloat(PlayerState->Score) );
 			TextItem.Text = FText::FromString(Text);
 
 			Canvas->DrawItem(TextItem, 50, 200);
-		}
-
-		
+		}		
 	}
 }

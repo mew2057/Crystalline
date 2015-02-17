@@ -162,7 +162,7 @@ bool ACGCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, ACo
 
 
 	NetUpdateFrequency = GetDefault<ACGCharacter>()->NetUpdateFrequency;
-	CharacterMovement->ForceReplicationUpdate();
+	GetCharacterMovement()->ForceReplicationUpdate();
 
 	OnDeath(KillingDamage, DamageEvent, Killer ? Killer->GetPawn() : NULL, DamageCauser);
 
@@ -191,8 +191,8 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 
 
 	// Disables collisions.
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	//TODO Stop Anim,  Update Meshes,  stop all warnings, Ragdoll,
 

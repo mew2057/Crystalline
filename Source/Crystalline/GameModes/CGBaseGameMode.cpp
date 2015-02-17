@@ -104,6 +104,17 @@ void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)
 /**Determines which player won the round.*/
 void ACGBaseGameMode::EndGame(ACGPlayerState* Winner)
 {
+	// Stop all of the pawns in the Scene.
+/*  TODO do we want it to freeze?
+	for (FConstPawnIterator Iterator = GetWorld()->GetPawnIterator(); Iterator; ++Iterator)
+	{
+		APawn* Pawn = *Iterator;
+		if (Pawn)
+		{
+			Pawn->TurnOff();
+		}
+	}
+*/
 	EndMatch();
 }
 
