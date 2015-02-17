@@ -6,6 +6,7 @@
 #include "Pickups/CGCrystal.h"
 #include "CGCharacter.generated.h"
 
+#pragma region Structs
 
 USTRUCT()
 struct FCGZoom
@@ -49,31 +50,39 @@ public:
 
 
 USTRUCT()
-struct FCGPlayerCrystalInfo
+struct FCGPlayerInventory
 {
 	GENERATED_USTRUCT_BODY()
 
+	#define TIER_WIDTH 2
+
 	/** The Tier 1 Crystal for the Player. (FORCE, ACCURACY, UTILITY)*/
 	UPROPERTY()
-	ECrystalType Tier1Crystal;
+	ECrystalType TierOneCrystal;
 
 	/** The Tier 2 Crystal for the Player. (POWER UP) */
 	UPROPERTY()
-	ECrystalType Tier2Crystal;
+	ECrystalType TierTwoCrystal;
 
-	FCGPlayerCrystalInfo()
+	UPROPERTY()
+	TArray<class ACGWeapon*> Weapons;
+
+	UPROPERTY()
+	int32 UseableWeapons;
+
+	FCGPlayerInventory()
 	{
-		Tier1Crystal = ECrystalType::NONE;
-		Tier2Crystal = ECrystalType::NONE;
+		TierOneCrystal = ECrystalType::NONE;
+		TierTwoCrystal = ECrystalType::NONE;
+		UseableWeapons = 0;
 	}
-
 
 public:
 	bool CanLoadCrystal(ECrystalType Crystal)
 	{
 		return Crystal != ECrystalType::NONE &&
-			((Crystal > ECrystalType::POWER_UP && Tier1Crystal != Crystal) ||
-			(Crystal <= ECrystalType::POWER_UP && Tier2Crystal != Crystal));
+			((Crystal > ECrystalType::POWER_UP && TierOneCrystal != Crystal) ||
+			(Crystal <= ECrystalType::POWER_UP && TierTwoCrystal != Crystal));
 	}
 
 	void LoadCrystal(ECrystalType Crystal)
@@ -81,15 +90,72 @@ public:
 		// Tier1 crystal
 		if (Crystal > ECrystalType::POWER_UP)
 		{
-			Tier1Crystal = Crystal;
+			TierOneCrystal = Crystal;
 		}
 		else if (Crystal > ECrystalType::NONE)
 		{
-			Tier2Crystal = Crystal;
+			TierTwoCrystal = Crystal;
 		}
 	}
 
+	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
+	{
+		if (Type > ECrystalType::NONE)
+		{
+			// TODO do something for weapon sets.
+		}
+		else
+		{
+			Weapons.AddUnique(Weapon);
+		}
+	}
+
+	int32 NumWeapons()
+	{
+
+	}
 };
+
+#pragma region WeaponConfigStructs
+
+USTRUCT()
+struct FCGDDefaultCrystalTreeConfig
+{
+	GENERATED_USTRUCT_BODY()
+	
+	/** The Tier One Gun, Available when the player has a tier one crystal.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGCrystalGun> TierOneGun;
+
+	/** The Tier Two Gun, Available when the player has a tier one and two crystal.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGCrystalGun> TierTwoGun;
+
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	ECrystalType TierOneCrystalType;
+};
+
+USTRUCT()
+struct FCGDefaultWeaponConfig
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** An ammo free side arm.*/
+	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	TSubclassOf<class ACGWeapon> CoreWeapon;
+	
+	/** The baseline crystal gun, this is always present for the player.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGCrystalGun> CoreCrystalGun;
+
+	/** Defines the Tiers for the Crystal Guns.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TArray<FCGDDefaultCrystalTreeConfig> CrystalGunTiers;
+};
+
+#pragma endregion
+
+#pragma endregion
 
 /**
  * 
@@ -279,6 +345,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TArray<TSubclassOf<class ACGWeapon>> DefaultWeaponClasses;
 
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FCGDefaultWeaponConfig DefaultWeaponConfig;
+
 	UPROPERTY(Transient, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
 	TArray<class ACGWeapon*> Weapons;
 
@@ -302,8 +371,8 @@ protected:
 public:
 
 	//FIXME Move to private
-	UPROPERTY(Transient, Replicated)
-	FCGPlayerCrystalInfo WeaponCrystals;
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CrystalChanged)
+	FCGPlayerInventory Inventory;
 
 	// TODO make me private
 	/** Tracks whether or not the player is attempting to shoot the gun.*/
@@ -339,7 +408,7 @@ public:
 	 * Invokes the weapon's OnEnterInventory.
 	 * @param NewWeapon the candidate weapon for addition.
 	 */
-	void AddWeapon(ACGWeapon* NewWeapon);
+	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type = ECrystalType::NONE);
 	
 	void RemoveWeapon(ACGWeapon* Weapon);
 
@@ -364,6 +433,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_PendingCrystalPickup();
+
+	UFUNCTION()
+	void OnRep_CrystalChanged();
 
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/
 	FORCEINLINE FName GetWeaponAttachPoint() const { return WeaponAttachPoint; };

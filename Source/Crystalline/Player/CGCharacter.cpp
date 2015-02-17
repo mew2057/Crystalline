@@ -397,20 +397,39 @@ void ACGCharacter::SpawnBaseInventory()
 		return;
 	}
 
-	const int32 NumDefaultWeapons = DefaultWeaponClasses.Num();
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
 
-	for (int i = 0; i < NumDefaultWeapons; ++i)
+	if (DefaultWeaponConfig.CoreWeapon)
+	{
+		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CoreWeapon, SpawnInfo));
+	}
+
+	if (DefaultWeaponConfig.CoreCrystalGun)
+	{
+		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CoreCrystalGun, SpawnInfo));
+	}
+
+
+	const int32 NumWeaponGroups = DefaultWeaponConfig.CrystalGunTiers.Num();
+
+
+	ACGWeapon* Weapon;
+	for (int i = 0; i < NumWeaponGroups; ++i)
 	{
 		// If it exists spawn the weapon.
-		if (DefaultWeaponClasses[i])
+		if (DefaultWeaponConfig.CrystalGunTiers[i].TierOneGun)
 		{
-			FActorSpawnParameters SpawnInfo;
-			SpawnInfo.bNoCollisionFail = true;
+			// Add the Tier OneGun
+			Weapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CrystalGunTiers[i].TierOneGun, SpawnInfo);
+			AddWeapon(Weapon);
+		}
 
-			// Spawn an actor of type ACrystallineWeapon with the DefaultWeaponClasses[i] as the archetype, and the spawnInfo settings.
-			ACGWeapon* NewWeapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponClasses[i], SpawnInfo);
-
-			AddWeapon(NewWeapon);
+		if (DefaultWeaponConfig.CrystalGunTiers[i].TierTwoGun)
+		{
+			// Add the TierTwo Gun
+			Weapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CrystalGunTiers[i].TierTwoGun, SpawnInfo);
+			AddWeapon(Weapon);
 		}
 	}
 	
@@ -441,12 +460,13 @@ void ACGCharacter::DestroyInventory()
 	}
 }
 
-void ACGCharacter::AddWeapon(ACGWeapon* NewWeapon)
+void ACGCharacter::AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
 {
-	if (NewWeapon && Role == ROLE_Authority)
+	if (Weapon && Role == ROLE_Authority)
 	{
-		Weapons.AddUnique(NewWeapon);
-		NewWeapon->OnEnterInventory(this);
+		Inventory.AddWeapon(Weapon, Type);
+		Weapons.AddUnique(Weapon);
+		Weapon->OnEnterInventory(this);
 	}
 }
 
@@ -493,7 +513,7 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 void ACGCharacter::OnStartCrystalOverlap(class ACGCrystal* Crystal)
 {
 	// Only Execute this code if the crystal type is grabbable and the crystal is not null.
-	if (Crystal && WeaponCrystals.CanLoadCrystal(Crystal->GetCrystalType()))
+	if (Crystal && Inventory.CanLoadCrystal(Crystal->GetCrystalType()))
 	{
 		PendingCrystalPickup = Crystal;
 
@@ -541,6 +561,11 @@ void ACGCharacter::OnRep_PendingCrystalPickup()
 	}
 }
 
+
+void ACGCharacter::OnRep_CrystalChanged()
+{
+
+}
 
 #pragma endregion
 
@@ -667,7 +692,7 @@ void ACGCharacter::PickupCrystal()
 		if (PendingCrystalPickup->Pickup())
 		{
 			// Load the crystal to the appropriate slot.
-			WeaponCrystals.LoadCrystal(CachedType);
+			Inventory.LoadCrystal(CachedType);
 		}
 	}
 }
@@ -692,9 +717,9 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	// Not sure about this one.
 	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
-	//DOREPLIFETIME(ACGCharacter, PendingCrystalPickup);
+	DOREPLIFETIME_CONDITION(ACGCharacter, Inventory, COND_OwnerOnly);
+
 	// Everyone.
-	DOREPLIFETIME(ACGCharacter, WeaponCrystals);
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
 	DOREPLIFETIME(ACGCharacter, CurrentHealth);
 	DOREPLIFETIME(ACGCharacter, CurrentShield);
