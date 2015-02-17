@@ -5,6 +5,10 @@
 #include "Engine/Canvas.h"
 #include "TextureResource.h"
 #include "CanvasItem.h"
+#include "GameModes/CGGameState.h"
+#include "GameModes/CGPlayerState.h"
+#include "GameModes/CGBaseGameMode.h"
+
 #include "Weapons/States/CGWeaponState.h"
 
 ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -61,9 +65,12 @@ void ACGPlayerHUD::DrawHUD()
 			TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
 			//TextItem.FontRenderInfo = ShadowedFont;
 
-			Canvas->DrawItem(TextItem, 100, 100);
+			Canvas->DrawItem(TextItem, 50, 150);
 		}
 	}
+
+	DrawGameInfo();
+
 
 	
 }
@@ -173,12 +180,12 @@ void ACGPlayerHUD::DrawHealth()
 	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
 	//TextItem.FontRenderInfo = ShadowedFont;
 
-	Canvas->DrawItem(TextItem, 100, 300);
+	Canvas->DrawItem(TextItem, 50, 300);
 
 	Text = FString::SanitizeFloat(Pawn->GetCurrentHealth());
 	TextItem.Text = FText::FromString(Text);
 
-	Canvas->DrawItem(TextItem, 100, 350);
+	Canvas->DrawItem(TextItem, 50, 350);
 
 
 }
@@ -186,4 +193,36 @@ void ACGPlayerHUD::DrawHealth()
 void ACGPlayerHUD::DrawGameInfo()
 {
 
+	ACGGameState* const CGGameState = Cast<ACGGameState>(GetWorld()->GameState);
+	if (CGGameState)
+	{
+
+		float SizeX, SizeY;
+		FString Text = TEXT("Time: " + FString::SanitizeFloat(CGGameState->RemainingTime));
+
+		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
+		TextItem.EnableShadow(FLinearColor::Black);
+		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+
+		const float TopTextScale = 0.73f; // of 51pt font
+
+		TextItem.Text = FText::FromString(Text);
+		TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
+		//TextItem.FontRenderInfo = ShadowedFont;
+
+		Canvas->DrawItem(TextItem, 50, 250);
+
+		AController* Controller = GetOwningPlayerController();
+		if (Controller && Cast<ACGPlayerState>(Controller->PlayerState))
+		{
+			ACGPlayerState* PlayerState = Cast<ACGPlayerState>(Controller->PlayerState);
+
+			Text = TEXT("Kills: "   + FString::SanitizeFloat(PlayerState->GetNumKills()) + 
+						" Deaths: " + FString::SanitizeFloat(PlayerState->GetNumDeaths())+
+						" Score: "  + FString::SanitizeFloat(PlayerState->Score) );
+			TextItem.Text = FText::FromString(Text);
+
+			Canvas->DrawItem(TextItem, 50, 200);
+		}		
+	}
 }
