@@ -139,6 +139,14 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 		Canvas->DrawItem(TextItem, 50, 10);
 		////////////////////////////////////////////////////
+
+		/** Draw the crystals the player has*/
+		TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->WeaponCrystals.Tier1Crystal)));
+		Canvas->DrawItem(TextItem, 5, 100);
+
+		TextItem.Text = FText::FromString(TEXT("T2: " + FString::FromInt((int8)Pawn->WeaponCrystals.Tier2Crystal)));
+		Canvas->DrawItem(TextItem, 5, 150);
+
 	}
 	
 	
@@ -156,6 +164,10 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		// NOTE: Don't include ammunition on this one.	
 	}
 	*/
+
+
+
+
 }
 
 void ACGPlayerHUD::DrawHealth()

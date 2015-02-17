@@ -492,19 +492,23 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 
 void ACGCharacter::OnStartCrystalOverlap(class ACGCrystal* Crystal)
 {
-	PendingCrystalPickup = Crystal;
-
-	// If this is controlled locally post the prompt.
-	if (IsLocallyControlled())
+	// Only Execute this code if the crystal type is grabbable and the crystal is not null.
+	if (Crystal && WeaponCrystals.CanLoadCrystal(Crystal->GetCrystalType()))
 	{
-		OnRep_PendingCrystalPickup();
+		PendingCrystalPickup = Crystal;
+
+		// If this is controlled locally post the prompt.
+		if (IsLocallyControlled())
+		{
+			OnRep_PendingCrystalPickup();
+		}
 	}
 }
 
 void ACGCharacter::OnStopCrystalOverlap(class ACGCrystal* Crystal)
 {
 	// If the crystal is not the same, exit this logic since some degree of overlap shenanigans occured.
-	if (PendingCrystalPickup != Crystal)
+	if (PendingCrystalPickup && PendingCrystalPickup != Crystal)
 	{
 		return;
 	}
@@ -532,7 +536,7 @@ void ACGCharacter::OnRep_PendingCrystalPickup()
 		}
 		else
 		{
-			HUD->SetPromptMessage(TEXT("Pickup Crystal"));
+			HUD->SetPromptMessage(TEXT("Pickup Crystal " + FString::FromInt((int8)(PendingCrystalPickup->GetCrystalType()))));
 		}
 	}
 }
@@ -637,7 +641,7 @@ void ACGCharacter::OnActionButton()
 		}
 		else
 		{
-			PendingCrystalPickup->Pickup();
+			PickupCrystal();
 		}
 	}
 }
@@ -649,7 +653,23 @@ bool ACGCharacter::ServerPickUpCrystal_Validate()
 
 void ACGCharacter::ServerPickUpCrystal_Implementation()
 {
-	PendingCrystalPickup->Pickup();
+	PickupCrystal();
+}
+
+void ACGCharacter::PickupCrystal()
+{
+	// Make sure the PendingCrystal is still there.
+	if (PendingCrystalPickup)
+	{
+		// Cache the Crystal Type.
+		ECrystalType CachedType = PendingCrystalPickup->GetCrystalType();
+		// Pickup is valid.
+		if (PendingCrystalPickup->Pickup())
+		{
+			// Load the crystal to the appropriate slot.
+			WeaponCrystals.LoadCrystal(CachedType);
+		}
+	}
 }
 
 
@@ -674,6 +694,7 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
 	//DOREPLIFETIME(ACGCharacter, PendingCrystalPickup);
 	// Everyone.
+	DOREPLIFETIME(ACGCharacter, WeaponCrystals);
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
 	DOREPLIFETIME(ACGCharacter, CurrentHealth);
 	DOREPLIFETIME(ACGCharacter, CurrentShield);
