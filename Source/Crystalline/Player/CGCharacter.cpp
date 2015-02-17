@@ -492,10 +492,13 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 
 void ACGCharacter::OnStartCrystalOverlap(class ACGCrystal* Crystal)
 {
-	UE_LOG(LogTemp, Log, TEXT("OVERLAP"));
 	PendingCrystalPickup = Crystal;
 
-	OnRep_PendingCrystalPickup();
+	// If this is controlled locally post the prompt.
+	if (IsLocallyControlled())
+	{
+		OnRep_PendingCrystalPickup();
+	}
 }
 
 void ACGCharacter::OnStopCrystalOverlap(class ACGCrystal* Crystal)
@@ -505,24 +508,24 @@ void ACGCharacter::OnStopCrystalOverlap(class ACGCrystal* Crystal)
 	{
 		return;
 	}
-	UE_LOG(LogTemp, Log, TEXT("OVERLAPSTOP"));
 
 	PendingCrystalPickup = NULL;
 
-	OnRep_PendingCrystalPickup();
+	// If this is controlled locally post the prompt.
+	if (IsLocallyControlled())
+	{
+		OnRep_PendingCrystalPickup();
+	}
 }
 
 void ACGCharacter::OnRep_PendingCrystalPickup()
 {
-	// FIXME this doesn't work!
 	// Get the HUD
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
-	
-	UE_LOG(LogTemp, Log, TEXT("Pending Crystal REP"));
-
 	if (HUD )
 	{
+
 		if (PendingCrystalPickup == NULL)
 		{
 			HUD->SetPromptMessage(TEXT(""));
@@ -627,13 +630,14 @@ void ACGCharacter::OnActionButton()
 	// FIXME Might be more actions.
 	if (PendingCrystalPickup)
 	{
-		// Pickup locally, this ensures that the visual feedback is instantaneous.
-		PendingCrystalPickup->Pickup();
-
 		// If we aren't the server, we better tell the server what we're doing.
 		if (Role < ROLE_Authority)
 		{
 			ServerPickUpCrystal();
+		}
+		else
+		{
+			PendingCrystalPickup->Pickup();
 		}
 	}
 }
@@ -668,7 +672,7 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	// Not sure about this one.
 	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
-
+	//DOREPLIFETIME(ACGCharacter, PendingCrystalPickup);
 	// Everyone.
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
 	DOREPLIFETIME(ACGCharacter, CurrentHealth);

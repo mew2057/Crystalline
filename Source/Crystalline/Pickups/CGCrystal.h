@@ -80,5 +80,4 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Config)
 	float TimeToRespawn;
 
-
 };

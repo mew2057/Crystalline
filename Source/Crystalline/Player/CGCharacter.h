@@ -245,8 +245,9 @@ protected:
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
 	
-	UPROPERTY(Transient, Replicated = OnRep_PendingCrystalPickup)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_PendingCrystalPickup)
 	class ACGCrystal* PendingCrystalPickup;
+
 
 
 

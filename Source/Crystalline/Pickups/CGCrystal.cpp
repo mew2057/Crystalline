@@ -70,8 +70,7 @@ void ACGCrystal::ReceiveActorBeginOverlap(class AActor* Other)
 	{
 		return;
 	}
-
-
+	
 	Super::ReceiveActorBeginOverlap(Other);
 
 	// Only the server can tell the player that they can pickup the crystal.
@@ -101,13 +100,12 @@ void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other)
 
 void ACGCrystal::Pickup()
 {
-	if (!bIsActive && TimeToRespawn <= 0)
+	if (!bIsActive || TimeToRespawn <= 0.f)
 	{
 		return;
 	}
 
 	HideCrystal();
-
 
 	// Hide the crystal.
 	if (Role == ROLE_Authority)
@@ -144,8 +142,6 @@ void ACGCrystal::ShowCrystal()
 
 void ACGCrystal::OnRep_Active()
 {
-	UE_LOG(LogTemp, Log, TEXT("ONREP"));
-
 	if (bIsActive)
 	{
 		ShowCrystal();
