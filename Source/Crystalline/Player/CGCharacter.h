@@ -64,9 +64,22 @@ public:
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 	
+	bool CantDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
+
+	bool Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser);
+
+	void OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser);
+
+	/**Invoked on player death.*/
+	virtual void TornOff() override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	virtual void Restart() override;
+
+	/** Make Sure the inventory is destroyed. */
+	virtual void Destroyed() override;
+
 
 protected:
 	/** Max player shield amount. This is decayed before the health.*/
@@ -242,6 +255,10 @@ public:
 	UPROPERTY(Transient)
 	uint32 bWantsToFire : 1;
 
+	/**Prevents the player from dying twice.*/
+	UPROPERTY(Transient)
+	uint32 bIsDying : 1;
+
 	/**
 	* Sets up the current weapon and triggers the OnEquip and OnUnequip calls.
 	* @param NewWeapon The Weapon that is equipped.
@@ -259,12 +276,17 @@ public:
 	/** Spawns the base inventory as specified in the Defaul WeaponClasses array.*/
 	void SpawnBaseInventory();
 
+	/** Destroys the inventory to ensure we don't have any stragglers on death.*/
+	void DestroyInventory();
+
 	/** 
 	 * Adds the weapon to the Weapons Array. If the weapon is in the array don't add it again.
 	 * Invokes the weapon's OnEnterInventory.
 	 * @param NewWeapon the candidate weapon for addition.
 	 */
 	void AddWeapon(ACGWeapon* NewWeapon);
+	
+	void RemoveWeapon(ACGWeapon* Weapon);
 
 	/**
 	 * [server,client] Equips the supplied weapon to the player.

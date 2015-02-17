@@ -13,7 +13,11 @@ class CRYSTALLINE_API ACGPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+public:
+
+	/**Restarts the player*/
+	virtual void UnFreeze() override;
+
+	/** If the pawn can't spawn, try the spawn again.*/
+	virtual void FailedToSpawnPawn() override;
 };

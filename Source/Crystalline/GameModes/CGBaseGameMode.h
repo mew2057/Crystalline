@@ -21,6 +21,10 @@ class CRYSTALLINE_API ACGBaseGameMode : public AGameMode
 public:
 	ACGBaseGameMode(const FObjectInitializer& ObjectInitializer);
 
+	/**Informs the game state that a kill occured.*/
+	virtual void Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
+
+
 protected:
 
 
@@ -31,12 +35,7 @@ protected:
 	/** Updates the gameplay timers.*/
 	virtual void DefaultTimer() override;
 
-
-	/**Informs the game state that a kill occured.*/
-	virtual void Killed(AController* Killer, AController* KilledPlayer,  const UDamageType* DamageType);
-
-
-
+	/**Checks the score after a scoring action for the player.*/
 	virtual void CheckScore(ACGPlayerState* Player);
 
 

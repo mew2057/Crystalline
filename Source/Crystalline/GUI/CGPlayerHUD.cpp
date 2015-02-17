@@ -33,7 +33,6 @@ void ACGPlayerHUD::DrawHUD()
 	if (Pawn)
 	{
 		DrawHealth();
-		DrawGameInfo();
 
 		ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
@@ -68,6 +67,9 @@ void ACGPlayerHUD::DrawHUD()
 			Canvas->DrawItem(TextItem, 50, 150);
 		}
 	}
+
+	DrawGameInfo();
+
 
 	
 }

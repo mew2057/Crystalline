@@ -19,9 +19,12 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) : 
 	PlayerStateClass      = ACGPlayerState::StaticClass();
 	GameStateClass        = ACGGameState::StaticClass();
 
-	// Built in field
 	MinRespawnDelay = 2.0f;
 	ScoreToWin = 25;
+	RoundTime = 300;
+	ScorePerKill = 1;
+	SuicidePenalty = 1; 
+
 }
 
 void ACGBaseGameMode::HandleMatchHasStarted()

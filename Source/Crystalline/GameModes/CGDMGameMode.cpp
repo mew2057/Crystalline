@@ -48,5 +48,9 @@ void ACGDMGameMode::EndGame(ACGPlayerState* Winner)
 
 	GameWinner = Winner;
 
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("GAME OVER!"));
+	}
 	Super::EndGame(Winner);
 }
