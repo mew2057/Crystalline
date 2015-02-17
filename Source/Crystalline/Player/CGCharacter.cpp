@@ -3,6 +3,7 @@
 #include "Crystalline.h"
 #include "CGCharacter.h"
 #include "GameModes/CGBaseGameMode.h"
+#include "Pickups/CGCrystal.h"
 #include "CGCharacterMovementComponent.h"
 
 
@@ -204,6 +205,14 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 
 	// Detach the controller from the pawn, so respawn can work.
 	DetachFromControllerPendingDestroy();
+
+	// Clean up the HUD.
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->SetPromptMessage(TEXT(""));
+	}
 	// Once the Pawn is destroyed the playercontroller will spawn a new pawn, see UnFreeze() 
 }
 
@@ -224,6 +233,8 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAction("Fire", IE_Released,  this, &ACGCharacter::StopFire);
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ACGCharacter::OnReload);
+
+	InputComponent->BindAction("ActionButton", IE_Pressed, this, &ACGCharacter::OnActionButton);
 
 	InputComponent->BindAction("Zoom", IE_Pressed, this, &ACGCharacter::StartZoom);
 	InputComponent->BindAction("Zoom", IE_Released, this, &ACGCharacter::StopZoom);
@@ -462,18 +473,6 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 	}
 }
 
-
-void ACGCharacter::ClientSetWeapon_Implementation(ACGWeapon* Weapon)
-{
-	SetCurrentWeapon(Weapon);
-	
-	// Tell the server that it needs to set the weapon to be safe.
-	if (Role < ROLE_Authority)
-	{
-		ServerEquipWeapon(Weapon);
-	}
-}
-
 bool ACGCharacter::ServerEquipWeapon_Validate(ACGWeapon* NewWeapon)
 {
 	return true;
@@ -487,6 +486,39 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 		SetCurrentWeapon(NewWeapon);
 	}
 }
+
+
+void ACGCharacter::OnStartCrystalOverlap(class ACGCrystal* Crystal)
+{
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->SetPromptMessage(TEXT("Pickup Crystal"));
+	}
+	// FIXME
+
+	OverlappedCrystal = Crystal;
+
+}
+
+void ACGCharacter::OnStopCrystalOverlap(class ACGCrystal* Crystal)
+{
+	// If the crystal is not the same, exit this logic since some degree of overlap shenanigans occured.
+	if (OverlappedCrystal != Crystal)
+	{
+		return;
+	}
+
+	// FIXME
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->SetPromptMessage(TEXT(""));
+	}
+}
+
 
 #pragma endregion
 
@@ -575,6 +607,33 @@ void ACGCharacter::StopZoom()
 	bZooming = true;
 }
 
+void ACGCharacter::OnActionButton()
+{
+	// FIXME Might be more actions.
+	if (OverlappedCrystal)
+	{
+		if (Role < ROLE_Authority)
+		{
+			ServerPickUpCrystal();
+		}
+		else
+		{
+			OverlappedCrystal->OnDespawn();
+		}
+	}
+}
+
+bool ACGCharacter::ServerPickUpCrystal_Validate()
+{
+	return true;
+}
+
+void ACGCharacter::ServerPickUpCrystal_Implementation()
+{
+	OverlappedCrystal->OnDespawn();
+}
+
+
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -593,7 +652,8 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 
 	// Not sure about this one.
 	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
-
+	DOREPLIFETIME_CONDITION(ACGCharacter, OverlappedCrystal, COND_OwnerOnly);
+	
 
 	// Everyone.
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);

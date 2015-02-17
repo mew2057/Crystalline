@@ -10,14 +10,14 @@ USTRUCT()
 struct FCGZoom
 {
 	GENERATED_USTRUCT_BODY()
-		/** The factor that this zoom.*/
-		UPROPERTY(EditDefaultsOnly)
-		float ZoomFactor;
+	/** The factor that this zoom.*/
+	UPROPERTY(EditDefaultsOnly)
+	float ZoomFactor;
 
 
 	/**Speed of the interpolation from zoomed to zoomed out and vice versa. TODO make this seconds!*/
 	UPROPERTY(EditDefaultsOnly)
-		float ZoomSpeed;
+	float ZoomSpeed;
 
 	// Used in the zoom operation.
 	///////////////////////////////////////////
@@ -213,6 +213,12 @@ protected:
 	/** Unzooms the player's view, may stop ADS. */
 	void StopZoom();
 
+	/** Triggers the action button response.*/
+	void OnActionButton();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerPickUpCrystal();
+
 
 #pragma endregion
 
@@ -227,7 +233,7 @@ protected:
 
 	/** The Default list of weapons the player is carrying. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TArray<TSubclassOf<class ACGWeapon>> DefaultWeaponClasses;
+	TArray<TSubclassOf<class ACGWeapon>> DefaultWeaponClasses;
 
 	UPROPERTY(Transient, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
 	TArray<class ACGWeapon*> Weapons;
@@ -239,8 +245,9 @@ protected:
 	/** A pending weapon for equips. */
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
-
-
+	
+	UPROPERTY(Transient, Replicated)
+	class ACGCrystal* OverlappedCrystal;
 
 	//XXX This is getting removed when I get the crystal system in.
 	/** The index of the currently equipped weapon. */
@@ -295,20 +302,22 @@ public:
 	void EquipWeapon(ACGWeapon* Weapon);
 
 	/**
-	 * Replicates the inventory change to the owning player.
-	 */
-	UFUNCTION(Client, Reliable)
-	void ClientSetWeapon(ACGWeapon* Weapon);
-
-	/**
 	* [server]Equips the supplied weapon to the player.
 	* @param The weapon to equip.
 	*/
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(ACGWeapon* Weapon);
 
+	/** Invoked when the player begins to Overlap with a Crystal Pickup, triggers a prompt.*/
+	void OnStartCrystalOverlap(class ACGCrystal* Crystal);
+
+	/** Invoked when the player is no longer overlapping a crystal, verifies that the crystal is the one currently overlapped.*/
+	void OnStopCrystalOverlap(class ACGCrystal* Crystal);
+
+
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/
 	FORCEINLINE FName GetWeaponAttachPoint() const { return WeaponAttachPoint; };
+
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

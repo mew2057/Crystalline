@@ -25,6 +25,7 @@ class CRYSTALLINE_API ACGCrystal : public AActor
 	GENERATED_BODY()
 public:
 	ACGCrystal(const FObjectInitializer& ObjectInitializer);
+	void PostInitializeComponents();
 
 	/** Triggers the pickup prompt for the crystal. */
 	virtual void ACGCrystal::ReceiveActorBeginOverlap(class AActor* Other) override;
@@ -33,7 +34,17 @@ public:
 	virtual void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other) override;
 
 	/** Invoked by the actor, returns false if the pickup is invalid.*/
-	bool Pickup();
+	bool OnDespawn();
+
+	/** Syncronizes the status of the crystal. */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerOnDespawn();
+
+	void OnRespawn();
+
+	/** Syncronizes the status of the crystal. */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerOnRespawn();
 
 	/**Hides the crystal and sets it's state to inactive. */
 	void HideCrystal();
@@ -63,14 +74,16 @@ protected:
 	ECrystalType CrystalType;
 	
 	/** Tracks whether or not the crystal can be picked up. */
-	UPROPERTY(Transient, ReplicatedUsing=OnRep_Active)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Active)
 	uint32 bIsActive : 1;
 
 	/**If set to true the crystal will spawn as though it were present on the construction of the object. */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
+	UPROPERTY(EditAnywhere, Category = Config)
 	uint32 bSpawnActive : 1;
 
 	/** Time to respawn after pickup, if set to zero the crystal is never exhausted. */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
+	UPROPERTY(EditAnywhere, Category = Config)
 	float TimeToRespawn;
+
+
 };

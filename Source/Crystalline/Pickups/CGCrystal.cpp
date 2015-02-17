@@ -10,6 +10,9 @@ ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	OverlapVolume = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("CrystalOverlapVolume"));
 	OverlapVolume->SetCapsuleHalfHeight(88.f);
 	OverlapVolume->SetCapsuleRadius(80.f);
+	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	OverlapVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
+	OverlapVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	RootComponent = OverlapVolume;
 
 	CrystalMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CrystalMesh"));
@@ -35,43 +38,60 @@ ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	BaseMesh->SetHiddenInGame(false);
 	CrystalMesh->RelativeLocation = FVector(0.f, 0.f, -80.f);
 	BaseMesh->AttachParent = OverlapVolume;
-	
-	//TODO Stuff
-	CrystalType = ECrystalType::UPGRADE;
-
 
 	// Make it so we have replication.
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
-	bReplicateInstigator = true;
-	bNetUseOwnerRelevancy = true;
+
+	// TODO set is active based on spawn active.
+	bIsActive = true;
+	bSpawnActive = true;
+	CrystalType = ECrystalType::UPGRADE;
+
+}
+
+void ACGCrystal::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	// If not spawned as active, kick off a despawn event.
+	if (!bSpawnActive)
+	{
+		OnDespawn();
+	}	
 }
 
 
 void ACGCrystal::ReceiveActorBeginOverlap(class AActor* Other)
 {
+	// EARLY Return if the pickup is not active.
+	if (!bIsActive )
+	{
+		return;
+	}
+
 	Super::ReceiveActorBeginOverlap(Other);
 	// TODO Tell the player that they can pickup the item.
 	ACGCharacter* Player = Cast<ACGCharacter>(Other);
 	if (Player)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Crystal is colliding with a player. "));
+		Player->OnStartCrystalOverlap(this);
 	}
-	UE_LOG(LogTemp, Log, TEXT("OverLap. "));
-
 }
 
 void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other)
 {
+
 	Super::ReceiveActorEndOverlap(Other);
 
 	ACGCharacter* Player = Cast<ACGCharacter>(Other);
 	if (Player)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Crystal is no longer colliding with a player. "));
+		Player->OnStopCrystalOverlap(this);
 	}
 }
 
-bool ACGCrystal::Pickup()
+bool ACGCrystal::OnDespawn()
 {
 	if (!bIsActive)
 	{
@@ -79,30 +99,86 @@ bool ACGCrystal::Pickup()
 	}
 
 	// Hide the crystal.
-	HideCrystal();
+	if (TimeToRespawn > 0)
+	{
+		HideCrystal();
+		bIsActive = false;
+		GetWorldTimerManager().SetTimer(this, &ACGCrystal::OnRespawn, TimeToRespawn, false);
+
+		// For some reason this refused to replicate on clients 
+		if (Role < ROLE_Authority)
+		{
+			UE_LOG(LogTemp, Log, TEXT("NOT AUTHORITY"));
+
+			ServerOnDespawn();
+		}
+	}
 
 	return true;
 }
 
+bool ACGCrystal::ServerOnDespawn_Validate()
+{
+	return true;
+}
+
+void ACGCrystal::ServerOnDespawn_Implementation()
+{
+	UE_LOG(LogTemp, Log, TEXT("Server Do Despawn"));
+
+	bIsActive = false;
+}
+
+void ACGCrystal::OnRespawn()
+{
+	ShowCrystal();
+	bIsActive = true;
+
+	if (Role < ROLE_Authority)
+	{
+		ServerOnRespawn();
+	}
+}
+
+bool ACGCrystal::ServerOnRespawn_Validate()
+{
+	return true;
+}
+
+void ACGCrystal::ServerOnRespawn_Implementation()
+{
+	UE_LOG(LogTemp, Log, TEXT("Server Do Respawn"));
+
+	bIsActive = true;
+}
+
 void ACGCrystal::HideCrystal()
 {
-	if (TimeToRespawn <= 0)
-	{ 
-		return;
-	}
-
-	GetWorldTimerManager().SetTimer(this, &ACGCrystal::ShowCrystal, TimeToRespawn, false);
+	// Disable the Crystal and Trigger Replication.
+	CrystalMesh->SetHiddenInGame(true);
+	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ACGCrystal::ShowCrystal()
 {
-
+	// Enable the Show the crystal and Trigger Replication.
+	bIsActive = true;
+	CrystalMesh->SetHiddenInGame(false);
+	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
-
-
 
 void ACGCrystal::OnRep_Active()
 {
+	UE_LOG(LogTemp, Log, TEXT("ONREP"));
+
+	if (bIsActive)
+	{
+		ShowCrystal();
+	}
+	else
+	{
+		HideCrystal();
+	}
 
 }
 

@@ -16,6 +16,7 @@ ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(
 	// TODO REPLACE THIS FONT!
 	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
 	BigFont = BigFontOb.Object;
+
 }
 
 
@@ -50,6 +51,7 @@ void ACGPlayerHUD::DrawHUD()
 				(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 
 			DrawWeaponHUD();
+			DrawPrompt();
 
 			// State Print out
 			float SizeX, SizeY;
@@ -70,9 +72,6 @@ void ACGPlayerHUD::DrawHUD()
 	}
 
 	DrawGameInfo();
-
-
-	
 }
 
 
@@ -225,4 +224,28 @@ void ACGPlayerHUD::DrawGameInfo()
 			Canvas->DrawItem(TextItem, 50, 200);
 		}		
 	}
+}
+
+void ACGPlayerHUD::DrawPrompt()
+{
+	// TODO Make this print out images and whatnot.
+	float SizeX, SizeY;
+	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
+	TextItem.EnableShadow(FLinearColor::Black);
+	Canvas->StrLen(BigFont, PromptMessage, SizeX, SizeY);
+
+	const float TopTextScale = 0.73f; // of 51pt font
+
+	TextItem.Text = FText::FromString(PromptMessage);
+	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
+
+	Canvas->SetDrawColor(FColor::Yellow);
+
+	Canvas->DrawItem(TextItem, 50, 100);
+	
+}
+
+void ACGPlayerHUD::SetPromptMessage(const FString& Message)
+{
+	PromptMessage = Message;
 }
