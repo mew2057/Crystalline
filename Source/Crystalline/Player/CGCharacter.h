@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Pickups/CGCrystal.h"
 #include "CGCharacter.generated.h"
 
 
@@ -99,8 +100,6 @@ protected:
 
 	/** Tracks when the shield is regenerating for the tick.*/
 	uint32 bShieldRegenerating : 1;
-	
-	
 
 	/** The maximum health for the player. This is reset on shield regeneration.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -246,8 +245,10 @@ protected:
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
 	
-	UPROPERTY(Transient, Replicated)
-	class ACGCrystal* OverlappedCrystal;
+	UPROPERTY(Transient, Replicated = OnRep_PendingCrystalPickup)
+	class ACGCrystal* PendingCrystalPickup;
+
+
 
 	//XXX This is getting removed when I get the crystal system in.
 	/** The index of the currently equipped weapon. */
@@ -314,6 +315,8 @@ public:
 	/** Invoked when the player is no longer overlapping a crystal, verifies that the crystal is the one currently overlapped.*/
 	void OnStopCrystalOverlap(class ACGCrystal* Crystal);
 
+	UFUNCTION()
+	void OnRep_PendingCrystalPickup();
 
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/
 	FORCEINLINE FName GetWeaponAttachPoint() const { return WeaponAttachPoint; };

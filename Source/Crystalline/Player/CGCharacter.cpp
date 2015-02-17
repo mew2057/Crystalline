@@ -3,7 +3,6 @@
 #include "Crystalline.h"
 #include "CGCharacter.h"
 #include "GameModes/CGBaseGameMode.h"
-#include "Pickups/CGCrystal.h"
 #include "CGCharacterMovementComponent.h"
 
 
@@ -490,32 +489,45 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 
 void ACGCharacter::OnStartCrystalOverlap(class ACGCrystal* Crystal)
 {
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
-	if (HUD)
-	{
-		HUD->SetPromptMessage(TEXT("Pickup Crystal"));
-	}
-	// FIXME
+	UE_LOG(LogTemp, Log, TEXT("OVERLAP"));
+	PendingCrystalPickup = Crystal;
 
-	OverlappedCrystal = Crystal;
-
+	OnRep_PendingCrystalPickup();
 }
 
 void ACGCharacter::OnStopCrystalOverlap(class ACGCrystal* Crystal)
 {
 	// If the crystal is not the same, exit this logic since some degree of overlap shenanigans occured.
-	if (OverlappedCrystal != Crystal)
+	if (PendingCrystalPickup != Crystal)
 	{
 		return;
 	}
+	UE_LOG(LogTemp, Log, TEXT("OVERLAPSTOP"));
 
-	// FIXME
+	PendingCrystalPickup = NULL;
+
+	OnRep_PendingCrystalPickup();
+}
+
+void ACGCharacter::OnRep_PendingCrystalPickup()
+{
+	// FIXME this doesn't work!
+	// Get the HUD
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
-	if (HUD)
+	
+	UE_LOG(LogTemp, Log, TEXT("Pending Crystal REP"));
+
+	if (HUD )
 	{
-		HUD->SetPromptMessage(TEXT(""));
+		if (PendingCrystalPickup == NULL)
+		{
+			HUD->SetPromptMessage(TEXT(""));
+		}
+		else
+		{
+			HUD->SetPromptMessage(TEXT("Pickup Crystal"));
+		}
 	}
 }
 
@@ -610,15 +622,15 @@ void ACGCharacter::StopZoom()
 void ACGCharacter::OnActionButton()
 {
 	// FIXME Might be more actions.
-	if (OverlappedCrystal)
+	if (PendingCrystalPickup)
 	{
+		// Pickup locally, this ensures that the visual feedback is instantaneous.
+		PendingCrystalPickup->Pickup();
+
+		// If we aren't the server, we better tell the server what we're doing.
 		if (Role < ROLE_Authority)
 		{
 			ServerPickUpCrystal();
-		}
-		else
-		{
-			OverlappedCrystal->OnDespawn();
 		}
 	}
 }
@@ -630,7 +642,7 @@ bool ACGCharacter::ServerPickUpCrystal_Validate()
 
 void ACGCharacter::ServerPickUpCrystal_Implementation()
 {
-	OverlappedCrystal->OnDespawn();
+	PendingCrystalPickup->Pickup();
 }
 
 
@@ -652,8 +664,7 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 
 	// Not sure about this one.
 	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ACGCharacter, OverlappedCrystal, COND_OwnerOnly);
-	
+	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
 
 	// Everyone.
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);

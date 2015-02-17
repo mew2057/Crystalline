@@ -6,9 +6,10 @@
 #include "CGCrystal.generated.h"
 
 
-UENUM(BlueprintType)		
+UENUM(BlueprintType)
 enum class ECrystalType : uint8
 {
+	NONE UMETA(DisplayName = "None"),
 	UPGRADE UMETA(DisplayName = "Upgrade"),
 	FORCE UMETA(DisplayName = "Force"),
 	ACCURACY  UMETA(DisplayName = "Accuracy"),
@@ -34,17 +35,10 @@ public:
 	virtual void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other) override;
 
 	/** Invoked by the actor, returns false if the pickup is invalid.*/
-	bool OnDespawn();
-
-	/** Syncronizes the status of the crystal. */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerOnDespawn();
-
+	void Pickup();
+	
+	/** Invoked once the respawn timer is done.*/
 	void OnRespawn();
-
-	/** Syncronizes the status of the crystal. */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerOnRespawn();
 
 	/**Hides the crystal and sets it's state to inactive. */
 	void HideCrystal();
@@ -54,6 +48,10 @@ public:
 
 	UFUNCTION()
 	void OnRep_Active();
+
+	/** The Crystal type of the pickup. */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	ECrystalType CrystalType;
 
 
 protected:
@@ -69,10 +67,7 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Config)
 	UCapsuleComponent* OverlapVolume;
 
-	/** The Crystal type of the pickup. */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	ECrystalType CrystalType;
-	
+
 	/** Tracks whether or not the crystal can be picked up. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Active)
 	uint32 bIsActive : 1;

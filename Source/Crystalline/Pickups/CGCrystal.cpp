@@ -13,6 +13,7 @@ ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	OverlapVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 	OverlapVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	OverlapVolume->SetIsReplicated(true);
 	RootComponent = OverlapVolume;
 
 	CrystalMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CrystalMesh"));
@@ -46,7 +47,7 @@ ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	// TODO set is active based on spawn active.
 	bIsActive = true;
 	bSpawnActive = true;
-	CrystalType = ECrystalType::UPGRADE;
+	CrystalType = ECrystalType::NONE;
 
 }
 
@@ -57,7 +58,7 @@ void ACGCrystal::PostInitializeComponents()
 	// If not spawned as active, kick off a despawn event.
 	if (!bSpawnActive)
 	{
-		OnDespawn();
+		Pickup();
 	}	
 }
 
@@ -70,86 +71,60 @@ void ACGCrystal::ReceiveActorBeginOverlap(class AActor* Other)
 		return;
 	}
 
+
 	Super::ReceiveActorBeginOverlap(Other);
-	// TODO Tell the player that they can pickup the item.
-	ACGCharacter* Player = Cast<ACGCharacter>(Other);
-	if (Player)
+
+	// Only the server can tell the player that they can pickup the crystal.
+	if (Role == ROLE_Authority)
 	{
-		Player->OnStartCrystalOverlap(this);
+		ACGCharacter* Player = Cast<ACGCharacter>(Other);
+		if (Player)
+		{
+			Player->OnStartCrystalOverlap(this);
+		}
 	}
 }
 
 void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other)
 {
-
 	Super::ReceiveActorEndOverlap(Other);
 
-	ACGCharacter* Player = Cast<ACGCharacter>(Other);
-	if (Player)
+	if (Role == ROLE_Authority)
 	{
-		Player->OnStopCrystalOverlap(this);
-	}
-}
-
-bool ACGCrystal::OnDespawn()
-{
-	if (!bIsActive)
-	{
-		return false;
-	}
-
-	// Hide the crystal.
-	if (TimeToRespawn > 0)
-	{
-		HideCrystal();
-		bIsActive = false;
-		GetWorldTimerManager().SetTimer(this, &ACGCrystal::OnRespawn, TimeToRespawn, false);
-
-		// For some reason this refused to replicate on clients 
-		if (Role < ROLE_Authority)
+		ACGCharacter* Player = Cast<ACGCharacter>(Other);
+		if (Player)
 		{
-			UE_LOG(LogTemp, Log, TEXT("NOT AUTHORITY"));
-
-			ServerOnDespawn();
+			Player->OnStopCrystalOverlap(this);
 		}
 	}
-
-	return true;
 }
 
-bool ACGCrystal::ServerOnDespawn_Validate()
+void ACGCrystal::Pickup()
 {
-	return true;
-}
+	if (!bIsActive && TimeToRespawn <= 0)
+	{
+		return;
+	}
 
-void ACGCrystal::ServerOnDespawn_Implementation()
-{
-	UE_LOG(LogTemp, Log, TEXT("Server Do Despawn"));
+	HideCrystal();
 
-	bIsActive = false;
+
+	// Hide the crystal.
+	if (Role == ROLE_Authority)
+	{
+		bIsActive = false;
+		GetWorldTimerManager().SetTimer(this, &ACGCrystal::OnRespawn, TimeToRespawn, false);
+	}
 }
 
 void ACGCrystal::OnRespawn()
 {
 	ShowCrystal();
-	bIsActive = true;
 
-	if (Role < ROLE_Authority)
+	if (Role == ROLE_Authority)
 	{
-		ServerOnRespawn();
+		bIsActive = true;
 	}
-}
-
-bool ACGCrystal::ServerOnRespawn_Validate()
-{
-	return true;
-}
-
-void ACGCrystal::ServerOnRespawn_Implementation()
-{
-	UE_LOG(LogTemp, Log, TEXT("Server Do Respawn"));
-
-	bIsActive = true;
 }
 
 void ACGCrystal::HideCrystal()
