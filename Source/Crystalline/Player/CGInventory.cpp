@@ -9,6 +9,8 @@ ACGInventory::ACGInventory(const FObjectInitializer& ObjectInitializer) : Super(
 	TierTwoCrystal = ECrystalType::NONE;
 
 	bReplicates = true;
+	bOnlyRelevantToOwner = true;
+	
 }
 
 void ACGInventory::PostInitializeComponents()
