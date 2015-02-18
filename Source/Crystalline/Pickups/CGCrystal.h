@@ -10,7 +10,7 @@ UENUM(BlueprintType)
 enum class ECrystalType : uint8
 {
 	NONE UMETA(DisplayName = "None"),
-	UPGRADE UMETA(DisplayName = "Upgrade"),
+	POWER_UP UMETA(DisplayName = "Power Up"),
 	FORCE UMETA(DisplayName = "Force"),
 	ACCURACY  UMETA(DisplayName = "Accuracy"),
 	UTILITY	 UMETA(DisplayName = "Utility")
@@ -35,7 +35,7 @@ public:
 	virtual void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other) override;
 
 	/** Invoked by the actor, returns false if the pickup is invalid.*/
-	void Pickup();
+	bool Pickup();
 	
 	/** Invoked once the respawn timer is done.*/
 	void OnRespawn();
@@ -49,12 +49,14 @@ public:
 	UFUNCTION()
 	void OnRep_Active();
 
+	FORCEINLINE ECrystalType GetCrystalType() const { return CrystalType; };
+
+protected:
+
 	/** The Crystal type of the pickup. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	ECrystalType CrystalType;
 
-
-protected:
 	/** Crystal Mesh, defines the Noteworthy portion of the crystal.*/
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	UMeshComponent* CrystalMesh;

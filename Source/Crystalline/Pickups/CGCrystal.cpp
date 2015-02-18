@@ -98,11 +98,11 @@ void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other)
 	}
 }
 
-void ACGCrystal::Pickup()
+bool ACGCrystal::Pickup()
 {
 	if (!bIsActive || TimeToRespawn <= 0.f)
 	{
-		return;
+		return false;
 	}
 
 	HideCrystal();
@@ -113,6 +113,8 @@ void ACGCrystal::Pickup()
 		bIsActive = false;
 		GetWorldTimerManager().SetTimer(this, &ACGCrystal::OnRespawn, TimeToRespawn, false);
 	}
+
+	return true;
 }
 
 void ACGCrystal::OnRespawn()

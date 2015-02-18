@@ -23,7 +23,7 @@ struct FCGZoom
 	// Used in the zoom operation.
 	///////////////////////////////////////////
 	UPROPERTY(Transient)
-		float TargetZoom;
+	float TargetZoom;
 	///////////////////////////////////////////
 
 	FCGZoom()
@@ -47,6 +47,49 @@ public:
 
 };
 
+
+USTRUCT()
+struct FCGPlayerCrystalInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** The Tier 1 Crystal for the Player. (FORCE, ACCURACY, UTILITY)*/
+	UPROPERTY()
+	ECrystalType Tier1Crystal;
+
+	/** The Tier 2 Crystal for the Player. (POWER UP) */
+	UPROPERTY()
+	ECrystalType Tier2Crystal;
+
+	FCGPlayerCrystalInfo()
+	{
+		Tier1Crystal = ECrystalType::NONE;
+		Tier2Crystal = ECrystalType::NONE;
+	}
+
+
+public:
+	bool CanLoadCrystal(ECrystalType Crystal)
+	{
+		return Crystal != ECrystalType::NONE &&
+			((Crystal > ECrystalType::POWER_UP && Tier1Crystal != Crystal) ||
+			(Crystal <= ECrystalType::POWER_UP && Tier2Crystal != Crystal));
+	}
+
+	void LoadCrystal(ECrystalType Crystal)
+	{
+		// Tier1 crystal
+		if (Crystal > ECrystalType::POWER_UP)
+		{
+			Tier1Crystal = Crystal;
+		}
+		else if (Crystal > ECrystalType::NONE)
+		{
+			Tier2Crystal = Crystal;
+		}
+	}
+
+};
 
 /**
  * 
@@ -218,6 +261,8 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerPickUpCrystal();
 
+	void PickupCrystal();
+
 
 #pragma endregion
 
@@ -247,10 +292,7 @@ protected:
 	
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PendingCrystalPickup)
 	class ACGCrystal* PendingCrystalPickup;
-
-
-
-
+	
 	//XXX This is getting removed when I get the crystal system in.
 	/** The index of the currently equipped weapon. */
 	uint32 WeaponIndex;
@@ -258,6 +300,10 @@ protected:
 
 
 public:
+
+	//FIXME Move to private
+	UPROPERTY(Transient, Replicated)
+	FCGPlayerCrystalInfo WeaponCrystals;
 
 	// TODO make me private
 	/** Tracks whether or not the player is attempting to shoot the gun.*/
