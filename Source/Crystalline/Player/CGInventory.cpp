@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Crystalline.h"
-#include "Weapons/CGAmmo.h"
 #include "CGInventory.h"
 
 ACGInventory::ACGInventory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
