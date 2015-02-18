@@ -13,8 +13,6 @@ ACGCrystalGun::ACGCrystalGun(const FObjectInitializer& ObjectInitializer) :Super
 void ACGCrystalGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	Ammo = AmmoConfig.AmmoCapacity;
-	AmmoInClip = AmmoConfig.ClipSize;
 	ClipPercentPerShot = AmmoConfig.AmmoPerShot / AmmoConfig.ClipSize;
 }
 
@@ -53,6 +51,26 @@ void ACGCrystalGun::ApplyReload()
 
 	Ammo -= Difference;
 	AmmoInClip += Difference;
+}
+
+void ACGCrystalGun::InitializeAmmo(const FCGCrystalAmmo& AmmoStruct)
+{
+	AmmoInClip = AmmoStruct.AmmoInClip;
+	Ammo = AmmoStruct.AmmoCarried;
+	AmmoConfig.AmmoCapacity = AmmoStruct.MaxAmmoCarried;
+
+	//XXX Should this exist?
+	// Reload the gun if the base ammo isn't set.
+	if (AmmoInClip <= 0)
+	{
+		ApplyReload();
+	}
+};
+
+void ACGCrystalGun::CopyAmmo(const ACGCrystalGun* Other)
+{
+	AmmoInClip = Other->AmmoInClip;
+	Ammo = Other->Ammo;
 }
 
 #pragma endregion

@@ -47,7 +47,34 @@ public:
 
 };
 
+// TODO move this somewhere sane!
 #pragma region WeaponConfigStructs
+
+
+USTRUCT()
+struct FCGCrystalAmmo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Ammo)
+	int32 MaxAmmoCarried;
+
+	UPROPERTY(EditAnywhere, Category = Ammo)
+	int32 AmmoCarried;
+
+	UPROPERTY(EditAnywhere, Category = Ammo)
+	int32 AmmoInClip;
+
+
+	FCGCrystalAmmo()
+	{
+		MaxAmmoCarried = 120;
+		AmmoCarried = 80;
+		AmmoInClip = 0;
+	}
+
+};
+
 
 USTRUCT()
 struct FCGDDefaultCrystalTreeConfig
@@ -81,7 +108,25 @@ struct FCGDefaultWeaponConfig
 
 	/** Defines the Tiers for the Crystal Guns.*/
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TArray<FCGDDefaultCrystalTreeConfig> CrystalGunTiers;
+	TArray<FCGDDefaultCrystalTreeConfig> CrystalGunGroups;
+
+	/**Defines the max ammo for the assault rife.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FCGCrystalAmmo TierZeroAmmoConfig;
+
+	/**Defines the max ammo for the tier one weapons.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FCGCrystalAmmo TierOneAmmoConfig;
+
+	/**Defines the max ammo for the tier two weapons.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FCGCrystalAmmo TierTwoAmmoConfig;
+
+	FCGDefaultWeaponConfig()
+	{
+	}
+
+
 };
 
 #pragma endregion

@@ -20,13 +20,14 @@ public:
 
 
 #pragma region Ammo
+	
+	
 
 	virtual void UseAmmo() override;
 
 	virtual bool CanFire(bool InitFireCheck) const override;
 
 	virtual float GetClipPercent() const override;
-
 
 	virtual float GetReloadTime() const override;
 
@@ -38,6 +39,9 @@ public:
 
 	virtual int32 GetAmmoInClip() const override { return AmmoInClip; }
 
+	void InitializeAmmo(const FCGCrystalAmmo& AmmoStruct);
+
+	void CopyAmmo(const ACGCrystalGun* Other);
 #pragma endregion
 
 protected:
@@ -49,7 +53,5 @@ protected:
 	int32 Ammo;
 	
 	UPROPERTY(Transient, Replicated)
-	int32 AmmoInClip;
-	
-	
+	int32 AmmoInClip; 
 };

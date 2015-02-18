@@ -3,8 +3,11 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-//#include "Players/CGCharacter.h"
 #include "CGInventory.generated.h"
+
+#define TIER_ZERO_AMMO 0
+#define TIER_ONE_AMMO 1
+#define TIER_TWO_AMMO 2
 
 /**
  * 
@@ -19,7 +22,7 @@ public:
 
 	void PostInitializeComponents();
 
-	void InitializeInventory(FCGDefaultWeaponConfig WeaponInvConfig);
+	void InitializeInventory(const FCGDefaultWeaponConfig& Config);
 
 	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type = ECrystalType::NONE);
 
@@ -36,9 +39,6 @@ public:
 	FORCEINLINE int32 GetWeaponCount() const { return Weapons.Num(); }
 
 	FORCEINLINE int32 GetWeaponIndex(ACGWeapon* Weapon) const { return Weapons.Find(Weapon); }
-
-
-
 
 	void SetCGOwner(ACGCharacter* NewOwner);
 
@@ -67,5 +67,4 @@ public:
 
 	/** Contains the weapon groups that the gun inventory is selected by. Managed by the server, then replicated to the client through Weapons.*/
 	TMap<ECrystalType, TArray<class ACGWeapon*>> WeaponGroups;
-
 };
