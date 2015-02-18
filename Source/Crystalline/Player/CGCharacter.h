@@ -3,26 +3,27 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Pickups/CGCrystal.h"
 #include "CGCharacter.generated.h"
 
+#pragma region Structs
 
 USTRUCT()
 struct FCGZoom
 {
 	GENERATED_USTRUCT_BODY()
-		/** The factor that this zoom.*/
-		UPROPERTY(EditDefaultsOnly)
-		float ZoomFactor;
-
+	/** The factor that this zoom.*/
+	UPROPERTY(EditDefaultsOnly)
+	float ZoomFactor;
 
 	/**Speed of the interpolation from zoomed to zoomed out and vice versa. TODO make this seconds!*/
 	UPROPERTY(EditDefaultsOnly)
-		float ZoomSpeed;
+	float ZoomSpeed;
 
 	// Used in the zoom operation.
 	///////////////////////////////////////////
 	UPROPERTY(Transient)
-		float TargetZoom;
+	float TargetZoom;
 	///////////////////////////////////////////
 
 	FCGZoom()
@@ -46,6 +47,46 @@ public:
 
 };
 
+#pragma region WeaponConfigStructs
+
+USTRUCT()
+struct FCGDDefaultCrystalTreeConfig
+{
+	GENERATED_USTRUCT_BODY()
+	
+	/** The Tier One Gun, Available when the player has a tier one crystal.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGCrystalGun> TierOneGun;
+
+	/** The Tier Two Gun, Available when the player has a tier one and two crystal.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGCrystalGun> TierTwoGun;
+
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	ECrystalType TierOneCrystalType;
+};
+
+USTRUCT()
+struct FCGDefaultWeaponConfig
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** An ammo free side arm.*/
+	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	TSubclassOf<class ACGWeapon> CoreWeapon;
+	
+	/** The baseline crystal gun, this is always present for the player.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGCrystalGun> CoreCrystalGun;
+
+	/** Defines the Tiers for the Crystal Guns.*/
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TArray<FCGDDefaultCrystalTreeConfig> CrystalGunTiers;
+};
+
+#pragma endregion
+
+#pragma endregion
 
 /**
  * 
@@ -99,8 +140,6 @@ protected:
 
 	/** Tracks when the shield is regenerating for the tick.*/
 	uint32 bShieldRegenerating : 1;
-	
-	
 
 	/** The maximum health for the player. This is reset on shield regeneration.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -213,6 +252,14 @@ protected:
 	/** Unzooms the player's view, may stop ADS. */
 	void StopZoom();
 
+	/** Triggers the action button response.*/
+	void OnActionButton();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerPickUpCrystal();
+
+	void PickupCrystal();
+
 
 #pragma endregion
 
@@ -224,13 +271,12 @@ protected:
 	/** The name of the Socket/Bone on the skeleton the weapon attaches to. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName WeaponAttachPoint;
-
-	/** The Default list of weapons the player is carrying. */
+	
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TArray<TSubclassOf<class ACGWeapon>> DefaultWeaponClasses;
+	FCGDefaultWeaponConfig DefaultWeaponConfig;
 
-	UPROPERTY(Transient, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
-	TArray<class ACGWeapon*> Weapons;
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGInventory> DefaultInventoryClass;
 
 	/** The currently equipped weapon for the player. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
@@ -239,16 +285,17 @@ protected:
 	/** A pending weapon for equips. */
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
-
-
-
-	//XXX This is getting removed when I get the crystal system in.
-	/** The index of the currently equipped weapon. */
-	uint32 WeaponIndex;
-
-
+	
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_PendingCrystalPickup)
+	class ACGCrystal* PendingCrystalPickup;
+	
 
 public:
+
+
+	//FIXME Move to private
+	UPROPERTY(Transient, Replicated)
+	class ACGInventory* Inventory;
 
 	// TODO make me private
 	/** Tracks whether or not the player is attempting to shoot the gun.*/
@@ -284,9 +331,7 @@ public:
 	 * Invokes the weapon's OnEnterInventory.
 	 * @param NewWeapon the candidate weapon for addition.
 	 */
-	void AddWeapon(ACGWeapon* NewWeapon);
-	
-	void RemoveWeapon(ACGWeapon* Weapon);
+	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type = ECrystalType::NONE);
 
 	/**
 	 * [server,client] Equips the supplied weapon to the player.
@@ -295,20 +340,27 @@ public:
 	void EquipWeapon(ACGWeapon* Weapon);
 
 	/**
-	 * Replicates the inventory change to the owning player.
-	 */
-	UFUNCTION(Client, Reliable)
-	void ClientSetWeapon(ACGWeapon* Weapon);
-
-	/**
 	* [server]Equips the supplied weapon to the player.
 	* @param The weapon to equip.
 	*/
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(ACGWeapon* Weapon);
 
+	/** Invoked when the player begins to Overlap with a Crystal Pickup, triggers a prompt.*/
+	void OnStartCrystalOverlap(class ACGCrystal* Crystal);
+
+	/** Invoked when the player is no longer overlapping a crystal, verifies that the crystal is the one currently overlapped.*/
+	void OnStopCrystalOverlap(class ACGCrystal* Crystal);
+
+	UFUNCTION()
+	void OnRep_PendingCrystalPickup();
+
+	UFUNCTION()
+	void OnRep_CrystalChanged();
+
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/
 	FORCEINLINE FName GetWeaponAttachPoint() const { return WeaponAttachPoint; };
+
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

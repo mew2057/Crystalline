@@ -16,6 +16,7 @@ ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(
 	// TODO REPLACE THIS FONT!
 	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
 	BigFont = BigFontOb.Object;
+
 }
 
 
@@ -50,6 +51,7 @@ void ACGPlayerHUD::DrawHUD()
 				(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 
 			DrawWeaponHUD();
+			DrawPrompt();
 
 			// State Print out
 			float SizeX, SizeY;
@@ -70,9 +72,6 @@ void ACGPlayerHUD::DrawHUD()
 	}
 
 	DrawGameInfo();
-
-
-	
 }
 
 
@@ -81,7 +80,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	// XXX Crystals should be present on the weapon sprites for the crystal gun.
 	
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
-	ACGWeapon* CurrentWeapon = Pawn->GetCurrentWeapon();
+	ACGWeapon* CurrentWeapon = Pawn ? Pawn->GetCurrentWeapon() : NULL;
 	FCanvasIcon WeaponIcon;
 	
 	FCanvasIcon AmmoIcon;
@@ -140,6 +139,19 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 		Canvas->DrawItem(TextItem, 50, 10);
 		////////////////////////////////////////////////////
+
+		// FIXME this crashes when both players are dead and respawning. Seems to happen on client, this ONLY occurs in release mode.
+		/*
+		if (Pawn && Pawn->Inventory)
+		{
+			/** Draw the crystals the player has*/
+		/*	TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->Inventory->TierOneCrystal)));
+			Canvas->DrawItem(TextItem, 5, 100);
+
+			TextItem.Text = FText::FromString(TEXT("T2: " + FString::FromInt((int8)Pawn->Inventory->TierTwoCrystal)));
+			Canvas->DrawItem(TextItem, 5, 150);
+		}*/
+
 	}
 	
 	
@@ -157,6 +169,10 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		// NOTE: Don't include ammunition on this one.	
 	}
 	*/
+
+
+
+
 }
 
 void ACGPlayerHUD::DrawHealth()
@@ -225,4 +241,28 @@ void ACGPlayerHUD::DrawGameInfo()
 			Canvas->DrawItem(TextItem, 50, 200);
 		}		
 	}
+}
+
+void ACGPlayerHUD::DrawPrompt()
+{
+	// TODO Make this print out images and whatnot.
+	float SizeX, SizeY;
+	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
+	TextItem.EnableShadow(FLinearColor::Black);
+	Canvas->StrLen(BigFont, PromptMessage, SizeX, SizeY);
+
+	const float TopTextScale = 0.73f; // of 51pt font
+
+	TextItem.Text = FText::FromString(PromptMessage);
+	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
+
+	Canvas->SetDrawColor(FColor::Yellow);
+
+	Canvas->DrawItem(TextItem, 50, 100);
+	
+}
+
+void ACGPlayerHUD::SetPromptMessage(const FString& Message)
+{
+	PromptMessage = Message;
 }

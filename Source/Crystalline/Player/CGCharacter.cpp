@@ -50,6 +50,7 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	PendingWeapon = NULL;
 	bWantsToFire  = false;
 	bIsDying = false;
+	// TODO preload Inventory!
 }
 
 void ACGCharacter::PostInitializeComponents()
@@ -127,8 +128,7 @@ float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 			GetWorldTimerManager().SetTimer(this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
 
 			// TODO Feedback from hit, e.g. force feedback and direction.
-		}
-		
+		}		
 	}
 
 	return ActualDamage;
@@ -204,12 +204,23 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 
 	// Detach the controller from the pawn, so respawn can work.
 	DetachFromControllerPendingDestroy();
+
+	// Clean up the HUD.
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->SetPromptMessage(TEXT(""));
+	}
 	// Once the Pawn is destroyed the playercontroller will spawn a new pawn, see UnFreeze() 
+
+	// TODO Ragdoll
+	SetLifeSpan(2.f);
 }
 
 void ACGCharacter::TornOff()
 {
-	SetLifeSpan(5.f);
+	SetLifeSpan(2.f);
 }
 
 void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -224,6 +235,8 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAction("Fire", IE_Released,  this, &ACGCharacter::StopFire);
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ACGCharacter::OnReload);
+
+	InputComponent->BindAction("ActionButton", IE_Pressed, this, &ACGCharacter::OnActionButton);
 
 	InputComponent->BindAction("Zoom", IE_Pressed, this, &ACGCharacter::StartZoom);
 	InputComponent->BindAction("Zoom", IE_Released, this, &ACGCharacter::StopZoom);
@@ -254,13 +267,13 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 void ACGCharacter::Restart()
 {
 	Super::Restart();
-
+	/*
 	/// XXX WRONG
 	// This should be invoked after the inventory is spawned by the game mode.
 	if (IsLocallyControlled() && Weapons.Num() > 0)
 	{
 		EquipWeapon(Weapons[0]);
-	}
+	}*/
 }
 
 /** Make Sure the inventory is destroyed. */
@@ -384,30 +397,14 @@ void ACGCharacter::SpawnBaseInventory()
 		return;
 	}
 
-	const int32 NumDefaultWeapons = DefaultWeaponClasses.Num();
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
 
-	for (int i = 0; i < NumDefaultWeapons; ++i)
-	{
-		// If it exists spawn the weapon.
-		if (DefaultWeaponClasses[i])
-		{
-			FActorSpawnParameters SpawnInfo;
-			SpawnInfo.bNoCollisionFail = true;
-
-			// Spawn an actor of type ACrystallineWeapon with the DefaultWeaponClasses[i] as the archetype, and the spawnInfo settings.
-			ACGWeapon* NewWeapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponClasses[i], SpawnInfo);
-
-			AddWeapon(NewWeapon);
-		}
-	}
-	
-	if (Weapons.Num() > 0)
-	{
-		WeaponIndex = 0;
-		EquipWeapon(Weapons[0]);
-	}
-
+	Inventory = GetWorld()->SpawnActor<ACGInventory>(DefaultInventoryClass, SpawnInfo);
+	Inventory->SetCGOwner(this);
+	Inventory->InitializeInventory(DefaultWeaponConfig);
 }
+
 
 void ACGCharacter::DestroyInventory()
 {
@@ -416,35 +413,14 @@ void ACGCharacter::DestroyInventory()
 		return;
 	}
 	
-	for (int32 i = Weapons.Num() - 1; i >= 0; --i)
+	if (Inventory)
 	{
-		// Cache for pending removal.
-		ACGWeapon* Weapon = Weapons[i];
-		if (Weapon)
-		{
-			RemoveWeapon(Weapon);
-			Weapon->Destroy();
-		}
+		Inventory->DestroyInventory();
+		Inventory->Destroy();
 	}
 }
 
-void ACGCharacter::AddWeapon(ACGWeapon* NewWeapon)
-{
-	if (NewWeapon && Role == ROLE_Authority)
-	{
-		Weapons.AddUnique(NewWeapon);
-		NewWeapon->OnEnterInventory(this);
-	}
-}
 
-void ACGCharacter::RemoveWeapon(ACGWeapon* Weapon)
-{
-	if (Weapon && Role == ROLE_Authority)
-	{
-		Weapon->OnExitInventory();
-		Weapons.RemoveSingle(Weapon);
-	}
-}
 
 void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 {
@@ -462,18 +438,6 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 	}
 }
 
-
-void ACGCharacter::ClientSetWeapon_Implementation(ACGWeapon* Weapon)
-{
-	SetCurrentWeapon(Weapon);
-	
-	// Tell the server that it needs to set the weapon to be safe.
-	if (Role < ROLE_Authority)
-	{
-		ServerEquipWeapon(Weapon);
-	}
-}
-
 bool ACGCharacter::ServerEquipWeapon_Validate(ACGWeapon* NewWeapon)
 {
 	return true;
@@ -486,6 +450,64 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 	{
 		SetCurrentWeapon(NewWeapon);
 	}
+}
+
+
+void ACGCharacter::OnStartCrystalOverlap(class ACGCrystal* Crystal)
+{
+	// Only Execute this code if the crystal type is grabbable and the crystal is not null.
+	if (Crystal && Inventory->CanLoadCrystal(Crystal->GetCrystalType()))
+	{
+		PendingCrystalPickup = Crystal;
+
+		// If this is controlled locally post the prompt.
+		if (IsLocallyControlled())
+		{
+			OnRep_PendingCrystalPickup();
+		}
+	}
+}
+
+void ACGCharacter::OnStopCrystalOverlap(class ACGCrystal* Crystal)
+{
+	// If the crystal is not the same, exit this logic since some degree of overlap shenanigans occured.
+	if (PendingCrystalPickup && PendingCrystalPickup != Crystal)
+	{
+		return;
+	}
+
+	PendingCrystalPickup = NULL;
+
+	// If this is controlled locally post the prompt.
+	if (IsLocallyControlled())
+	{
+		OnRep_PendingCrystalPickup();
+	}
+}
+
+void ACGCharacter::OnRep_PendingCrystalPickup()
+{
+	// Get the HUD
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD )
+	{
+
+		if (PendingCrystalPickup == NULL)
+		{
+			HUD->SetPromptMessage(TEXT(""));
+		}
+		else
+		{
+			HUD->SetPromptMessage(TEXT("Pickup Crystal " + FString::FromInt((int8)(PendingCrystalPickup->GetCrystalType()))));
+		}
+	}
+}
+
+
+void ACGCharacter::OnRep_CrystalChanged()
+{
+
 }
 
 #pragma endregion
@@ -534,12 +556,13 @@ void ACGCharacter::OnReload()
 void ACGCharacter::NextWeapon()
 {
 	// Cache the number of weapons.
-	const int32 NumberOfWeapons = Weapons.Num();
+	const int32 NumberOfWeapons = Inventory->GetWeaponCount();
+	int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
 
 	if (NumberOfWeapons > 1)
 	{
 		WeaponIndex = (WeaponIndex + 1) % NumberOfWeapons;
-		EquipWeapon(Weapons[WeaponIndex]);
+		EquipWeapon(Inventory->GetWeapon(WeaponIndex));
 	}
 }
 
@@ -547,14 +570,14 @@ void ACGCharacter::NextWeapon()
 void ACGCharacter::PreviousWeapon()
 {
 	// Cache the number of weapons.
-	const int32 NumberOfWeapons = Weapons.Num();
+	const int32 NumberOfWeapons = Inventory->GetWeaponCount();
+	int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
 
 	// Check for undeflow.
 	if (NumberOfWeapons > 1)
 	{
 		WeaponIndex = (WeaponIndex - 1 + NumberOfWeapons) % NumberOfWeapons;
-
-		EquipWeapon(Weapons[WeaponIndex]);
+		EquipWeapon(Inventory->GetWeapon(WeaponIndex));
 	}
 }
 
@@ -575,6 +598,50 @@ void ACGCharacter::StopZoom()
 	bZooming = true;
 }
 
+void ACGCharacter::OnActionButton()
+{
+	// FIXME Might be more actions.
+	if (PendingCrystalPickup)
+	{
+		// If we aren't the server, we better tell the server what we're doing.
+		if (Role < ROLE_Authority)
+		{
+			ServerPickUpCrystal();
+		}
+		else
+		{
+			PickupCrystal();
+		}
+	}
+}
+
+bool ACGCharacter::ServerPickUpCrystal_Validate()
+{
+	return true;
+}
+
+void ACGCharacter::ServerPickUpCrystal_Implementation()
+{
+	PickupCrystal();
+}
+
+void ACGCharacter::PickupCrystal()
+{
+	// Make sure the PendingCrystal is still there.
+	if (PendingCrystalPickup)
+	{
+		// Cache the Crystal Type.
+		ECrystalType CachedType = PendingCrystalPickup->GetCrystalType();
+		// Pickup is valid.
+		if (PendingCrystalPickup->Pickup())
+		{
+			// Load the crystal to the appropriate slot.
+			Inventory->LoadCrystal(CachedType);
+		}
+	}
+}
+
+
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -592,8 +659,9 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 
 
 	// Not sure about this one.
-	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
-
+//	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACGCharacter, Inventory, COND_OwnerOnly);
 
 	// Everyone.
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);

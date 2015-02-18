@@ -43,7 +43,7 @@ public:
 	void SetPromptMessage(const FString& Message);
 
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-		UFont* BigFont;
+	UFont* BigFont;
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
@@ -51,6 +51,10 @@ private:
 
 	/** The horizontal scale factor of the UI Relative to 1920.*/
 	//float ScaleUIX; Commented for potential future usage. -John
+
+
+	/** The Prompt Message, In the future this shouold be a struct.*/
+	FString PromptMessage;
 
 	
 	
