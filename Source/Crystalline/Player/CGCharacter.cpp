@@ -397,6 +397,9 @@ void ACGCharacter::SpawnBaseInventory()
 		return;
 	}
 
+	// Ensure the inventory is clear.
+	Inventory.Reset();
+
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 
@@ -433,10 +436,10 @@ void ACGCharacter::SpawnBaseInventory()
 		}
 	}
 	
-	if (Weapons.Num() > 0)
+	if (Inventory.NumWeapons() > 0)
 	{
 		WeaponIndex = 0;
-		EquipWeapon(Weapons[0]);
+		EquipWeapon(Inventory.GetWeapon(0));
 	}
 
 }
@@ -448,16 +451,7 @@ void ACGCharacter::DestroyInventory()
 		return;
 	}
 	
-	for (int32 i = Weapons.Num() - 1; i >= 0; --i)
-	{
-		// Cache for pending removal.
-		ACGWeapon* Weapon = Weapons[i];
-		if (Weapon)
-		{
-			RemoveWeapon(Weapon);
-			Weapon->Destroy();
-		}
-	}
+	Inventory.Reset();
 }
 
 void ACGCharacter::AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
@@ -470,14 +464,6 @@ void ACGCharacter::AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
 	}
 }
 
-void ACGCharacter::RemoveWeapon(ACGWeapon* Weapon)
-{
-	if (Weapon && Role == ROLE_Authority)
-	{
-		Weapon->OnExitInventory();
-		Weapons.RemoveSingle(Weapon);
-	}
-}
 
 void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 {

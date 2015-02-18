@@ -49,6 +49,7 @@ public:
 };
 
 
+// TODO Refactor to UObjectType.
 USTRUCT()
 struct FCGPlayerInventory
 {
@@ -67,14 +68,31 @@ struct FCGPlayerInventory
 	UPROPERTY()
 	TArray<class ACGWeapon*> Weapons;
 
+	// FIXME This code is DIRTY!
+	////////////////////////////////////////////////////////////////
+	// Defines the weapons that the player may have access to.
+	UPROPERTY()
+	TArray<class ACGWeapon*> AccuracyWeapons;
+	
+	UPROPERTY()
+	TArray<class ACGWeapon*> UtilityWeapons;
+	
+	UPROPERTY()
+	TArray<class ACGWeapon*> ForceWeapons;
+	////////////////////////////////////////////////////////////////
+
 	UPROPERTY()
 	int32 UseableWeapons;
+
+	UPROPERTY()
+	int32 DefaultWeapons;
 
 	FCGPlayerInventory()
 	{
 		TierOneCrystal = ECrystalType::NONE;
 		TierTwoCrystal = ECrystalType::NONE;
 		UseableWeapons = 0;
+		DefaultWeapons = 0;
 	}
 
 public:
@@ -87,32 +105,112 @@ public:
 
 	void LoadCrystal(ECrystalType Crystal)
 	{
+		bool bIsDirty = false;
 		// Tier1 crystal
-		if (Crystal > ECrystalType::POWER_UP)
+		if (Crystal > ECrystalType::POWER_UP && TierOneCrystal != Crystal)
 		{
 			TierOneCrystal = Crystal;
+			bIsDirty = true;
 		}
-		else if (Crystal > ECrystalType::NONE)
+		else if (Crystal > ECrystalType::NONE && TierTwoCrystal != Crystal)
 		{
 			TierTwoCrystal = Crystal;
+			bIsDirty = true;
 		}
+
+		if (bIsDirty)
+		{
+
+		}
+	}
+
+	void Reset()
+	{
+		TierOneCrystal = ECrystalType::NONE;
+		TierTwoCrystal = ECrystalType::NONE;
+		UseableWeapons = 0;
+		DefaultWeapons = 0;
+
+		/*
+		class ACGWeapon* Weapon;
+		for (int32 i = Weapons.Num() - 1; i >= 0; --i)
+		{
+			Weapon = Weapons[i];
+			if (Weapon)
+			{
+				Weapon->OnExitInventory();
+				Weapons.RemoveSingle(Weapon);
+				Weapon->Destroy();
+			}
+		}
+
+		// TODO write a function?
+		for (int32 i = AccuracyWeapons.Num() - 1; i >= 0; --i)
+		{
+			Weapon = AccuracyWeapons[i];
+			if (Weapon)
+			{
+				Weapon->OnExitInventory();
+				AccuracyWeapons.RemoveSingle(Weapon);
+				Weapon->Destroy();
+			}
+		}
+
+		for (int32 i = UtilityWeapons.Num() - 1; i >= 0; --i)
+		{
+			Weapon = UtilityWeapons[i];
+			if (Weapon)
+			{
+				Weapon->OnExitInventory();
+				UtilityWeapons.RemoveSingle(Weapon);
+				Weapon->Destroy();
+			}
+		}
+
+		for (int32 i = ForceWeapons.Num() - 1; i >= 0; --i)
+		{
+			Weapon = ForceWeapons[i];
+			if (Weapon)
+			{
+				Weapon->OnExitInventory();
+				ForceWeapons.RemoveSingle(Weapon);
+				Weapon->Destroy();
+			}
+		} 
+		*/
+
 	}
 
 	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
 	{
-		if (Type > ECrystalType::NONE)
+		switch (Type)
 		{
-			// TODO do something for weapon sets.
+			case ECrystalType::NONE:
+				// Increment the default weapon count if the add worked.
+				DefaultWeapons+= Weapons.AddUnique(Weapon) > -1 ? 1 : 0;
+				break;
+			case ECrystalType::FORCE:
+				ForceWeapons.AddUnique(Weapon);
+				break;
+
+			case ECrystalType::ACCURACY:
+				AccuracyWeapons.AddUnique(Weapon);
+				break;
+
+			case ECrystalType::UTILITY:
+				UtilityWeapons.AddUnique(Weapon);
+				break;
 		}
-		else
-		{
-			Weapons.AddUnique(Weapon);
-		}
+	}
+
+	ACGWeapon* GetWeapon(int32 index) const
+	{
+		return index >= 0 && index < UseableWeapons ?  Weapons[index] : NULL;
 	}
 
 	int32 NumWeapons()
 	{
-
+		return UseableWeapons;
 	}
 };
 
@@ -409,8 +507,6 @@ public:
 	 * @param NewWeapon the candidate weapon for addition.
 	 */
 	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type = ECrystalType::NONE);
-	
-	void RemoveWeapon(ACGWeapon* Weapon);
 
 	/**
 	 * [server,client] Equips the supplied weapon to the player.
