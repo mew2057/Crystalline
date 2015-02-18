@@ -84,75 +84,76 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	FCanvasIcon WeaponIcon;
 	
 	FCanvasIcon AmmoIcon;
-	
+
+	ACGCrystalGun* cG = Cast<ACGCrystalGun>(CurrentWeapon);
 	/** Get Primary weapon for the player. */
-	if (CurrentWeapon)
-	{
-		FCGWeaponHUDData WeaponHUDConfig = CurrentWeapon->WeaponHUDConfig;
-		// TODO team modifications.
-		Canvas->SetDrawColor(FColor::White);
-	
-		AmmoIcon = WeaponHUDConfig.AmmoGuageBGIcon;
-		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
-		
-		AmmoIcon = WeaponHUDConfig.AmmoGuageFGIcon;
-	
-		const float Percent = CurrentWeapon->GetClipPercent();
-
-		// Determine the appropriate color for the guage.
-
-		if (CurrentWeapon->WeaponConfig.OverHeatWeapon)
-		{
-			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
-			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
-		}
-		else
-		{
-			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.LowAmmoColor, WeaponHUDConfig.FullAmmoColor, Percent));
-			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
-		}
-
-		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
-
-		Canvas->SetDrawColor(FColor::White);	
-		Canvas->DrawIcon(WeaponHUDConfig.WeaponIcon, 40, 20, ScaleUIY);
-
-		// Debug Ammo Text
-		////////////////////////////////////////////////////
-		float SizeX, SizeY;
-		FString Text = FString::SanitizeFloat(CurrentWeapon->GetAmmoInClip());
-
-		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
-		TextItem.EnableShadow(FLinearColor::Black);
-		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-
-		const float TopTextScale = 0.73f; // of 51pt font
-
-		TextItem.Text = FText::FromString(Text);
-		TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
-		//TextItem.FontRenderInfo = ShadowedFont;
-
-		Canvas->DrawItem(TextItem, 20, 10);
-
-		Text = FString::SanitizeFloat(CurrentWeapon->GetAmmo());
-		TextItem.Text = FText::FromString(Text);
-
-		Canvas->DrawItem(TextItem, 50, 10);
-		////////////////////////////////////////////////////
-
-		// FIXME this crashes when both players are dead and respawning. Seems to happen on client, this ONLY occurs in release mode.
-		/*
-		if (Pawn && Pawn->Inventory)
-		{
-			/** Draw the crystals the player has*/
-		/*	TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->Inventory->TierOneCrystal)));
-			Canvas->DrawItem(TextItem, 5, 100);
-
-			TextItem.Text = FText::FromString(TEXT("T2: " + FString::FromInt((int8)Pawn->Inventory->TierTwoCrystal)));
-			Canvas->DrawItem(TextItem, 5, 150);
-		}*/
-
-	}
+	//if (CurrentWeapon )
+	//{
+	//	FCGWeaponHUDData WeaponHUDConfig = CurrentWeapon->WeaponHUDConfig;
+	//	// TODO team modifications.
+	//	Canvas->SetDrawColor(FColor::White);
+	//
+	//	AmmoIcon = WeaponHUDConfig.AmmoGuageBGIcon;
+	//	Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
+	//	
+	//	AmmoIcon = WeaponHUDConfig.AmmoGuageFGIcon;
+	//
+	//	const float Percent = CurrentWeapon->GetClipPercent();
+	//
+	//	// Determine the appropriate color for the guage.
+	//
+	//	if (CurrentWeapon->WeaponConfig.OverHeatWeapon)
+	//	{
+	//		Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
+	//		AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
+	//	}
+	//	else
+	//	{
+	//		Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.LowAmmoColor, WeaponHUDConfig.FullAmmoColor, Percent));
+	//		AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
+	//	}
+	//
+	//	Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
+	//
+	//	Canvas->SetDrawColor(FColor::White);	
+	//	Canvas->DrawIcon(WeaponHUDConfig.WeaponIcon, 40, 20, ScaleUIY);
+	//
+	//	// Debug Ammo Text 
+	//	////////////////////////////////////////////////////
+	//	float SizeX, SizeY;
+	//	FString Text = FString::SanitizeFloat(CurrentWeapon->GetAmmoInClip());
+	//
+	//	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
+	//	TextItem.EnableShadow(FLinearColor::Black);
+	//	Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+	//
+	//	const float TopTextScale = 0.73f; // of 51pt font
+	//
+	//	TextItem.Text = FText::FromString(Text);
+	//	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
+	//	//TextItem.FontRenderInfo = ShadowedFont;
+	//
+	//	Canvas->DrawItem(TextItem, 20, 10);
+	//
+	//	Text = FString::SanitizeFloat(CurrentWeapon->GetAmmo());
+	//	TextItem.Text = FText::FromString(Text);
+	//
+	//	Canvas->DrawItem(TextItem, 50, 10);
+	//	////////////////////////////////////////////////////
+	//
+	//	// FIXME this crashes when both players are dead and respawning. Seems to happen on client, this ONLY occurs in release mode.
+	//	/*
+	//	if (Pawn && Pawn->Inventory)
+	//	{
+	//		/** Draw the crystals the player has*/
+	//	/*	TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->Inventory->TierOneCrystal)));
+	//		Canvas->DrawItem(TextItem, 5, 100);
+	//
+	//		TextItem.Text = FText::FromString(TEXT("T2: " + FString::FromInt((int8)Pawn->Inventory->TierTwoCrystal)));
+	//		Canvas->DrawItem(TextItem, 5, 150);
+	//	}*/
+	//
+	//}
 	
 	
 	/** Get the Secondary weapon for the player. */

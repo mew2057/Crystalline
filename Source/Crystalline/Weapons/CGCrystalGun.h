@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Weapons/CGWeapon.h"
+#include "Weapons/CGAmmo.h"
 #include "CGCrystalGun.generated.h"
 
 /**
@@ -12,7 +13,13 @@ UCLASS()
 class CRYSTALLINE_API ACGCrystalGun : public ACGWeapon
 {
 	GENERATED_BODY()
-	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FCGAmmoData AmmoConfig;
+
+	UPROPERTY(VisibleAnywhere, Replicated)
+	class UCGAmmo* CrystalAmmo;
+
 public:
 	ACGCrystalGun(const FObjectInitializer& ObjectInitializer);
 
@@ -27,29 +34,19 @@ public:
 
 	virtual float GetClipPercent() const override;
 
-
 	virtual float GetReloadTime() const override;
 
 	virtual bool GetCanReload() const override;
 
 	virtual void ApplyReload() override;
 
-	virtual int32 GetAmmo() const override { return Ammo; }
+	virtual int32 GetAmmo() const override { return CrystalAmmo->AmmoCarried; }
 
-	virtual int32 GetAmmoInClip() const override { return AmmoInClip; }
+	virtual int32 GetAmmoInClip() const override { return CrystalAmmo->AmmoInClip; }
 
+	FORCEINLINE void SetWeaponAmmo( UCGAmmo* const Ammo) { CrystalAmmo = Ammo; }
 #pragma endregion
 
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	FCGAmmoData AmmoConfig;
 
-	/**This is the ammo in addition to the ammo in the clip.*/
-	UPROPERTY(Transient, Replicated)
-	int32 Ammo;
-	
-	UPROPERTY(Transient, Replicated)
-	int32 AmmoInClip;
-	
 	
 };

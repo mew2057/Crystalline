@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Crystalline.h"
+#include "Weapons/CGAmmo.h"
 #include "CGInventory.h"
 
 ACGInventory::ACGInventory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -22,13 +23,29 @@ void ACGInventory::PostInitializeComponents()
 }
 
 
-void ACGInventory::InitializeInventory(FCGDefaultWeaponConfig Config)
+void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 {
 	// Make sure only the Authority is modifying this inventory!
 	if (Role < ROLE_Authority)
 	{
 		return;
 	}
+
+
+	// TODO Make this more robust!
+	UCGAmmo* AmmoTemp;
+
+	AmmoTemp = NewObject<UCGAmmo>();
+	AmmoTemp->InitializeAmmo(Config.TierZeroAmmoConfig);
+	AmmoCollection.Add(AmmoTemp);
+
+	AmmoTemp = NewObject<UCGAmmo>();
+	AmmoTemp->InitializeAmmo(Config.TierOneAmmoConfig);
+	AmmoCollection.Add(AmmoTemp);
+
+	AmmoTemp = NewObject<UCGAmmo>();
+	AmmoTemp->InitializeAmmo(Config.TierTwoAmmoConfig);
+	AmmoCollection.Add(AmmoTemp);
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
@@ -38,28 +55,38 @@ void ACGInventory::InitializeInventory(FCGDefaultWeaponConfig Config)
 		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(Config.CoreWeapon, SpawnInfo));
 	}
 
+
+	// Note all guns from this point on are assumed to be crystal guns.
+	ACGCrystalGun*  TempCrystalGun;
+
 	if (Config.CoreCrystalGun)
 	{
-		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(Config.CoreCrystalGun, SpawnInfo));
+		TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CoreCrystalGun, SpawnInfo);
+		TempCrystalGun->SetWeaponAmmo(AmmoCollection[TIER_ZERO_AMMO]);
+		AddWeapon(TempCrystalGun);
 	}
 
 	// Get the number of weaopns that were properly defined.
 	StaticWeaponCount = Weapons.Num();
-
-	const int32 NumWeaponGroups = Config.CrystalGunTiers.Num();
+	
+	const int32 NumWeaponGroups = Config.CrystalGunGroups.Num();
 	for (int i = 0; i < NumWeaponGroups; ++i)
 	{
 		// If it exists spawn the weapon.
-		if (Config.CrystalGunTiers[i].TierOneGun)
+		if (Config.CrystalGunGroups[i].TierOneGun)
 		{
 			// Add the Tier OneGun
-			AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(Config.CrystalGunTiers[i].TierOneGun, SpawnInfo), Config.CrystalGunTiers[i].TierOneCrystalType);
+			TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CrystalGunGroups[i].TierOneGun, SpawnInfo);
+			TempCrystalGun->SetWeaponAmmo(AmmoCollection[TIER_ONE_AMMO]);
+			AddWeapon(TempCrystalGun, Config.CrystalGunGroups[i].TierOneCrystalType);
 		}
 
-		if (Config.CrystalGunTiers[i].TierTwoGun)
+		if (Config.CrystalGunGroups[i].TierTwoGun)
 		{
 			// Add the TierTwo Gun
-			AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(Config.CrystalGunTiers[i].TierTwoGun, SpawnInfo), Config.CrystalGunTiers[i].TierOneCrystalType);
+			TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CrystalGunGroups[i].TierTwoGun, SpawnInfo);
+			TempCrystalGun->SetWeaponAmmo(AmmoCollection[TIER_TWO_AMMO]);
+			AddWeapon(TempCrystalGun, Config.CrystalGunGroups[i].TierOneCrystalType);
 		}
 	}
 
@@ -112,7 +139,7 @@ void ACGInventory::DestroyInventory()
 		CachedWeapon = Weapons[i];
 		if (CachedWeapon)
 		{
-			Weapons.RemoveSingle(CachedWeapon);
+			Weapons.RemoveAt(i);
 			CachedWeapon->OnExitInventory();
 			CachedWeapon->Destroy();
 		}
@@ -131,12 +158,27 @@ void ACGInventory::DestroyInventory()
 			CachedWeapon = Values[j];
 			if (CachedWeapon)
 			{
-				Values.RemoveSingle(CachedWeapon);
+				Values.RemoveAt(j);
 				CachedWeapon->OnExitInventory();
 				CachedWeapon->Destroy();
 			}
 		}
 		WeaponGroups.Remove(Keys[i]);
+	}
+
+	// TODO shoot off ammo actors.
+	UCGAmmo* AmmoCache;
+	for (int32 i = AmmoCollection.Num() - 1; i >= 0; --i)
+	{
+		AmmoCache = AmmoCollection[i];
+		if (AmmoCache)
+		{
+		
+			// TODO Spit off ammo drop here.
+
+			AmmoCollection.RemoveAt(i);
+			AmmoCache->ConditionalBeginDestroy();
+		}
 	}
 }
 
@@ -210,7 +252,8 @@ void ACGInventory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	DOREPLIFETIME_CONDITION(ACGInventory, TierOneCrystal, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGInventory, TierTwoCrystal, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGInventory, Weapons, COND_OwnerOnly);
-
+	DOREPLIFETIME_CONDITION(ACGInventory, AmmoCollection, COND_OwnerOnly);
+	
 	DOREPLIFETIME(ACGInventory, CGOwner);
 
 

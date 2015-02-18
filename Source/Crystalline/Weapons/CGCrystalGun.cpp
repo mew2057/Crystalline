@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Crystalline.h"
+#include "Weapons/CGAmmo.h"
 #include "CGCrystalGun.h"
-
 
 
 ACGCrystalGun::ACGCrystalGun(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
@@ -13,8 +13,6 @@ ACGCrystalGun::ACGCrystalGun(const FObjectInitializer& ObjectInitializer) :Super
 void ACGCrystalGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	Ammo = AmmoConfig.AmmoCapacity;
-	AmmoInClip = AmmoConfig.ClipSize;
 	ClipPercentPerShot = AmmoConfig.AmmoPerShot / AmmoConfig.ClipSize;
 }
 
@@ -22,17 +20,17 @@ void ACGCrystalGun::PostInitializeComponents()
 
 void ACGCrystalGun::UseAmmo()
 {
-	AmmoInClip = AmmoInClip - AmmoConfig.AmmoPerShot;
+	CrystalAmmo->AmmoInClip = CrystalAmmo->AmmoInClip - AmmoConfig.AmmoPerShot;
 }
 
 bool ACGCrystalGun::CanFire(bool InitFireCheck) const
 {
-	return AmmoInClip - AmmoConfig.AmmoPerShot >= 0;
+	return CrystalAmmo->AmmoInClip - AmmoConfig.AmmoPerShot >= 0;
 }
 
 float ACGCrystalGun::GetClipPercent() const
 {
-	return (float)AmmoInClip / AmmoConfig.ClipSize;
+	return (float)CrystalAmmo->AmmoInClip / AmmoConfig.ClipSize;
 }
 
 float ACGCrystalGun::GetReloadTime() const
@@ -42,17 +40,17 @@ float ACGCrystalGun::GetReloadTime() const
 
 bool ACGCrystalGun::GetCanReload() const
 {
-	// If we have ammo and we've actually fired something.
-	return Ammo > 0 && AmmoInClip < AmmoConfig.ClipSize;
+	// If we have CrystalAmmo->AmmoCarriedand we've actually fired something.
+	return CrystalAmmo->AmmoCarried> 0 && CrystalAmmo->AmmoInClip < AmmoConfig.ClipSize;
 }
 
 void ACGCrystalGun::ApplyReload()
 {
-	int32 Difference = AmmoConfig.ClipSize - AmmoInClip;
-	Difference = Ammo < Difference ? Ammo : Difference;
+	int32 Difference = AmmoConfig.ClipSize - CrystalAmmo->AmmoInClip;
+	Difference = CrystalAmmo->AmmoCarried< Difference ? CrystalAmmo->AmmoCarried: Difference;
 
-	Ammo -= Difference;
-	AmmoInClip += Difference;
+	CrystalAmmo->AmmoCarried-= Difference;
+	CrystalAmmo->AmmoInClip += Difference;
 }
 
 #pragma endregion
@@ -61,7 +59,10 @@ void ACGCrystalGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ACGCrystalGun, Ammo, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ACGCrystalGun, AmmoInClip, COND_OwnerOnly);
+
+	// Not sure about this one.
+	DOREPLIFETIME_CONDITION(ACGCrystalGun, CrystalAmmo, COND_OwnerOnly);
+
+
 
 }
