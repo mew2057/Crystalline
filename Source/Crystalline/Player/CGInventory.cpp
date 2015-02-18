@@ -138,7 +138,6 @@ void ACGInventory::DestroyInventory()
 		}
 		WeaponGroups.Remove(Keys[i]);
 	}
-
 }
 
 void ACGInventory::ReconstructInventory()
