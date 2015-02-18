@@ -140,7 +140,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		Canvas->DrawItem(TextItem, 50, 10);
 		////////////////////////////////////////////////////
 
-		if (Inventory)
+		if (Pawn->Inventory)
 		{
 			/** Draw the crystals the player has*/
 			TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->Inventory->TierOneCrystal)));
