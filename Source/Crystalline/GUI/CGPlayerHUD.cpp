@@ -80,7 +80,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	// XXX Crystals should be present on the weapon sprites for the crystal gun.
 	
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
-	ACGWeapon* CurrentWeapon = Pawn->GetCurrentWeapon();
+	ACGWeapon* CurrentWeapon = Pawn ? Pawn->GetCurrentWeapon() : NULL;
 	FCanvasIcon WeaponIcon;
 	
 	FCanvasIcon AmmoIcon;
@@ -140,15 +140,17 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		Canvas->DrawItem(TextItem, 50, 10);
 		////////////////////////////////////////////////////
 
-		if (Pawn->Inventory)
+		// FIXME this crashes when both players are dead and respawning. Seems to happen on client, this ONLY occurs in release mode.
+		/*
+		if (Pawn && Pawn->Inventory)
 		{
 			/** Draw the crystals the player has*/
-			TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->Inventory->TierOneCrystal)));
+		/*	TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->Inventory->TierOneCrystal)));
 			Canvas->DrawItem(TextItem, 5, 100);
 
 			TextItem.Text = FText::FromString(TEXT("T2: " + FString::FromInt((int8)Pawn->Inventory->TierTwoCrystal)));
 			Canvas->DrawItem(TextItem, 5, 150);
-		}
+		}*/
 
 	}
 	
