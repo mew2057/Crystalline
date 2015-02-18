@@ -454,7 +454,7 @@ public:
 
 #pragma region Hit Scan
 
-	void FireHitScan();
+	virtual void FireHitScan();
 
 	void ProcessHitScan(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
 	

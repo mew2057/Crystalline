@@ -12,11 +12,13 @@ UCLASS()
 class CRYSTALLINE_API ACGBeamGun : public ACGCrystalGun
 {
 	GENERATED_BODY()
-	
+
+	/** Overrides the hitscan.*/
+	virtual void FireHitScan() override;
 
 protected:
 	UPROPERTY(Transient, Replicated)
-	TSubclassOf<class AActor> Target;
+	class AActor* Target;
 
 	/** The maximum angle that the beam can be pointed away from it's target.*/
 	UPROPERTY(EditDefaultsOnly, Category=Config)
