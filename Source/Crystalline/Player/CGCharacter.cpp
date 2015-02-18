@@ -50,6 +50,7 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	PendingWeapon = NULL;
 	bWantsToFire  = false;
 	bIsDying = false;
+	// TODO preload Inventory!
 }
 
 void ACGCharacter::PostInitializeComponents()
@@ -127,8 +128,7 @@ float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 			GetWorldTimerManager().SetTimer(this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
 
 			// TODO Feedback from hit, e.g. force feedback and direction.
-		}
-		
+		}		
 	}
 
 	return ActualDamage;
@@ -267,13 +267,13 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 void ACGCharacter::Restart()
 {
 	Super::Restart();
-
+	/*
 	/// XXX WRONG
 	// This should be invoked after the inventory is spawned by the game mode.
 	if (IsLocallyControlled() && Weapons.Num() > 0)
 	{
 		EquipWeapon(Weapons[0]);
-	}
+	}*/
 }
 
 /** Make Sure the inventory is destroyed. */
@@ -397,52 +397,14 @@ void ACGCharacter::SpawnBaseInventory()
 		return;
 	}
 
-	// Ensure the inventory is clear.
-	Inventory.Reset();
-
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 
-	if (DefaultWeaponConfig.CoreWeapon)
-	{
-		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CoreWeapon, SpawnInfo));
-	}
-
-	if (DefaultWeaponConfig.CoreCrystalGun)
-	{
-		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CoreCrystalGun, SpawnInfo));
-	}
-
-
-	const int32 NumWeaponGroups = DefaultWeaponConfig.CrystalGunTiers.Num();
-
-
-	ACGWeapon* Weapon;
-	for (int i = 0; i < NumWeaponGroups; ++i)
-	{
-		// If it exists spawn the weapon.
-		if (DefaultWeaponConfig.CrystalGunTiers[i].TierOneGun)
-		{
-			// Add the Tier OneGun
-			Weapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CrystalGunTiers[i].TierOneGun, SpawnInfo);
-			AddWeapon(Weapon);
-		}
-
-		if (DefaultWeaponConfig.CrystalGunTiers[i].TierTwoGun)
-		{
-			// Add the TierTwo Gun
-			Weapon = GetWorld()->SpawnActor<ACGWeapon>(DefaultWeaponConfig.CrystalGunTiers[i].TierTwoGun, SpawnInfo);
-			AddWeapon(Weapon);
-		}
-	}
-	
-	if (Inventory.NumWeapons() > 0)
-	{
-		WeaponIndex = 0;
-		EquipWeapon(Inventory.GetWeapon(0));
-	}
-
+	Inventory = GetWorld()->SpawnActor<ACGInventory>(DefaultInventoryClass, SpawnInfo);
+	Inventory->SetCGOwner(this);
+	Inventory->InitializeInventory(DefaultWeaponConfig);
 }
+
 
 void ACGCharacter::DestroyInventory()
 {
@@ -451,18 +413,13 @@ void ACGCharacter::DestroyInventory()
 		return;
 	}
 	
-	Inventory.Reset();
-}
-
-void ACGCharacter::AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
-{
-	if (Weapon && Role == ROLE_Authority)
+	if (Inventory)
 	{
-		Inventory.AddWeapon(Weapon, Type);
-		Weapons.AddUnique(Weapon);
-		Weapon->OnEnterInventory(this);
+		Inventory->DestroyInventory();
+		Inventory->Destroy();
 	}
 }
+
 
 
 void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
@@ -499,7 +456,7 @@ void ACGCharacter::ServerEquipWeapon_Implementation(ACGWeapon* NewWeapon)
 void ACGCharacter::OnStartCrystalOverlap(class ACGCrystal* Crystal)
 {
 	// Only Execute this code if the crystal type is grabbable and the crystal is not null.
-	if (Crystal && Inventory.CanLoadCrystal(Crystal->GetCrystalType()))
+	if (Crystal && Inventory->CanLoadCrystal(Crystal->GetCrystalType()))
 	{
 		PendingCrystalPickup = Crystal;
 
@@ -599,12 +556,13 @@ void ACGCharacter::OnReload()
 void ACGCharacter::NextWeapon()
 {
 	// Cache the number of weapons.
-	const int32 NumberOfWeapons = Weapons.Num();
+	const int32 NumberOfWeapons = Inventory->GetWeaponCount();
+	int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
 
 	if (NumberOfWeapons > 1)
 	{
 		WeaponIndex = (WeaponIndex + 1) % NumberOfWeapons;
-		EquipWeapon(Weapons[WeaponIndex]);
+		EquipWeapon(Inventory->GetWeapon(WeaponIndex));
 	}
 }
 
@@ -612,14 +570,14 @@ void ACGCharacter::NextWeapon()
 void ACGCharacter::PreviousWeapon()
 {
 	// Cache the number of weapons.
-	const int32 NumberOfWeapons = Weapons.Num();
+	const int32 NumberOfWeapons = Inventory->GetWeaponCount();
+	int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
 
 	// Check for undeflow.
 	if (NumberOfWeapons > 1)
 	{
 		WeaponIndex = (WeaponIndex - 1 + NumberOfWeapons) % NumberOfWeapons;
-
-		EquipWeapon(Weapons[WeaponIndex]);
+		EquipWeapon(Inventory->GetWeapon(WeaponIndex));
 	}
 }
 
@@ -678,7 +636,7 @@ void ACGCharacter::PickupCrystal()
 		if (PendingCrystalPickup->Pickup())
 		{
 			// Load the crystal to the appropriate slot.
-			Inventory.LoadCrystal(CachedType);
+			Inventory->LoadCrystal(CachedType);
 		}
 	}
 }
@@ -701,7 +659,7 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 
 
 	// Not sure about this one.
-	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
+//	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, Inventory, COND_OwnerOnly);
 

@@ -16,6 +16,12 @@ enum class ECrystalType : uint8
 	UTILITY	 UMETA(DisplayName = "Utility")
 };
 
+// TODO find out what the overhead on this is.
+/** Implemented for TMap.*/
+inline uint8 GetTypeHash(const ECrystalType A)
+{
+	return (uint8)A;
+}
 
 /**
  * 

@@ -16,7 +16,6 @@ struct FCGZoom
 	UPROPERTY(EditDefaultsOnly)
 	float ZoomFactor;
 
-
 	/**Speed of the interpolation from zoomed to zoomed out and vice versa. TODO make this seconds!*/
 	UPROPERTY(EditDefaultsOnly)
 	float ZoomSpeed;
@@ -46,172 +45,6 @@ public:
 		TargetZoom = bZoomIn ? BaseFOV * ZoomFactor : BaseFOV;
 	}
 
-};
-
-
-// TODO Refactor to UObjectType.
-USTRUCT()
-struct FCGPlayerInventory
-{
-	GENERATED_USTRUCT_BODY()
-
-	#define TIER_WIDTH 2
-
-	/** The Tier 1 Crystal for the Player. (FORCE, ACCURACY, UTILITY)*/
-	UPROPERTY()
-	ECrystalType TierOneCrystal;
-
-	/** The Tier 2 Crystal for the Player. (POWER UP) */
-	UPROPERTY()
-	ECrystalType TierTwoCrystal;
-
-	UPROPERTY()
-	TArray<class ACGWeapon*> Weapons;
-
-	// FIXME This code is DIRTY!
-	////////////////////////////////////////////////////////////////
-	// Defines the weapons that the player may have access to.
-	UPROPERTY()
-	TArray<class ACGWeapon*> AccuracyWeapons;
-	
-	UPROPERTY()
-	TArray<class ACGWeapon*> UtilityWeapons;
-	
-	UPROPERTY()
-	TArray<class ACGWeapon*> ForceWeapons;
-	////////////////////////////////////////////////////////////////
-
-	UPROPERTY()
-	int32 UseableWeapons;
-
-	UPROPERTY()
-	int32 DefaultWeapons;
-
-	FCGPlayerInventory()
-	{
-		TierOneCrystal = ECrystalType::NONE;
-		TierTwoCrystal = ECrystalType::NONE;
-		UseableWeapons = 0;
-		DefaultWeapons = 0;
-	}
-
-public:
-	bool CanLoadCrystal(ECrystalType Crystal)
-	{
-		return Crystal != ECrystalType::NONE &&
-			((Crystal > ECrystalType::POWER_UP && TierOneCrystal != Crystal) ||
-			(Crystal <= ECrystalType::POWER_UP && TierTwoCrystal != Crystal));
-	}
-
-	void LoadCrystal(ECrystalType Crystal)
-	{
-		bool bIsDirty = false;
-		// Tier1 crystal
-		if (Crystal > ECrystalType::POWER_UP && TierOneCrystal != Crystal)
-		{
-			TierOneCrystal = Crystal;
-			bIsDirty = true;
-		}
-		else if (Crystal > ECrystalType::NONE && TierTwoCrystal != Crystal)
-		{
-			TierTwoCrystal = Crystal;
-			bIsDirty = true;
-		}
-
-		if (bIsDirty)
-		{
-
-		}
-	}
-
-	void Reset()
-	{
-		TierOneCrystal = ECrystalType::NONE;
-		TierTwoCrystal = ECrystalType::NONE;
-		UseableWeapons = 0;
-		DefaultWeapons = 0;
-
-		/*
-		class ACGWeapon* Weapon;
-		for (int32 i = Weapons.Num() - 1; i >= 0; --i)
-		{
-			Weapon = Weapons[i];
-			if (Weapon)
-			{
-				Weapon->OnExitInventory();
-				Weapons.RemoveSingle(Weapon);
-				Weapon->Destroy();
-			}
-		}
-
-		// TODO write a function?
-		for (int32 i = AccuracyWeapons.Num() - 1; i >= 0; --i)
-		{
-			Weapon = AccuracyWeapons[i];
-			if (Weapon)
-			{
-				Weapon->OnExitInventory();
-				AccuracyWeapons.RemoveSingle(Weapon);
-				Weapon->Destroy();
-			}
-		}
-
-		for (int32 i = UtilityWeapons.Num() - 1; i >= 0; --i)
-		{
-			Weapon = UtilityWeapons[i];
-			if (Weapon)
-			{
-				Weapon->OnExitInventory();
-				UtilityWeapons.RemoveSingle(Weapon);
-				Weapon->Destroy();
-			}
-		}
-
-		for (int32 i = ForceWeapons.Num() - 1; i >= 0; --i)
-		{
-			Weapon = ForceWeapons[i];
-			if (Weapon)
-			{
-				Weapon->OnExitInventory();
-				ForceWeapons.RemoveSingle(Weapon);
-				Weapon->Destroy();
-			}
-		} 
-		*/
-
-	}
-
-	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
-	{
-		switch (Type)
-		{
-			case ECrystalType::NONE:
-				// Increment the default weapon count if the add worked.
-				DefaultWeapons+= Weapons.AddUnique(Weapon) > -1 ? 1 : 0;
-				break;
-			case ECrystalType::FORCE:
-				ForceWeapons.AddUnique(Weapon);
-				break;
-
-			case ECrystalType::ACCURACY:
-				AccuracyWeapons.AddUnique(Weapon);
-				break;
-
-			case ECrystalType::UTILITY:
-				UtilityWeapons.AddUnique(Weapon);
-				break;
-		}
-	}
-
-	ACGWeapon* GetWeapon(int32 index) const
-	{
-		return index >= 0 && index < UseableWeapons ?  Weapons[index] : NULL;
-	}
-
-	int32 NumWeapons()
-	{
-		return UseableWeapons;
-	}
 };
 
 #pragma region WeaponConfigStructs
@@ -438,16 +271,12 @@ protected:
 	/** The name of the Socket/Bone on the skeleton the weapon attaches to. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName WeaponAttachPoint;
-
-	/** The Default list of weapons the player is carrying. */
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TArray<TSubclassOf<class ACGWeapon>> DefaultWeaponClasses;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FCGDefaultWeaponConfig DefaultWeaponConfig;
 
-	UPROPERTY(Transient, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
-	TArray<class ACGWeapon*> Weapons;
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TSubclassOf<class ACGInventory> DefaultInventoryClass;
 
 	/** The currently equipped weapon for the player. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
@@ -460,17 +289,13 @@ protected:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PendingCrystalPickup)
 	class ACGCrystal* PendingCrystalPickup;
 	
-	//XXX This is getting removed when I get the crystal system in.
-	/** The index of the currently equipped weapon. */
-	uint32 WeaponIndex;
-
-
 
 public:
 
+
 	//FIXME Move to private
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CrystalChanged)
-	FCGPlayerInventory Inventory;
+	UPROPERTY(Transient, Replicated)
+	class ACGInventory* Inventory;
 
 	// TODO make me private
 	/** Tracks whether or not the player is attempting to shoot the gun.*/

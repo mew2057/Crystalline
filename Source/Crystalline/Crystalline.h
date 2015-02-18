@@ -8,6 +8,8 @@
 #include "UnrealNetwork.h"
 #include "GUI/CGPlayerHUD.h"
 #include "Player/CGCharacter.h"
+#include "Player/CGInventory.h"
+
 #include "Weapons/CGWeapon.h"
 #include "Weapons/CGCrystalGun.h"
 
