@@ -56,7 +56,6 @@ void ACGProjectile::PostInitializeComponents()
 void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ECollisionResponse temp = OtherComp->GetCollisionResponseToChannel(CollisionComp->GetCollisionObjectType());
-	UE_LOG(LogTemp, Log, TEXT("Collision With "));
 	
 	if (Role == ROLE_Authority)
 	{

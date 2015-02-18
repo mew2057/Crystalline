@@ -6,13 +6,17 @@
 #include "Engine.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
+#include "GUI/CGPlayerHUD.h"
 #include "Player/CGCharacter.h"
 #include "Weapons/CGWeapon.h"
 #include "Weapons/CGCrystalGun.h"
 
 
 
+
 #define COLLISION_PROJECTILE ECC_GameTraceChannel1
 #define COLLISION_WEAPON     ECC_GameTraceChannel2
+
+
 
 #endif

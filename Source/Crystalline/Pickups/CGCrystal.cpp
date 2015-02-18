@@ -6,13 +6,157 @@
 
 ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	//TODO Stuff
+	
+	OverlapVolume = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("CrystalOverlapVolume"));
+	OverlapVolume->SetCapsuleHalfHeight(88.f);
+	OverlapVolume->SetCapsuleRadius(80.f);
+	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	OverlapVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
+	OverlapVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	OverlapVolume->SetIsReplicated(true);
+	RootComponent = OverlapVolume;
+
+	CrystalMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CrystalMesh"));
+	CrystalMesh->bReceivesDecals = false;
+	CrystalMesh->CastShadow = true;
+	CrystalMesh->bOnlyOwnerSee = false;
+	CrystalMesh->bOwnerNoSee = false;
+	CrystalMesh->SetCollisionObjectType(ECC_WorldStatic);
+	CrystalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CrystalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CrystalMesh->SetHiddenInGame(false);
+	CrystalMesh->RelativeLocation = FVector(0.f, 0.f, 50.f);
+	CrystalMesh->AttachParent = OverlapVolume;
+	
+	BaseMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CrystalBaseMesh"));
+	BaseMesh->bReceivesDecals = false;                             
+	BaseMesh->CastShadow = true;                                   
+	BaseMesh->bOnlyOwnerSee = false;
+	BaseMesh->bOwnerNoSee = false;
+	BaseMesh->SetCollisionObjectType(ECC_WorldStatic);			   
+	BaseMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); 
+	BaseMesh->SetCollisionResponseToAllChannels(ECR_Ignore);       
+	BaseMesh->SetHiddenInGame(false);
+	CrystalMesh->RelativeLocation = FVector(0.f, 0.f, -80.f);
+	BaseMesh->AttachParent = OverlapVolume;
+
+	// Make it so we have replication.
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+
+	// TODO set is active based on spawn active.
+	bIsActive = true;
+	bSpawnActive = true;
+	CrystalType = ECrystalType::NONE;
+
+}
+
+void ACGCrystal::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	// If not spawned as active, kick off a despawn event.
+	if (!bSpawnActive)
+	{
+		Pickup();
+	}	
 }
 
 
 void ACGCrystal::ReceiveActorBeginOverlap(class AActor* Other)
 {
+	// EARLY Return if the pickup is not active.
+	if (!bIsActive )
+	{
+		return;
+	}
+	
 	Super::ReceiveActorBeginOverlap(Other);
-	// TODO Tell the player that they can pickup the item.
+
+	// Only the server can tell the player that they can pickup the crystal.
+	if (Role == ROLE_Authority)
+	{
+		ACGCharacter* Player = Cast<ACGCharacter>(Other);
+		if (Player)
+		{
+			Player->OnStartCrystalOverlap(this);
+		}
+	}
+}
+
+void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other)
+{
+	Super::ReceiveActorEndOverlap(Other);
+
+	if (Role == ROLE_Authority)
+	{
+		ACGCharacter* Player = Cast<ACGCharacter>(Other);
+		if (Player)
+		{
+			Player->OnStopCrystalOverlap(this);
+		}
+	}
+}
+
+void ACGCrystal::Pickup()
+{
+	if (!bIsActive || TimeToRespawn <= 0.f)
+	{
+		return;
+	}
+
+	HideCrystal();
+
+	// Hide the crystal.
+	if (Role == ROLE_Authority)
+	{
+		bIsActive = false;
+		GetWorldTimerManager().SetTimer(this, &ACGCrystal::OnRespawn, TimeToRespawn, false);
+	}
+}
+
+void ACGCrystal::OnRespawn()
+{
+	ShowCrystal();
+
+	if (Role == ROLE_Authority)
+	{
+		bIsActive = true;
+	}
+}
+
+void ACGCrystal::HideCrystal()
+{
+	// Disable the Crystal and Trigger Replication.
+	CrystalMesh->SetHiddenInGame(true);
+	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ACGCrystal::ShowCrystal()
+{
+	// Enable the Show the crystal and Trigger Replication.
+	bIsActive = true;
+	CrystalMesh->SetHiddenInGame(false);
+	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void ACGCrystal::OnRep_Active()
+{
+	if (bIsActive)
+	{
+		ShowCrystal();
+	}
+	else
+	{
+		HideCrystal();
+	}
+
+}
+
+void ACGCrystal::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACGCrystal, bIsActive);
 }
 

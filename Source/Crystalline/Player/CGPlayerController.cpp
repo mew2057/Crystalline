@@ -3,6 +3,19 @@
 #include "Crystalline.h"
 #include "CGPlayerController.h"
 
+void ACGPlayerController::UnFreeze()
+{
+	ServerRestartPlayer();
+}
 
+
+void ACGPlayerController::FailedToSpawnPawn()
+{
+	if (StateName == NAME_Inactive)
+	{
+		BeginInactiveState();
+	}
+	Super::FailedToSpawnPawn();
+}
 
 

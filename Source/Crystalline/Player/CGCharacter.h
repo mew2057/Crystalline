@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Pickups/CGCrystal.h"
 #include "CGCharacter.generated.h"
 
 
@@ -10,14 +11,14 @@ USTRUCT()
 struct FCGZoom
 {
 	GENERATED_USTRUCT_BODY()
-		/** The factor that this zoom.*/
-		UPROPERTY(EditDefaultsOnly)
-		float ZoomFactor;
+	/** The factor that this zoom.*/
+	UPROPERTY(EditDefaultsOnly)
+	float ZoomFactor;
 
 
 	/**Speed of the interpolation from zoomed to zoomed out and vice versa. TODO make this seconds!*/
 	UPROPERTY(EditDefaultsOnly)
-		float ZoomSpeed;
+	float ZoomSpeed;
 
 	// Used in the zoom operation.
 	///////////////////////////////////////////
@@ -64,9 +65,22 @@ public:
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 	
+	bool CantDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
+
+	bool Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser);
+
+	void OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser);
+
+	/**Invoked on player death.*/
+	virtual void TornOff() override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	virtual void Restart() override;
+
+	/** Make Sure the inventory is destroyed. */
+	virtual void Destroyed() override;
+
 
 protected:
 	/** Max player shield amount. This is decayed before the health.*/
@@ -86,8 +100,6 @@ protected:
 
 	/** Tracks when the shield is regenerating for the tick.*/
 	uint32 bShieldRegenerating : 1;
-	
-	
 
 	/** The maximum health for the player. This is reset on shield regeneration.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -200,6 +212,12 @@ protected:
 	/** Unzooms the player's view, may stop ADS. */
 	void StopZoom();
 
+	/** Triggers the action button response.*/
+	void OnActionButton();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerPickUpCrystal();
+
 
 #pragma endregion
 
@@ -214,7 +232,7 @@ protected:
 
 	/** The Default list of weapons the player is carrying. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TArray<TSubclassOf<class ACGWeapon>> DefaultWeaponClasses;
+	TArray<TSubclassOf<class ACGWeapon>> DefaultWeaponClasses;
 
 	UPROPERTY(Transient, Replicated) // Transient- Empty on creation; Replicated- Replicated on server. 
 	TArray<class ACGWeapon*> Weapons;
@@ -226,6 +244,10 @@ protected:
 	/** A pending weapon for equips. */
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
+	
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_PendingCrystalPickup)
+	class ACGCrystal* PendingCrystalPickup;
+
 
 
 
@@ -241,6 +263,10 @@ public:
 	/** Tracks whether or not the player is attempting to shoot the gun.*/
 	UPROPERTY(Transient)
 	uint32 bWantsToFire : 1;
+
+	/**Prevents the player from dying twice.*/
+	UPROPERTY(Transient)
+	uint32 bIsDying : 1;
 
 	/**
 	* Sets up the current weapon and triggers the OnEquip and OnUnequip calls.
@@ -259,12 +285,17 @@ public:
 	/** Spawns the base inventory as specified in the Defaul WeaponClasses array.*/
 	void SpawnBaseInventory();
 
+	/** Destroys the inventory to ensure we don't have any stragglers on death.*/
+	void DestroyInventory();
+
 	/** 
 	 * Adds the weapon to the Weapons Array. If the weapon is in the array don't add it again.
 	 * Invokes the weapon's OnEnterInventory.
 	 * @param NewWeapon the candidate weapon for addition.
 	 */
 	void AddWeapon(ACGWeapon* NewWeapon);
+	
+	void RemoveWeapon(ACGWeapon* Weapon);
 
 	/**
 	 * [server,client] Equips the supplied weapon to the player.
@@ -273,20 +304,24 @@ public:
 	void EquipWeapon(ACGWeapon* Weapon);
 
 	/**
-	 * Replicates the inventory change to the owning player.
-	 */
-	UFUNCTION(Client, Reliable)
-	void ClientSetWeapon(ACGWeapon* Weapon);
-
-	/**
 	* [server]Equips the supplied weapon to the player.
 	* @param The weapon to equip.
 	*/
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(ACGWeapon* Weapon);
 
+	/** Invoked when the player begins to Overlap with a Crystal Pickup, triggers a prompt.*/
+	void OnStartCrystalOverlap(class ACGCrystal* Crystal);
+
+	/** Invoked when the player is no longer overlapping a crystal, verifies that the crystal is the one currently overlapped.*/
+	void OnStopCrystalOverlap(class ACGCrystal* Crystal);
+
+	UFUNCTION()
+	void OnRep_PendingCrystalPickup();
+
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/
 	FORCEINLINE FName GetWeaponAttachPoint() const { return WeaponAttachPoint; };
+
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
