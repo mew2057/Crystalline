@@ -67,9 +67,4 @@ public:
 
 	/** Contains the weapon groups that the gun inventory is selected by. Managed by the server, then replicated to the client through Weapons.*/
 	TMap<ECrystalType, TArray<class ACGWeapon*>> WeaponGroups;
-
-	// FIXME This may leak, investigate.
-	UPROPERTY(Transient, Replicated)
-	TArray<class UCGAmmo*> AmmoCollection;
-
 };

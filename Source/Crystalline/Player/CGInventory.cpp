@@ -31,22 +31,6 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 		return;
 	}
 
-
-	// TODO Make this more robust!
-	UCGAmmo* AmmoTemp;
-
-	AmmoTemp = NewObject<UCGAmmo>();
-	AmmoTemp->InitializeAmmo(Config.TierZeroAmmoConfig);
-	AmmoCollection.Add(AmmoTemp);
-
-	AmmoTemp = NewObject<UCGAmmo>();
-	AmmoTemp->InitializeAmmo(Config.TierOneAmmoConfig);
-	AmmoCollection.Add(AmmoTemp);
-
-	AmmoTemp = NewObject<UCGAmmo>();
-	AmmoTemp->InitializeAmmo(Config.TierTwoAmmoConfig);
-	AmmoCollection.Add(AmmoTemp);
-
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 
@@ -55,14 +39,12 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(Config.CoreWeapon, SpawnInfo));
 	}
 
-
 	// Note all guns from this point on are assumed to be crystal guns.
-	ACGCrystalGun*  TempCrystalGun;
-
+	ACGCrystalGun* TempCrystalGun;
 	if (Config.CoreCrystalGun)
 	{
 		TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CoreCrystalGun, SpawnInfo);
-		TempCrystalGun->SetWeaponAmmo(AmmoCollection[TIER_ZERO_AMMO]);
+		TempCrystalGun->InitializeAmmo(Config.TierZeroAmmoConfig);
 		AddWeapon(TempCrystalGun);
 	}
 
@@ -77,7 +59,7 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 		{
 			// Add the Tier OneGun
 			TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CrystalGunGroups[i].TierOneGun, SpawnInfo);
-			TempCrystalGun->SetWeaponAmmo(AmmoCollection[TIER_ONE_AMMO]);
+			TempCrystalGun->InitializeAmmo(Config.TierOneAmmoConfig);
 			AddWeapon(TempCrystalGun, Config.CrystalGunGroups[i].TierOneCrystalType);
 		}
 
@@ -85,7 +67,7 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 		{
 			// Add the TierTwo Gun
 			TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CrystalGunGroups[i].TierTwoGun, SpawnInfo);
-			TempCrystalGun->SetWeaponAmmo(AmmoCollection[TIER_TWO_AMMO]);
+			TempCrystalGun->InitializeAmmo(Config.TierTwoAmmoConfig);
 			AddWeapon(TempCrystalGun, Config.CrystalGunGroups[i].TierOneCrystalType);
 		}
 	}
@@ -109,7 +91,6 @@ void ACGInventory::AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
 	}
 	else
 	{
-		// FIXME breaks at runtime!
 		if (!WeaponGroups.Contains(Type))
 		{
 			TArray<class ACGWeapon*> NewWeapons;
@@ -167,19 +148,12 @@ void ACGInventory::DestroyInventory()
 	}
 
 	// TODO shoot off ammo actors.
-	UCGAmmo* AmmoCache;
+	/*FCGCrystalAmmo AmmoCache;
 	for (int32 i = AmmoCollection.Num() - 1; i >= 0; --i)
 	{
 		AmmoCache = AmmoCollection[i];
-		if (AmmoCache)
-		{
-		
-			// TODO Spit off ammo drop here.
-
-			AmmoCollection.RemoveAt(i);
-			AmmoCache->ConditionalBeginDestroy();
-		}
-	}
+		AmmoCollection.RemoveAt(i);
+	}*/
 }
 
 void ACGInventory::ReconstructInventory()
@@ -190,10 +164,32 @@ void ACGInventory::ReconstructInventory()
 		return;
 	}
 
+	// Flag that the weapon group actually exists.
+	bool bTierOneDefined = WeaponGroups.Contains(TierOneCrystal);
+
+	// If the tier is defined copy what we can.
+	if (bTierOneDefined )
+	{
+		const int32 WeaponCount = Weapons.Num();
+		const int32 GroupCount = WeaponGroups[TierOneCrystal].Num();
+		ACGCrystalGun * ReceivingGun;
+		ACGCrystalGun * TempGun;
+		for (int32 i = StaticWeaponCount, j = 0; i < WeaponCount && j < GroupCount; ++i, ++j)
+		{
+			// XXX this may be overkill, but I'm a bit overly cautious.
+			ReceivingGun = Cast<ACGCrystalGun>(WeaponGroups[TierOneCrystal][j]);
+			TempGun = Cast<ACGCrystalGun>(Weapons[i]);
+			if (ReceivingGun && TempGun)
+			{
+				ReceivingGun->CopyAmmo(TempGun);
+			}
+		}
+	}
+
 	// Clear the elements that need to be cleared.
 	Weapons.RemoveAt(StaticWeaponCount, Weapons.Num() - StaticWeaponCount, true);
 
-	if (TierOneCrystal != ECrystalType::NONE && WeaponGroups.Contains(TierOneCrystal))
+	if (bTierOneDefined)
 	{
 		// Determine the number of weapons to be transfered over.
 		int32 CopyLength = FMath::Min(WeaponGroups[TierOneCrystal].Num(),TierTwoCrystal == ECrystalType::NONE ? 1 : 2);
@@ -221,6 +217,7 @@ bool ACGInventory::CanLoadCrystal(ECrystalType Crystal)
 void ACGInventory::LoadCrystal(ECrystalType Crystal)
 {
 	bool bIsDirty = false;
+
 	// Tier1 crystal
 	if (Crystal > ECrystalType::POWER_UP && TierOneCrystal != Crystal)
 	{
@@ -252,11 +249,8 @@ void ACGInventory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	DOREPLIFETIME_CONDITION(ACGInventory, TierOneCrystal, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGInventory, TierTwoCrystal, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGInventory, Weapons, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ACGInventory, AmmoCollection, COND_OwnerOnly);
 	
 	DOREPLIFETIME(ACGInventory, CGOwner);
-
-
 }
 
 void ACGInventory::SetCGOwner(ACGCharacter* NewOwner)
