@@ -86,7 +86,7 @@ void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 	}
 }
 
-void StopFire()
+void ACGBeamGun::StopFire()
 {
 	Super::StopFire();
 	Target = NULL;
