@@ -401,8 +401,11 @@ void ACGCharacter::SpawnBaseInventory()
 	SpawnInfo.bNoCollisionFail = true;
 
 	Inventory = GetWorld()->SpawnActor<ACGInventory>(DefaultInventoryClass, SpawnInfo);
-	Inventory->SetCGOwner(this);
-	Inventory->InitializeInventory(DefaultWeaponConfig);
+	if (Inventory)
+	{
+		Inventory->SetCGOwner(this);
+		Inventory->InitializeInventory(DefaultWeaponConfig);
+	}
 }
 
 

@@ -832,7 +832,9 @@ FVector ACGWeapon::GetCameraAim() const
 {
 	// Zero the aim  in case of failure.
 	FVector Aim = FVector::ZeroVector;
-	AController* Controller = Instigator ? Instigator->Controller : NULL;
+	ACGPlayerController* Controller = Instigator ? Cast<ACGPlayerController>(Instigator->Controller) : NULL;
+	ACGBotController* BotController = Instigator ? Cast<ACGBotController>(Instigator->Controller) : NULL;
+
 	if (Controller)
 	{
 		FVector  TempOrigin;
@@ -843,7 +845,14 @@ FVector ACGWeapon::GetCameraAim() const
 	}
 	else if (Instigator)
 	{
-		Aim = Instigator->GetBaseAimRotation().Vector();
+		if (BotController)
+		{
+			Aim = Instigator->GetControlRotation().Vector();
+		}
+		else
+		{
+			Aim = Instigator->GetBaseAimRotation().Vector();
+		}
 	}
 
 	return Aim;
@@ -853,11 +862,16 @@ FVector ACGWeapon::GetCameraLocation() const
 {
 	// Zero the origin in case of failure.
 	FVector Origin = FVector::ZeroVector;
-	AController* Controller = Instigator ? Instigator->Controller : NULL;
+	ACGPlayerController* Controller = Instigator ? Cast<ACGPlayerController>(Instigator->Controller) : NULL;
+
 	if (Controller)
 	{
 		FRotator TempRotator;
 		Controller->GetPlayerViewPoint(Origin, TempRotator);
+	}
+	else
+	{
+		Origin = GetMuzzleLocation();
 	}
 
 	return Origin;
