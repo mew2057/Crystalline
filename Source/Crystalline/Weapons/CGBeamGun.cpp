@@ -21,7 +21,6 @@ void ACGBeamGun::FireHitScan()
 		FVector TargetDir = Target->GetActorLocation() - Origin;
 		const float Offset = AimDir.CosineAngle2D(TargetDir);
 
-		UE_LOG(LogTemp, Log, TEXT("Offset %f MaxOffset %f"), Offset,  MaxAngle);
 
 		if (Offset >= MaxAngle)
 		{

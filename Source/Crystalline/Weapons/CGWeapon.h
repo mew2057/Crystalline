@@ -402,6 +402,12 @@ public:
 	
 	void StopReload();
 
+	// TODO find a better way?
+	/**Invoked by the server when a timer based call finishes execution.*/
+	UFUNCTION(client, reliable)
+	void ClientCheckQueuedInput();
+
+
 	// This is managed by the weapon, not the state at the present.
 	// FIXME
 	virtual void StartOverheat();
@@ -409,7 +415,7 @@ public:
 	// Gives the Reload state the information it requires to spawn a timer.
 	virtual float GetReloadTime() const;
 
-	virtual bool GetCanReload() const;
+	virtual bool CanReload() const;
 		
 	virtual void ApplyReload();
 

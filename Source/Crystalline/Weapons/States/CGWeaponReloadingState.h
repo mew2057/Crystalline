@@ -21,16 +21,14 @@ public:
 	virtual void EnterState() override
 	{
 		// Stop reloading if it's not possible.
-		if (!GetOuterACGWeapon()->GetCanReload())
+		if (!GetOuterACGWeapon()->CanReload())
 		{
-			UE_LOG(LogTemp, Log, TEXT("Can't reload"));
 			// The owner can't fire so tell it to stop firing.
 			GetOuterACGWeapon()->StopReload();
 			return;
 		}
 
 		const float ReloadTime = GetOuterACGWeapon()->GetReloadTime();
-		UE_LOG(LogTemp, Log, TEXT("Reload Start"));
 
 		if (ReloadTime > .0f)
 		{
@@ -53,6 +51,10 @@ public:
 	{
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(this, &UCGWeaponReloadingState::ReloadFinished);
 	}
+
+	// You should not be able to cancel this with fire.
+	virtual void StartFire() override {}
+
 	
 	
 };
