@@ -38,7 +38,7 @@ float ACGCrystalGun::GetReloadTime() const
 	return AmmoConfig.ReloadTime;
 }
 
-bool ACGCrystalGun::GetCanReload() const
+bool ACGCrystalGun::CanReload() const
 {
 	// If we have ammo and we've actually fired something.
 	return Ammo > 0 && AmmoInClip < AmmoConfig.ClipSize;

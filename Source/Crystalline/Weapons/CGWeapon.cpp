@@ -168,24 +168,36 @@ void ACGWeapon::OnUnequip()
 
 void ACGWeapon::OnStartReload()
 {
+	// Reload locally.
 	CurrentState->StartReload();
 
-	if (Role < ROLE_Authority)
+	// Don't tell the server to reload if we can't locally, let the state play feedback locally.
+	if (Role < ROLE_Authority && CanReload())
 	{
 		ServerStartReload();
-	}
+	}	
 }
 
 void ACGWeapon::StopReload()
 {
-	// If firing was pending, continue firing if the gun can fire.
-	if (CGOwner->bWantsToFire && CanFire())
+	// Always go active first, this way the server and client start at the same place.
+	GotoState(ActiveState);
+
+	// Don't spawn unecessary RPCs.
+	if (Role == ROLE_Authority && CanFire())
 	{
-		GotoState(FiringState);
-	}
-	else
+		// TODO how can we speed this up?
+		// Check on the clientside, because we don't know about player input.
+		ClientCheckQueuedInput();
+	}	
+}
+
+void ACGWeapon::ClientCheckQueuedInput_Implementation()
+{
+	// If the user wants to fire, try firing.
+	if (CGOwner->bWantsToFire )
 	{
-		GotoState(ActiveState);
+		StartFire();
 	}
 }
 
@@ -207,7 +219,7 @@ float ACGWeapon::GetReloadTime() const
 	return 0.f; 
 }
 
-bool ACGWeapon::GetCanReload() const
+bool ACGWeapon::CanReload() const
 {
 	return false;
 }
@@ -226,14 +238,18 @@ void ACGWeapon::ApplyReload()
 
 void ACGWeapon::StartFire()
 {
-	// Verify we can fire.
+	// Verify we can fire. If not, EARLY RETURN with a reload attempt.
+	if (!CanFire())
+	{
+		OnStartReload();
+		return;
+	}
 
 	// Tell the server to start firing.
 	if (Role < ROLE_Authority)
 	{
 		ServerStartFire();
 	}
-
 
 	// Begin firing locally.
 	CurrentState->StartFire();
@@ -246,6 +262,8 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
+	UE_LOG(LogTemp, Log, TEXT("Server Start Fire. %s"), *CurrentState->GetName());
+
 	CurrentState->StartFire();
 }
 
@@ -278,7 +296,7 @@ bool ACGWeapon::StartFiring()
 	// EARLY RETURN! If the gun can't fire goto the reload state.
 	if (!CanFire())
 	{
-		GotoState(ReloadingState);
+		OnStartReload();
 		return false;
 	}
 
@@ -608,7 +626,7 @@ void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
 {
 	if (WeaponFXConfig.WeaponTrail)
 	{
-		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(
+		TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(
 			this,
 			WeaponFXConfig.WeaponTrail,
 			GetMuzzleLocation());
@@ -695,6 +713,19 @@ void ACGWeapon::OnRep_BurstCount()
 
 void ACGWeapon::GotoState(UCGWeaponState* NewState)
 {
+	if (CurrentState != NULL && NewState != NULL && false)
+	{
+		if (Role == ROLE_Authority)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Server State Transition: %s -> %s"), *CurrentState->GetName(), *NewState->GetName());
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("%s Local State Transition: %s -> %s"), *GetName(),*CurrentState->GetName(), *NewState->GetName());
+
+		}
+	}
+
 	// Don't transition back into the same state.
 	if (NewState != NULL && NewState->IsIn(this) && NewState != CurrentState)
 	{

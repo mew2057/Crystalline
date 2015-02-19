@@ -57,6 +57,11 @@ void ACGCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	// XXX ZOOM
+	// Init the Zoom to be sure.
+	CurrentZoom.InitZoom();
+	FirstPersonCameraComponent->FieldOfView = FOVDefault;
+
 	// Only the authority should spwan the inventory.
 	if (Role == ROLE_Authority)
 	{
@@ -66,10 +71,7 @@ void ACGCharacter::PostInitializeComponents()
 		
 	}
 	
-	// XXX ZOOM
-	// Init the Zoom to be sure.
-	CurrentZoom.InitZoom();
-	FirstPersonCameraComponent->FieldOfView = FOVDefault;
+
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
