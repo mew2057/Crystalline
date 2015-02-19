@@ -45,6 +45,8 @@ public:
 	UFUNCTION()
 	void OnRep_CGOwner();
 
+	bool GiveAmmo(ECGAmmoType AmmoType, int32 Ammo);
+
 	/** The ACGCharacter who owns this Inventory. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
 	ACGCharacter* CGOwner;
@@ -67,4 +69,7 @@ public:
 
 	/** Contains the weapon groups that the gun inventory is selected by. Managed by the server, then replicated to the client through Weapons.*/
 	TMap<ECrystalType, TArray<class ACGWeapon*>> WeaponGroups;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class ACGAmmoPickup> AmmoPickupTemplate;
 };

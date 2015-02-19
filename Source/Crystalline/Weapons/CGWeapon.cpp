@@ -276,8 +276,6 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
-	UE_LOG(LogTemp, Log, TEXT("Server Start Fire. %s"), *CurrentState->GetName());
-
 	CurrentState->StartFire();
 }
 
@@ -702,6 +700,11 @@ bool ACGWeapon::ShouldDealDamage_Instant(AActor* TestActor) const
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region Ammo
+
+void ACGWeapon::GiveAmmo(int32 Ammo)
+{
+
+}
 
 void ACGWeapon::UseAmmo()
 {

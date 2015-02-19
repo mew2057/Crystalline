@@ -6,6 +6,18 @@
 #include "Pickups/CGCrystal.h"
 #include "CGCharacter.generated.h"
 
+// TODO move me somewhere sane.
+#pragma region Enums
+UENUM(BlueprintType)
+enum class ECGAmmoType : uint8
+{
+	NONE UMETA(DisplayName = "None"),
+	T_ZERO UMETA(DisplayName = "Tier Zero"),
+	T_ONE  UMETA(DisplayName = "Tier One"),
+	T_TWO  UMETA(DisplayName = "Tier Two")
+};
+#pragma endregion
+
 #pragma region Structs
 
 USTRUCT()
@@ -406,6 +418,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_CrystalChanged();
+
+
+	bool GiveAmmo(ECGAmmoType AmmoType, int32 Ammo);
 
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/
 	FORCEINLINE FName GetWeaponAttachPoint() const { return WeaponAttachPoint; };

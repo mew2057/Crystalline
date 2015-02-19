@@ -70,8 +70,6 @@ void ACGCharacter::PostInitializeComponents()
 		SpawnBaseInventory();
 		
 	}
-	
-
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -509,8 +507,14 @@ void ACGCharacter::OnRep_PendingCrystalPickup()
 
 void ACGCharacter::OnRep_CrystalChanged()
 {
-
+	// TODO.
 }
+
+bool ACGCharacter::GiveAmmo(ECGAmmoType AmmoType, int32 Ammo)
+{
+	return Inventory && Inventory->GiveAmmo(AmmoType, Ammo);
+}
+
 
 #pragma endregion
 

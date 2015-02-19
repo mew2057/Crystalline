@@ -35,10 +35,10 @@ public:
 	void PostInitializeComponents();
 
 	/** Triggers the pickup prompt for the crystal. */
-	virtual void ACGCrystal::ReceiveActorBeginOverlap(class AActor* Other) override;
+	virtual void ReceiveActorBeginOverlap(class AActor* Other) override;
 	
 	/** Removes the pickup prompt for the crystal. */
-	virtual void ACGCrystal::ReceiveActorEndOverlap(class AActor* Other) override;
+	virtual void ReceiveActorEndOverlap(class AActor* Other) override;
 
 	/** Invoked by the actor, returns false if the pickup is invalid.*/
 	bool Pickup();

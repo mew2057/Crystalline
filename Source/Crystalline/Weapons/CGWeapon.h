@@ -7,17 +7,6 @@
 
 #define WEAPON_TRACE_TAG FName("WeaponTrace")
 
-#pragma region Enums
-UENUM(BlueprintType)
-enum class ECGAmmoType : uint8
-{
-	NONE UMETA(DisplayName = "None"),
-	T_ZERO UMETA(DisplayName = "Tier Zero"),
-	T_ONE  UMETA(DisplayName = "Tier One"),
-	T_TWO  UMETA(DisplayName = "Tier Two")
-};
-#pragma endregion
-
 #pragma region Structs
 USTRUCT()
 struct FCGWeaponConfig
@@ -521,6 +510,8 @@ public:
 
 #pragma region Ammo
 
+	virtual void GiveAmmo(int32 Ammo);
+
 	virtual void UseAmmo();
 
 	// If set to false it's a check by something like CGCharacter.
@@ -531,7 +522,6 @@ public:
 	float GetPercentPerShot() const { return ClipPercentPerShot; }
 
 	virtual int32 GetAmmo() const { return 0; }
-
 
 	virtual int32 GetAmmoInClip() const { return 0; }
 

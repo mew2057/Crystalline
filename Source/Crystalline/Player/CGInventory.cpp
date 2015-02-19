@@ -113,12 +113,29 @@ void ACGInventory::DestroyInventory()
 
 	// Destruction code.
 	ACGWeapon* CachedWeapon;
+	
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+	ACGAmmoPickup * TempPickup;
+
 	// Destroy inventory weapons.
 	for (int32 i = Weapons.Num() - 1; i >= 0; --i)
 	{
 		CachedWeapon = Weapons[i];
 		if (CachedWeapon)
 		{
+			// TODO refactor, this is a quick and dirty ammo pickuip spawner.
+			if (AmmoPickupTemplate && CachedWeapon->WeaponConfig.AmmoType > ECGAmmoType::NONE)
+			{
+				TempPickup = GetWorld()->SpawnActor<ACGAmmoPickup>(
+					AmmoPickupTemplate, 
+					CGOwner->GetActorLocation(),
+					FRotator::ZeroRotator,
+					SpawnInfo);
+				TempPickup->Initialize(CGOwner, CachedWeapon->GetAmmo(), CachedWeapon->WeaponConfig.AmmoType);
+			}
+			 
+
 			Weapons.RemoveAt(i);
 			CachedWeapon->OnExitInventory();
 			CachedWeapon->Destroy();
@@ -145,14 +162,6 @@ void ACGInventory::DestroyInventory()
 		}
 		WeaponGroups.Remove(Keys[i]);
 	}
-
-	// TODO shoot off ammo actors.
-	/*FCGCrystalAmmo AmmoCache;
-	for (int32 i = AmmoCollection.Num() - 1; i >= 0; --i)
-	{
-		AmmoCache = AmmoCollection[i];
-		AmmoCollection.RemoveAt(i);
-	}*/
 }
 
 void ACGInventory::ReconstructInventory()
@@ -239,6 +248,23 @@ void ACGInventory::LoadCrystal(ECrystalType Crystal)
 void ACGInventory::OnRep_CGOwner()
 {
 	// TODO Replicate the inventory being loaded.
+}
+
+bool ACGInventory::GiveAmmo(ECGAmmoType AmmoType, int32 Ammo)
+{
+	bool bFound = false;
+	for (int32 i = Weapons.Num() - 1; i >= 0; --i)
+	{
+		// TODO Make this reject if the player doesn't benefit from the pickup.
+		if (Weapons[i]->WeaponConfig.AmmoType == AmmoType)
+		{
+			Weapons[i]->GiveAmmo(Ammo);
+			bFound = true;
+			break;
+		}
+	}
+
+	return bFound;
 }
 
 void ACGInventory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
