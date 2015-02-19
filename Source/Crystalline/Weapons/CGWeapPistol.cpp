@@ -57,9 +57,16 @@ float ACGWeapPistol::GetClipPercent() const
 	return  WeaponHeat / OverheatConfig.MaxHeat;
 }
 
+// This gun can only reload if it can't fire.
+bool ACGWeapPistol::CanReload() const
+{
+	return !CanFire();
+}
 
 void ACGWeapPistol::StartOverheat()
 {
+	UE_LOG(LogTemp, Log, TEXT("StartOverheat!"));
+
 	bIsOverheated = true;
 
 	GetWorldTimerManager().SetTimer(this,

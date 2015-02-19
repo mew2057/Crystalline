@@ -184,7 +184,6 @@ void ACGWeapon::OnStartReload()
 {
 	// Reload locally.
 	CurrentState->StartReload();
-
 	// Don't tell the server to reload if we can't locally, let the state play feedback locally.
 	if (Role < ROLE_Authority && CanReload())
 	{
@@ -741,19 +740,6 @@ void ACGWeapon::OnRep_BurstCount()
 
 void ACGWeapon::GotoState(UCGWeaponState* NewState)
 {
-	if (CurrentState != NULL && NewState != NULL && false)
-	{
-		if (Role == ROLE_Authority)
-		{
-			UE_LOG(LogTemp, Log, TEXT("Server State Transition: %s -> %s"), *CurrentState->GetName(), *NewState->GetName());
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("%s Local State Transition: %s -> %s"), *GetName(),*CurrentState->GetName(), *NewState->GetName());
-
-		}
-	}
-
 	// Don't transition back into the same state.
 	if (NewState != NULL && NewState->IsIn(this) && NewState != CurrentState)
 	{

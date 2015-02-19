@@ -19,16 +19,17 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	virtual void OnStartReload() override {}// No manual reload behavior!
+	//virtual void OnStartReload() override {}// No manual reload behavior!
 
 #pragma region Ammo
 
 	virtual void UseAmmo() override;
 
-	virtual bool CanFire(bool InitFireCheck) const override;
+	virtual bool CanFire(bool InitFireCheck = false) const override;
 
 	virtual float GetClipPercent() const override;
 
+	virtual bool CanReload() const override;
 
 	virtual void StartOverheat() override;
 
