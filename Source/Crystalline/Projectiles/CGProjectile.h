@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	UParticleSystem* ProjectileTrail;
 
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UParticleSystem* ImpactEffect;
+
 	UPROPERTY(Transient)
 	UParticleSystemComponent* TrailPSC;
 
@@ -79,6 +82,9 @@ public:
 
 	/**Spawns the trail for the projectile.*/
 	virtual void SpawnTrailParticleSystem();
+
+
+	virtual void SpawnImpact();
 
 
 	////////////////////////////////////////////////////////

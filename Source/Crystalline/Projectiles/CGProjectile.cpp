@@ -63,6 +63,8 @@ void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FV
 		PrepForDestroy();
 	}
 
+	SpawnImpact();
+
 	/*
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
@@ -103,6 +105,19 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 
 
 	}*/
+}
+
+void ACGProjectile::SpawnImpact()
+{
+	// TOOD Make this more than garbage.
+	if (ImpactEffect)
+	{
+		UParticleSystemComponent* ImpactPSC = UGameplayStatics::SpawnEmitterAtLocation(
+			this,
+			ImpactEffect,
+			GetActorLocation(),
+			GetActorRotation());
+	}
 }
 
 void ACGProjectile::PrepForDestroy()

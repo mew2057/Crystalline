@@ -203,7 +203,9 @@ struct FCGWeaponFXData
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UParticleSystem* WeaponTrail;
 
-	// TODO impact.
+	// TODO Improve impact.
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UParticleSystem* ImpactEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	TSubclassOf<UCameraShake> CameraShake;

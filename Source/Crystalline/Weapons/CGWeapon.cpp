@@ -77,7 +77,6 @@ void ACGWeapon::PostInitializeComponents()
 	WeaponZoomConfig.InitZoom();
 
 	// Init the spread factors, even if it's not used.
-	SpreadConfig.MaxSpread = FMath::DegreesToRadians(SpreadConfig.MaxSpread * 0.5f);
 	SpreadConfig.BaseSpread = FMath::DegreesToRadians(SpreadConfig.BaseSpread * 0.5f);
 	CurrentSpread = SpreadConfig.BaseSpread;
 	SpreadConfig.SpreadPerShot = FMath::DegreesToRadians(SpreadConfig.SpreadPerShot * 0.5f);
@@ -640,7 +639,18 @@ void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
 }
 
 // TODO
-void ACGWeapon::SpawnHitEffect(const FHitResult& Impact) { }
+void ACGWeapon::SpawnHitEffect(const FHitResult& Impact) 
+{
+	if (WeaponFXConfig.ImpactEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(
+			this,
+			WeaponFXConfig.ImpactEffect,
+			Impact.ImpactPoint,
+			Impact.ImpactNormal.Rotation());
+
+	}
+}
 
 
 void ACGWeapon::DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir)
