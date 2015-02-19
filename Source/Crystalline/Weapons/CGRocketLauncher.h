@@ -13,7 +13,7 @@ class CRYSTALLINE_API ACGRocketLauncher : public ACGCrystalGun
 {
 	GENERATED_BODY()
 	
-	
+	ACGRocketLauncher(const FObjectInitializer& ObjectInitializer);
 	
 	
 };

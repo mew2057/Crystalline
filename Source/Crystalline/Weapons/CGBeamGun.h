@@ -13,6 +13,8 @@ class CRYSTALLINE_API ACGBeamGun : public ACGCrystalGun
 {
 	GENERATED_BODY()
 public:
+	ACGBeamGun(const FObjectInitializer& ObjectInitializer);
+
 	void PostInitializeComponents();
 
 	/** Overrides the hitscan.*/

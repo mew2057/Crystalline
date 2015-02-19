@@ -6,6 +6,6 @@
 ACGWeapAssaultRifle::ACGWeapAssaultRifle(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WeaponConfig.bUsesProjectile = false;
-
+	WeaponConfig.AmmoType = ECGAmmoType::T_ZERO;
 }
 

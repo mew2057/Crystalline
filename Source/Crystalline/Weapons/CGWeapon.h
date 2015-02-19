@@ -7,6 +7,17 @@
 
 #define WEAPON_TRACE_TAG FName("WeaponTrace")
 
+#pragma region Enums
+UENUM(BlueprintType)
+enum class ECGAmmoType : uint8
+{
+	NONE UMETA(DisplayName = "None"),
+	T_ZERO UMETA(DisplayName = "Tier Zero"),
+	T_ONE  UMETA(DisplayName = "Tier One"),
+	T_TWO  UMETA(DisplayName = "Tier Two")
+};
+#pragma endregion
+
 #pragma region Structs
 USTRUCT()
 struct FCGWeaponConfig
@@ -42,6 +53,13 @@ struct FCGWeaponConfig
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 	uint32 OverHeatWeapon : 1;
 
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	ECGAmmoType AmmoType;
+
+	/** Modifies the spread while aiming.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	float ADSSpreadMod;
+
 	FCGWeaponConfig()
 	{
 		// Timing.
@@ -56,6 +74,10 @@ struct FCGWeaponConfig
 		WeaponRange = 10000.f;
 
 		OverHeatWeapon = false;
+
+		AmmoType = ECGAmmoType::NONE;
+
+		ADSSpreadMod = .5f;
 	}
 };
 
@@ -309,6 +331,11 @@ protected:
 
 
 public:
+	////////////////////////////
+	// Gettors
+	float GetCurrentSpread();
+
+
 	////////////////////////////
 	// Config
 

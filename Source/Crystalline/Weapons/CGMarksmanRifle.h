@@ -13,7 +13,8 @@ class CRYSTALLINE_API ACGMarksmanRifle : public ACGCrystalGun
 {
 	GENERATED_BODY()
 	
-	
+	ACGMarksmanRifle(const FObjectInitializer& ObjectInitializer);
+
 	
 	
 };

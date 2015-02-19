@@ -125,8 +125,6 @@ struct FCGDefaultWeaponConfig
 	FCGDefaultWeaponConfig()
 	{
 	}
-
-
 };
 
 #pragma endregion
@@ -214,18 +212,18 @@ public:
 	// FIXME this may not work with the network!
 	/** Tracks whether or not the weapon is currently zoomed.*/
 	UPROPERTY(Transient, Replicated)
-		uint32 bZoomed : 1;
+	uint32 bZoomed : 1;
 
 	UPROPERTY(Transient)
-		uint32 bZooming : 1;
+	uint32 bZooming : 1;
 
 	/** Defines the zoom factor for the weapon. */
 	UPROPERTY(Transient)
-		FCGZoom CurrentZoom;
+	FCGZoom CurrentZoom;
 
 	/** The FOV in the general case for the player.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-		float FOVDefault;
+	float FOVDefault;
 	///////////////////////////////////////////////////////////
 
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -296,6 +294,12 @@ protected:
 
 	/** Unzooms the player's view, may stop ADS. */
 	void StopZoom();
+
+	void SetZoom(bool bZoom);
+
+	// This will eventually telegraph the ADS animation montage to clients.
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetZoom(bool bZoom);
 
 	/** Triggers the action button response.*/
 	void OnActionButton();
