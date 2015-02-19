@@ -23,4 +23,15 @@ protected:
 
 	virtual void EndGame(ACGPlayerState* Winner) override;
 
+	/** select best spawn point for player */
+	virtual AActor* ChoosePlayerStart(AController* Player) override;
+
+	/** always pick new random spawn */
+	virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
+ 
+	/** check team constraints */
+	virtual bool IsSpawnpointAllowed(APlayerStart* SpawnPoint, AController* Player) const;
+
+	/** check if player should use spawnpoint */
+	virtual bool IsSpawnpointPreferred(APlayerStart* SpawnPoint, AController* Player) const;
 };
