@@ -402,6 +402,12 @@ public:
 	
 	void StopReload();
 
+	// TODO find a better way?
+	/**Invoked by the server when a timer based call finishes execution.*/
+	UFUNCTION(client, reliable)
+	void ClientCheckQueuedInput();
+
+
 	// This is managed by the weapon, not the state at the present.
 	// FIXME
 	virtual void StartOverheat();
@@ -409,7 +415,7 @@ public:
 	// Gives the Reload state the information it requires to spawn a timer.
 	virtual float GetReloadTime() const;
 
-	virtual bool GetCanReload() const;
+	virtual bool CanReload() const;
 		
 	virtual void ApplyReload();
 
@@ -454,11 +460,11 @@ public:
 
 #pragma region Hit Scan
 
-	void FireHitScan();
+	virtual void FireHitScan();
 
 	void ProcessHitScan(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
 	
-	void ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
+	virtual void ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
 
 	/** server notified of hit from client to verify */
 	UFUNCTION(reliable, server, WithValidation)
@@ -473,7 +479,7 @@ public:
 
 	void SimulateHitScan(const FVector& Origin, const FVector& ShotDir);
 
-	void SpawnTrailEffect(const FVector& EndPoint);
+	virtual void SpawnTrailEffect(const FVector& EndPoint);
 
 	// TODO
 	void SpawnHitEffect(const FHitResult& Impact);
