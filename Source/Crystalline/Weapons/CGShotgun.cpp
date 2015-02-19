@@ -4,6 +4,11 @@
 #include "Projectiles/CGProjectile.h"
 #include "CGShotgun.h"
 
+ACGShotgun::ACGShotgun(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	WeaponConfig.AmmoType = ECGAmmoType::T_ONE;
+}
+
 void ACGShotgun :: SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir)
 {
 
@@ -17,7 +22,7 @@ void ACGShotgun :: SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal Sho
 	for (int32 i = 0; i < BulletsPerShot; ++i)
 	{
 		
-		const FVector InitialRotation = WeaponRandomStream.VRandCone(ShootDir, CurrentSpread, CurrentSpread);
+		const FVector InitialRotation = WeaponRandomStream.VRandCone(ShootDir, GetCurrentSpread());
 		const FTransform BulletSpawn(InitialRotation.Rotation(), Origin);
 
 		SGBullet = Cast<ACGProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileConfig.ProjectileClass, BulletSpawn, true));

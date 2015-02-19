@@ -77,7 +77,6 @@ void ACGWeapon::PostInitializeComponents()
 	WeaponZoomConfig.InitZoom();
 
 	// Init the spread factors, even if it's not used.
-	SpreadConfig.MaxSpread = FMath::DegreesToRadians(SpreadConfig.MaxSpread * 0.5f);
 	SpreadConfig.BaseSpread = FMath::DegreesToRadians(SpreadConfig.BaseSpread * 0.5f);
 	CurrentSpread = SpreadConfig.BaseSpread;
 	SpreadConfig.SpreadPerShot = FMath::DegreesToRadians(SpreadConfig.SpreadPerShot * 0.5f);
@@ -121,6 +120,21 @@ void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 
 		SetOwner(CGOwner);
 	}
+}
+
+
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma region  Gettors
+
+
+float ACGWeapon::GetCurrentSpread()
+{
+	// TODO CGOwner NULL test.
+	// TODO eliminate ternary?
+	return CurrentSpread * (CGOwner->bZoomed ? WeaponConfig.ADSSpreadMod : 1);
 }
 
 
@@ -262,8 +276,6 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
-	UE_LOG(LogTemp, Log, TEXT("Server Start Fire. %s"), *CurrentState->GetName());
-
 	CurrentState->StartFire();
 }
 
@@ -493,7 +505,7 @@ void ACGWeapon::FireHitScan()
 	const FVector AimDir     = GetCameraAim();
 
 	// Adds variation to the bullet.
-	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, CurrentSpread, CurrentSpread);
+	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, GetCurrentSpread());
 
 	// Specify the end point for the weapon's fire.
 	FVector EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
@@ -501,7 +513,7 @@ void ACGWeapon::FireHitScan()
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 	
-	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, CurrentSpread);
+	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, GetCurrentSpread());
 	
 	CurrentSpread = FMath::Min(SpreadConfig.MaxSpread, CurrentSpread + SpreadConfig.SpreadPerShot);
 	
@@ -640,7 +652,18 @@ void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
 }
 
 // TODO
-void ACGWeapon::SpawnHitEffect(const FHitResult& Impact) { }
+void ACGWeapon::SpawnHitEffect(const FHitResult& Impact) 
+{
+	if (WeaponFXConfig.ImpactEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(
+			this,
+			WeaponFXConfig.ImpactEffect,
+			Impact.ImpactPoint,
+			Impact.ImpactNormal.Rotation());
+
+	}
+}
 
 
 void ACGWeapon::DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir)
@@ -677,6 +700,11 @@ bool ACGWeapon::ShouldDealDamage_Instant(AActor* TestActor) const
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region Ammo
+
+void ACGWeapon::GiveAmmo(int32 Ammo)
+{
+
+}
 
 void ACGWeapon::UseAmmo()
 {

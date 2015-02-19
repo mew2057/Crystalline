@@ -14,6 +14,7 @@ class CRYSTALLINE_API ACGShotgun : public ACGCrystalGun
 	GENERATED_BODY()
 	
 public:
+	ACGShotgun(const FObjectInitializer& ObjectInitializer);
 
 	virtual void SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir)  override;
 

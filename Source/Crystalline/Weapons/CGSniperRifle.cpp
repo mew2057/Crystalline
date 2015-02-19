@@ -3,6 +3,11 @@
 #include "Crystalline.h"
 #include "CGSniperRifle.h"
 
+ACGSniperRifle::ACGSniperRifle(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	WeaponConfig.AmmoType = ECGAmmoType::T_TWO;
+}
+
 
 
 

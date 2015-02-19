@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description pconst age of Project Settings.
 
 #include "Crystalline.h"
 #include "CGCrystalGun.h"
@@ -17,6 +17,14 @@ void ACGCrystalGun::PostInitializeComponents()
 }
 
 #pragma region Ammo
+
+void ACGCrystalGun::GiveAmmo(int32 NewAmmo)
+{
+	UE_LOG(LogTemp, Log, TEXT("Give Ammo %d"), NewAmmo);
+
+	Ammo = FMath::Min(AmmoConfig.AmmoCapacity, Ammo + NewAmmo);
+}
+
 
 void ACGCrystalGun::UseAmmo()
 {
@@ -59,6 +67,7 @@ void ACGCrystalGun::InitializeAmmo(const FCGCrystalAmmo& AmmoStruct)
 	Ammo = AmmoStruct.AmmoCarried;
 	AmmoConfig.AmmoCapacity = AmmoStruct.MaxAmmoCarried;
 
+
 	//XXX Should this exist?
 	// Reload the gun if the base ammo isn't set.
 	if (AmmoInClip <= 0)
@@ -71,6 +80,14 @@ void ACGCrystalGun::CopyAmmo(const ACGCrystalGun* Other)
 {
 	AmmoInClip = Other->AmmoInClip;
 	Ammo = Other->Ammo;
+
+	// TODO Modify so the energy doesn't exceed the Clipsize.
+	const int32 Overflow = AmmoInClip - AmmoConfig.ClipSize;
+	if (Overflow > 0)
+	{
+		AmmoInClip -= Overflow;
+		Ammo += FMath::Min(Overflow, AmmoConfig.AmmoCapacity);
+	}
 }
 
 #pragma endregion

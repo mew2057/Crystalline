@@ -70,8 +70,6 @@ void ACGCharacter::PostInitializeComponents()
 		SpawnBaseInventory();
 		
 	}
-	
-
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -509,8 +507,14 @@ void ACGCharacter::OnRep_PendingCrystalPickup()
 
 void ACGCharacter::OnRep_CrystalChanged()
 {
-
+	// TODO.
 }
+
+bool ACGCharacter::GiveAmmo(ECGAmmoType AmmoType, int32 Ammo)
+{
+	return Inventory && Inventory->GiveAmmo(AmmoType, Ammo);
+}
+
 
 #pragma endregion
 
@@ -584,21 +588,47 @@ void ACGCharacter::PreviousWeapon()
 }
 
 // TODO make sure that if this gets interrupted the player will always return to their default zoom.
-/** Zooms the player's view, may trigger ADS. */
 void ACGCharacter::StartZoom()
 {
-	bZoomed = !bZoomed;
+	SetZoom(!bZoomed);
 	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
 	bZooming = true;
+
+	// Tell the server about the state change.
+	if (Role < ROLE_Authority)
+	{
+		ServerSetZoom(bZoomed);
+	}
 }
 
-/** Unzooms the player's view, may stop ADS. */
 void ACGCharacter::StopZoom()
 {
-	bZoomed = !bZoomed;
+	SetZoom(!bZoomed);
 	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
 	bZooming = true;
+
+	// Tell the server about the state change.
+	if (Role < ROLE_Authority)
+	{
+		ServerSetZoom(bZoomed);
+	}
 }
+
+void ACGCharacter::SetZoom(bool bZoom)
+{
+	bZoomed = bZoom;
+}
+
+void ACGCharacter::ServerSetZoom_Implementation(bool bZoom)
+{
+	SetZoom(bZoom);
+}
+
+bool ACGCharacter::ServerSetZoom_Validate(bool bZoom)
+{
+	return true;
+}
+
 
 void ACGCharacter::OnActionButton()
 {
@@ -664,6 +694,8 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 //	DOREPLIFETIME_CONDITION(ACGCharacter, Weapons, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, Inventory, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACGCharacter, bZoomed, COND_SkipOwner);
+
 
 	// Everyone.
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);

@@ -21,7 +21,7 @@ public:
 
 #pragma region Ammo
 	
-	
+	virtual void GiveAmmo(int32 NewAmmo) override;
 
 	virtual void UseAmmo() override;
 
