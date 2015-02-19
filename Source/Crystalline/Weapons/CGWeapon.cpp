@@ -608,7 +608,7 @@ void ACGWeapon::SpawnTrailEffect(const FVector& EndPoint)
 {
 	if (WeaponFXConfig.WeaponTrail)
 	{
-		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(
+		TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(
 			this,
 			WeaponFXConfig.WeaponTrail,
 			GetMuzzleLocation());

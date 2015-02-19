@@ -458,7 +458,7 @@ public:
 
 	void ProcessHitScan(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
 	
-	void ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
+	virtual void ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread);
 
 	/** server notified of hit from client to verify */
 	UFUNCTION(reliable, server, WithValidation)
@@ -473,7 +473,7 @@ public:
 
 	void SimulateHitScan(const FVector& Origin, const FVector& ShotDir);
 
-	void SpawnTrailEffect(const FVector& EndPoint);
+	virtual void SpawnTrailEffect(const FVector& EndPoint);
 
 	// TODO
 	void SpawnHitEffect(const FHitResult& Impact);
