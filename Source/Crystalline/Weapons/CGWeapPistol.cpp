@@ -9,6 +9,8 @@
 ACGWeapPistol::ACGWeapPistol(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WeaponConfig.bUsesProjectile = true;
+	WeaponConfig.bHasManualReload = false;
+
 	ReloadingState = ObjectInitializer.CreateDefaultSubobject<UCGWeaponReloadOverheatState>(this, TEXT("StateOverheating"));
 }
 
@@ -60,7 +62,7 @@ float ACGWeapPistol::GetClipPercent() const
 // This gun can only reload if it can't fire.
 bool ACGWeapPistol::CanReload() const
 {
-	return !CanFire();
+	return WeaponHeat + OverheatConfig.HeatPerShot >= OverheatConfig.MaxHeat;
 }
 
 void ACGWeapPistol::StartOverheat()

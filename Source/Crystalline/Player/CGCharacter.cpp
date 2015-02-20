@@ -604,7 +604,8 @@ void ACGCharacter::StopFire()
 /** Triggers the reload for current weapon. */
 void ACGCharacter::OnReload()
 {
-	if (IsLocallyControlled() && CurrentWeapon != NULL)
+	// Make sure the gun is able to be reloaded.
+	if (IsLocallyControlled() && CurrentWeapon != NULL && CurrentWeapon->HasManualReload())
 	{
 		CurrentWeapon->OnStartReload();
 	}

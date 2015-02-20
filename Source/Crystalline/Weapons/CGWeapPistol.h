@@ -19,7 +19,7 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	//virtual void OnStartReload() override {}// No manual reload behavior!
+	//virtual void OnStartReload() override{}
 
 #pragma region Ammo
 

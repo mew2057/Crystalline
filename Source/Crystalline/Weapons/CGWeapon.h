@@ -157,6 +157,8 @@ public:
 	// Gives the Reload state the information it requires to spawn a timer.
 	virtual float GetReloadTime() const;
 
+	virtual bool HasManualReload() const { return WeaponConfig.bHasManualReload; }
+
 	virtual bool CanReload() const;
 		
 	virtual void ApplyReload();

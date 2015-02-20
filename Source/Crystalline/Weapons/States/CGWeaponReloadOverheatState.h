@@ -22,8 +22,6 @@ public:
 
 	virtual void EnterState() override
 	{
-		UE_LOG(LogTemp, Log, TEXT("Failed Reload"));
-
 		// Make sure the overheat guage is fully maxed.
 		GetOuterACGWeapon()->UseAmmo();
 		GetOuterACGWeapon()->StartOverheat();

@@ -165,20 +165,26 @@ struct FCGWeaponConfig
 {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditDefaultsOnly, Category = Timing)
-		float TimeBetweenShots;
-
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 		uint32 bAutomaticFire : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+		uint32 bUsesProjectile : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+		uint32 bHasManualReload : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+		uint32 OverHeatWeapon : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = Timing)
+		float TimeBetweenShots;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 		float EquipTime;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 		float UnequipTime;
-
-	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		uint32 bUsesProjectile : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 		TSubclassOf<UDamageType> DamageType;
@@ -191,8 +197,6 @@ struct FCGWeaponConfig
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 		float WeaponRange;
 
-	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		uint32 OverHeatWeapon : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 		ECGAmmoType AmmoType;
@@ -211,6 +215,7 @@ struct FCGWeaponConfig
 
 		// Attributes.
 		bUsesProjectile = true;
+		bHasManualReload = true;
 		BaseDamage = 10.f;
 		WeaponRange = 10000.f;
 
