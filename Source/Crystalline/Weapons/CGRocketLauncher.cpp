@@ -4,5 +4,11 @@
 #include "CGRocketLauncher.h"
 
 
+ACGRocketLauncher::ACGRocketLauncher(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	WeaponConfig.AmmoType = ECGAmmoType::T_TWO;
+}
+
+
 
 

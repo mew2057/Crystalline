@@ -127,6 +127,21 @@ void ACGWeapon::SetCGOwner(ACGCharacter* NewOwner)
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma region  Gettors
+
+
+float ACGWeapon::GetCurrentSpread()
+{
+	// TODO CGOwner NULL test.
+	// TODO eliminate ternary?
+	return CurrentSpread * (CGOwner->bZoomed ? WeaponConfig.ADSSpreadMod : 1);
+}
+
+
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma region State Functions
 
 void ACGWeapon::OnEnterInventory(ACGCharacter* NewOwner)
@@ -261,8 +276,6 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
-	UE_LOG(LogTemp, Log, TEXT("Server Start Fire. %s"), *CurrentState->GetName());
-
 	CurrentState->StartFire();
 }
 
@@ -492,7 +505,7 @@ void ACGWeapon::FireHitScan()
 	const FVector AimDir     = GetCameraAim();
 
 	// Adds variation to the bullet.
-	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, CurrentSpread, CurrentSpread);
+	FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, GetCurrentSpread());
 
 	// Specify the end point for the weapon's fire.
 	FVector EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
@@ -500,7 +513,7 @@ void ACGWeapon::FireHitScan()
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 	
-	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, CurrentSpread);
+	ProcessHitScan(Impact, StartTrace, ShootDir, FireSeed, GetCurrentSpread());
 	
 	CurrentSpread = FMath::Min(SpreadConfig.MaxSpread, CurrentSpread + SpreadConfig.SpreadPerShot);
 	
@@ -687,6 +700,11 @@ bool ACGWeapon::ShouldDealDamage_Instant(AActor* TestActor) const
 ////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region Ammo
+
+void ACGWeapon::GiveAmmo(int32 Ammo)
+{
+
+}
 
 void ACGWeapon::UseAmmo()
 {

@@ -3,6 +3,11 @@
 #include "Crystalline.h"
 #include "CGBeamGun.h"
 
+ACGBeamGun::ACGBeamGun(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	WeaponConfig.AmmoType = ECGAmmoType::T_ONE;
+}
+
 void ACGBeamGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();

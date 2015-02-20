@@ -4,7 +4,7 @@
 	<ItemGroup>
 		<None Include="..\..\Crystalline.uproject" />
 		<Filter Include="Source">
-			<UniqueIdentifier>{565E1A88-AC2C-4A81-A108-C4CBBBD74EF7}</UniqueIdentifier>
+			<UniqueIdentifier>{0B01B244-04DC-4B25-9951-CFCDE3BFAF60}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Source\Crystalline.Target.cs">
 			<Filter>Source</Filter>
@@ -13,7 +13,7 @@
 			<Filter>Source</Filter>
 		</None >
 		<Filter Include="Config">
-			<UniqueIdentifier>{F9A7DE9D-E1BC-4655-9C99-D46938D43261}</UniqueIdentifier>
+			<UniqueIdentifier>{48A7CFD7-0EFA-44A1-B4BC-6E7A20740D47}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Config\DefaultEditor.ini">
 			<Filter>Config</Filter>
@@ -27,101 +27,8 @@
 		<None Include="..\..\Config\DefaultInput.ini">
 			<Filter>Config</Filter>
 		</None >
-		<Filter Include="Plugins">
-			<UniqueIdentifier>{DB743C49-3BEB-4B45-9018-398F05AE97EC}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="Plugins\GitSourceControl">
-			<UniqueIdentifier>{705BCEB8-84D7-4002-9786-01AEEE9C6B4E}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="Plugins\GitSourceControl\Source">
-			<UniqueIdentifier>{66454C77-236E-42ED-AE91-474C00D1E00C}</UniqueIdentifier>
-		</Filter>
-		<Filter Include="Plugins\GitSourceControl\Source\GitSourceControl">
-			<UniqueIdentifier>{89641692-E4C0-4AA5-B7E2-04C1E4397D2E}</UniqueIdentifier>
-		</Filter>
-		<None Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\GitSourceControl.Build.cs">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl</Filter>
-		</None >
-		<Filter Include="Plugins\GitSourceControl\Source\GitSourceControl\Private">
-			<UniqueIdentifier>{29508845-F799-4D3E-87DD-660BC13CF602}</UniqueIdentifier>
-		</Filter>
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlCommand.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlCommand.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlModule.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlModule.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlOperations.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlOperations.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlPrivatePCH.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlProvider.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlProvider.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlRevision.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlRevision.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlSettings.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlSettings.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlState.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlState.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlUtils.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\GitSourceControlUtils.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\IGitSourceControlWorker.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\SGitInitDialog.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\SGitInitDialog.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\SGitSourceControlSettings.cpp">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Plugins\GitSourceControl\Source\GitSourceControl\Private\SGitSourceControlSettings.h">
-			<Filter>Plugins\GitSourceControl\Source\GitSourceControl\Private</Filter>
-		</ClInclude >
-		<None Include="..\..\Plugins\GitSourceControl\GitSourceControl.uplugin">
-			<Filter>Plugins\GitSourceControl</Filter>
-		</None >
-		<Filter Include="Plugins\GitSourceControl\Resources">
-			<UniqueIdentifier>{C8E036D2-6080-42BE-917A-B7369C4AA80A}</UniqueIdentifier>
-		</Filter>
-		<None Include="..\..\Plugins\GitSourceControl\Resources\Icon128.png">
-			<Filter>Plugins\GitSourceControl\Resources</Filter>
-		</None >
 		<Filter Include="Source\Crystalline">
-			<UniqueIdentifier>{5909E476-0926-45A3-BC68-70913AFD7C66}</UniqueIdentifier>
+			<UniqueIdentifier>{BA713903-5EB9-46ED-B747-D738BCCEB37A}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Source\Crystalline\Crystalline.Build.cs">
 			<Filter>Source\Crystalline</Filter>
@@ -133,7 +40,7 @@
 			<Filter>Source\Crystalline</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\GameModes">
-			<UniqueIdentifier>{CB60D6B8-4089-4D7F-9767-538FEDCEF4D3}</UniqueIdentifier>
+			<UniqueIdentifier>{9E7CFD18-8641-4AD6-9D2A-DBEA4CAFBC42}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\GameModes\CGBaseGameMode.cpp">
 			<Filter>Source\Crystalline\GameModes</Filter>
@@ -160,7 +67,7 @@
 			<Filter>Source\Crystalline\GameModes</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\GUI">
-			<UniqueIdentifier>{2BDF1A2E-79A0-4EA8-96FD-9CBC1B52C8EA}</UniqueIdentifier>
+			<UniqueIdentifier>{E8979FFC-EDB2-4EE6-B2C2-834C93A6D52D}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\GUI\CGPlayerHUD.cpp">
 			<Filter>Source\Crystalline\GUI</Filter>
@@ -169,8 +76,14 @@
 			<Filter>Source\Crystalline\GUI</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Pickups">
-			<UniqueIdentifier>{61F174E1-4D75-461B-B15B-5A5F0DEEB45A}</UniqueIdentifier>
+			<UniqueIdentifier>{466F972F-3A02-4BD0-B187-60BA8071F665}</UniqueIdentifier>
 		</Filter>
+		<ClCompile Include="..\..\Source\Crystalline\Pickups\CGAmmoPickup.cpp">
+			<Filter>Source\Crystalline\Pickups</Filter>
+		</ClCompile >
+		<ClInclude Include="..\..\Source\Crystalline\Pickups\CGAmmoPickup.h">
+			<Filter>Source\Crystalline\Pickups</Filter>
+		</ClInclude >
 		<ClCompile Include="..\..\Source\Crystalline\Pickups\CGCrystal.cpp">
 			<Filter>Source\Crystalline\Pickups</Filter>
 		</ClCompile >
@@ -178,7 +91,7 @@
 			<Filter>Source\Crystalline\Pickups</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Player">
-			<UniqueIdentifier>{CE81A1E2-AC5D-45CB-88EA-FA07A67EDAB7}</UniqueIdentifier>
+			<UniqueIdentifier>{76B0721F-0508-495F-958D-908A39D987BA}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Player\CGCharacter.cpp">
 			<Filter>Source\Crystalline\Player</Filter>
@@ -205,13 +118,13 @@
 			<Filter>Source\Crystalline\Player</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Private">
-			<UniqueIdentifier>{C9E0D227-B513-4F40-8D14-9A6CFB7E4209}</UniqueIdentifier>
+			<UniqueIdentifier>{B5B23081-A9B6-4614-AD86-2CC85B67F027}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Private\CrystallineCharacter.cpp">
 			<Filter>Source\Crystalline\Private</Filter>
 		</ClCompile >
 		<Filter Include="Source\Crystalline\Projectiles">
-			<UniqueIdentifier>{6A5C5FF7-4221-4C4F-B854-5BF3B74E1FF1}</UniqueIdentifier>
+			<UniqueIdentifier>{5960C466-EF1E-4473-BA1B-03132E38ECC0}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Projectiles\CGProjectile.cpp">
 			<Filter>Source\Crystalline\Projectiles</Filter>
@@ -232,22 +145,22 @@
 			<Filter>Source\Crystalline\Projectiles</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Public">
-			<UniqueIdentifier>{2152C9CC-26FD-4EAA-86F1-FFE98908AB7A}</UniqueIdentifier>
+			<UniqueIdentifier>{A29E97A2-E620-4523-BCD7-0F5AB62A3962}</UniqueIdentifier>
 		</Filter>
 		<ClInclude Include="..\..\Source\Crystalline\Public\CrystallineCharacter.h">
 			<Filter>Source\Crystalline\Public</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Resources">
-			<UniqueIdentifier>{3D18D897-84F7-45DC-9E1A-CBA6A710259A}</UniqueIdentifier>
+			<UniqueIdentifier>{60CE7C28-B093-4648-8A3D-5BE9BB9ABC1A}</UniqueIdentifier>
 		</Filter>
 		<Filter Include="Source\Crystalline\Resources\Windows">
-			<UniqueIdentifier>{53015935-2330-4DD8-9979-9003BBEFC544}</UniqueIdentifier>
+			<UniqueIdentifier>{247EEC2C-66DC-4A99-9B64-4DC5C9F55DE0}</UniqueIdentifier>
 		</Filter>
 		<ResourceCompile Include="..\..\Source\Crystalline\Resources\Windows\Crystalline.rc">
 			<Filter>Source\Crystalline\Resources\Windows</Filter>
 		</ResourceCompile >
 		<Filter Include="Source\Crystalline\Weapons">
-			<UniqueIdentifier>{1A8E380C-C829-41B7-ADE9-7CF3312D7C71}</UniqueIdentifier>
+			<UniqueIdentifier>{76B37BF8-1D11-4471-A96B-D78C4ADB0A03}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Weapons\CGBeamGun.cpp">
 			<Filter>Source\Crystalline\Weapons</Filter>
@@ -304,7 +217,7 @@
 			<Filter>Source\Crystalline\Weapons</Filter>
 		</ClInclude >
 		<Filter Include="Source\Crystalline\Weapons\States">
-			<UniqueIdentifier>{BC410BD4-2451-4D1F-B5CB-C078CC02A6E6}</UniqueIdentifier>
+			<UniqueIdentifier>{34D9EAE1-DC09-4BF4-B217-848B26B2B0E4}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponActiveState.cpp">
 			<Filter>Source\Crystalline\Weapons\States</Filter>

@@ -6,6 +6,18 @@
 #include "Pickups/CGCrystal.h"
 #include "CGCharacter.generated.h"
 
+// TODO move me somewhere sane.
+#pragma region Enums
+UENUM(BlueprintType)
+enum class ECGAmmoType : uint8
+{
+	NONE UMETA(DisplayName = "None"),
+	T_ZERO UMETA(DisplayName = "Tier Zero"),
+	T_ONE  UMETA(DisplayName = "Tier One"),
+	T_TWO  UMETA(DisplayName = "Tier Two")
+};
+#pragma endregion
+
 #pragma region Structs
 
 USTRUCT()
@@ -125,8 +137,6 @@ struct FCGDefaultWeaponConfig
 	FCGDefaultWeaponConfig()
 	{
 	}
-
-
 };
 
 #pragma endregion
@@ -214,18 +224,18 @@ public:
 	// FIXME this may not work with the network!
 	/** Tracks whether or not the weapon is currently zoomed.*/
 	UPROPERTY(Transient, Replicated)
-		uint32 bZoomed : 1;
+	uint32 bZoomed : 1;
 
 	UPROPERTY(Transient)
-		uint32 bZooming : 1;
+	uint32 bZooming : 1;
 
 	/** Defines the zoom factor for the weapon. */
 	UPROPERTY(Transient)
-		FCGZoom CurrentZoom;
+	FCGZoom CurrentZoom;
 
 	/** The FOV in the general case for the player.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-		float FOVDefault;
+	float FOVDefault;
 	///////////////////////////////////////////////////////////
 
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -296,6 +306,12 @@ protected:
 
 	/** Unzooms the player's view, may stop ADS. */
 	void StopZoom();
+
+	void SetZoom(bool bZoom);
+
+	// This will eventually telegraph the ADS animation montage to clients.
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetZoom(bool bZoom);
 
 	/** Triggers the action button response.*/
 	void OnActionButton();
@@ -402,6 +418,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_CrystalChanged();
+
+
+	bool GiveAmmo(ECGAmmoType AmmoType, int32 Ammo);
 
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/
 	FORCEINLINE FName GetWeaponAttachPoint() const { return WeaponAttachPoint; };

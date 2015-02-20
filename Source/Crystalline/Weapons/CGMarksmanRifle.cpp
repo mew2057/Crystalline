@@ -4,5 +4,7 @@
 #include "CGMarksmanRifle.h"
 
 
-
-
+ACGMarksmanRifle::ACGMarksmanRifle(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	WeaponConfig.AmmoType = ECGAmmoType::T_ONE;
+}

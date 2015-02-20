@@ -42,6 +42,13 @@ struct FCGWeaponConfig
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 	uint32 OverHeatWeapon : 1;
 
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	ECGAmmoType AmmoType;
+
+	/** Modifies the spread while aiming.*/
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	float ADSSpreadMod;
+
 	FCGWeaponConfig()
 	{
 		// Timing.
@@ -56,6 +63,10 @@ struct FCGWeaponConfig
 		WeaponRange = 10000.f;
 
 		OverHeatWeapon = false;
+
+		AmmoType = ECGAmmoType::NONE;
+
+		ADSSpreadMod = .5f;
 	}
 };
 
@@ -310,6 +321,11 @@ protected:
 
 public:
 	////////////////////////////
+	// Gettors
+	float GetCurrentSpread();
+
+
+	////////////////////////////
 	// Config
 
 	/** Generic weapon configuration settings.*/
@@ -494,6 +510,8 @@ public:
 
 #pragma region Ammo
 
+	virtual void GiveAmmo(int32 Ammo);
+
 	virtual void UseAmmo();
 
 	// If set to false it's a check by something like CGCharacter.
@@ -504,7 +522,6 @@ public:
 	float GetPercentPerShot() const { return ClipPercentPerShot; }
 
 	virtual int32 GetAmmo() const { return 0; }
-
 
 	virtual int32 GetAmmoInClip() const { return 0; }
 

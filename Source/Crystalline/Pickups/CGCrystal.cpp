@@ -28,6 +28,7 @@ ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	CrystalMesh->RelativeLocation = FVector(0.f, 0.f, 50.f);
 	CrystalMesh->AttachParent = OverlapVolume;
 	
+	// TODO this is not strictly necessary.
 	BaseMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CrystalBaseMesh"));
 	BaseMesh->bReceivesDecals = false;                             
 	BaseMesh->CastShadow = true;                                   
