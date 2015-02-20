@@ -21,7 +21,7 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	// Creates a mesh component to be used in the first person view. This is edited in the blueprint.
 	Mesh1P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("CharacterMesh1P"));
 	Mesh1P->AttachParent = FirstPersonCameraComponent;
-	Mesh1P->bOnlyOwnerSee = false; // NOTE this should be true.
+	Mesh1P->bOnlyOwnerSee = true; 
 	Mesh1P->bOwnerNoSee = false;
 	Mesh1P->RelativeLocation = FVector(0.f, 0.f, -90); // Relative location of the mesh to the origin of the player.
 	Mesh1P->bCastDynamicShadow = false;
@@ -30,8 +30,21 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);
 
+	GetMesh()->bOnlyOwnerSee = false;
+	GetMesh()->bOwnerNoSee = true;
+	GetMesh()->bReceivesDecals = false;
+	GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+
 	// Set the Collision Capsule Size (TODO hitbox!)
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 
 	// Set turn rates for input
 	BaseTurnRate   = 45.f;
@@ -194,7 +207,7 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	//TODO Stop Anim,  Update Meshes,  stop all warnings, Ragdoll,
+	//TODO  Update Meshes,  stop all warnings.
 
 	// Clears out any and all timers for the object.
 	GetWorldTimerManager().ClearAllTimersForObject(this);
@@ -214,13 +227,49 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	}
 	// Once the Pawn is destroyed the playercontroller will spawn a new pawn, see UnFreeze() 
 
-	// TODO Ragdoll
-	SetLifeSpan(2.f);
+	StopAllAnim();
+
+	/// Ragdoll
+	/////////////////////////////////////////////////////
+	
+	if (GetMesh() && GetMesh()->GetPhysicsAsset())
+	{
+		static FName CollisionProfileName(TEXT("Ragdoll"));
+		GetMesh()->SetCollisionProfileName(CollisionProfileName);
+		
+		SetActorEnableCollision(true);
+		
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->WakeAllRigidBodies();
+		GetMesh()->bBlendPhysics = true;
+
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->DisableMovement();
+		GetCharacterMovement()->SetComponentTickEnabled(false);
+
+
+	}
+	
+	/////////////////////////////////////////////////////
+
+	SetLifeSpan(5.f);
 }
+
+void ACGCharacter::StopAllAnim()
+{
+	USkeletalMeshComponent* UsedMesh = GetMesh();
+	if (UsedMesh && UsedMesh->AnimScriptInstance)
+	{
+		UsedMesh->AnimScriptInstance->Montage_Stop(0.f);
+	}
+
+}
+
 
 void ACGCharacter::TornOff()
 {
-	SetLifeSpan(2.f);
+	SetLifeSpan(5.f);
 }
 
 void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -666,7 +715,7 @@ void ACGCharacter::PickupCrystal()
 	if (PendingCrystalPickup)
 	{
 		// Cache the Crystal Type.
-		ECrystalType CachedType = PendingCrystalPickup->GetCrystalType();
+		ECGCrystalType CachedType = PendingCrystalPickup->GetCrystalType();
 		// Pickup is valid.
 		if (PendingCrystalPickup->Pickup())
 		{

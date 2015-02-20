@@ -5,10 +5,6 @@
 #include "GameFramework/Actor.h"
 #include "CGInventory.generated.h"
 
-#define TIER_ZERO_AMMO 0
-#define TIER_ONE_AMMO 1
-#define TIER_TWO_AMMO 2
-
 /**
  * 
  */
@@ -24,15 +20,15 @@ public:
 
 	void InitializeInventory(const FCGDefaultWeaponConfig& Config);
 
-	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type = ECrystalType::NONE);
+	void AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
 
 	void DestroyInventory();
 
 	void ReconstructInventory();
 
-	bool CanLoadCrystal(ECrystalType Crystal);
+	bool CanLoadCrystal(ECGCrystalType Crystal);
 
-	void LoadCrystal(ECrystalType Crystal);
+	void LoadCrystal(ECGCrystalType Crystal);
 
 	FORCEINLINE ACGWeapon* GetWeapon(int32 Index) const { return Weapons[Index]; }
 
@@ -53,11 +49,11 @@ public:
 	
 	/** The Tier 1 Crystal for the Player. (FORCE, ACCURACY, UTILITY)*/
 	UPROPERTY(Transient, Replicated)
-	ECrystalType TierOneCrystal;
+	ECGCrystalType TierOneCrystal;
 
 	/** The Tier 2 Crystal for the Player. (POWER UP) */
 	UPROPERTY(Transient, Replicated)
-	ECrystalType TierTwoCrystal;
+	ECGCrystalType TierTwoCrystal;
 	
 	/**The Weapons the player has available to them.*/
 	UPROPERTY(Transient, Replicated)
@@ -68,7 +64,7 @@ public:
 	int32 StaticWeaponCount;
 
 	/** Contains the weapon groups that the gun inventory is selected by. Managed by the server, then replicated to the client through Weapons.*/
-	TMap<ECrystalType, TArray<class ACGWeapon*>> WeaponGroups;
+	TMap<ECGCrystalType, TArray<class ACGWeapon*>> WeaponGroups;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ACGAmmoPickup> AmmoPickupTemplate;

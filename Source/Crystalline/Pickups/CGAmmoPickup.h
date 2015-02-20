@@ -3,8 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-
-
+#include "Misc/CGTypes.h"
 #include "CGAmmoPickup.generated.h"
 
 

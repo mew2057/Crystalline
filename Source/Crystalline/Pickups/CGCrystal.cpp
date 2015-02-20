@@ -48,7 +48,7 @@ ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	// TODO set is active based on spawn active.
 	bIsActive = true;
 	bSpawnActive = true;
-	CrystalType = ECrystalType::NONE;
+	CrystalType = ECGCrystalType::NONE;
 
 }
 

@@ -5,8 +5,8 @@
 
 ACGInventory::ACGInventory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	TierOneCrystal = ECrystalType::NONE;
-	TierTwoCrystal = ECrystalType::NONE;
+	TierOneCrystal = ECGCrystalType::NONE;
+	TierTwoCrystal = ECGCrystalType::NONE;
 
 	bReplicates = true;
 	bOnlyRelevantToOwner = true;
@@ -17,8 +17,8 @@ void ACGInventory::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	
-	TierOneCrystal = ECrystalType::NONE;
-	TierTwoCrystal = ECrystalType::NONE;
+	TierOneCrystal = ECGCrystalType::NONE;
+	TierTwoCrystal = ECGCrystalType::NONE;
 }
 
 
@@ -75,7 +75,7 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 	ReconstructInventory();
 }
 
-void ACGInventory::AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
+void ACGInventory::AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type)
 {
 	// If the weapon wasn't set and we're not the server, don't bother.
 	if (Weapon == NULL || Role < ROLE_Authority)
@@ -84,7 +84,7 @@ void ACGInventory::AddWeapon(ACGWeapon* Weapon, ECrystalType Type)
 	}
 
 	// If no type is specified, assume that it's a default weapon.
-	if (Type == ECrystalType::NONE)
+	if (Type == ECGCrystalType::NONE)
 	{
 		Weapons.AddUnique(Weapon);
 	}
@@ -143,7 +143,7 @@ void ACGInventory::DestroyInventory()
 	}
 
 	// Clear the weapon groups.
-	TArray<ECrystalType> Keys;
+	TArray<ECGCrystalType> Keys;
 	TArray<ACGWeapon*> Values;
 	WeaponGroups.GetKeys(Keys);
 	for (int32 i = Keys.Num() - 1; i >= 0; --i)
@@ -200,7 +200,7 @@ void ACGInventory::ReconstructInventory()
 	if (bTierOneDefined)
 	{
 		// Determine the number of weapons to be transfered over.
-		int32 CopyLength = FMath::Min(WeaponGroups[TierOneCrystal].Num(),TierTwoCrystal == ECrystalType::NONE ? 1 : 2);
+		int32 CopyLength = FMath::Min(WeaponGroups[TierOneCrystal].Num(), TierTwoCrystal == ECGCrystalType::NONE ? 1 : 2);
 
 		for (int32 i = 0; i < CopyLength; ++i)
 		{
@@ -215,24 +215,24 @@ void ACGInventory::ReconstructInventory()
 	}
 }
 
-bool ACGInventory::CanLoadCrystal(ECrystalType Crystal)
+bool ACGInventory::CanLoadCrystal(ECGCrystalType Crystal)
 {
-	return Crystal != ECrystalType::NONE &&
-		((Crystal > ECrystalType::POWER_UP && TierOneCrystal != Crystal) ||
-		(Crystal <= ECrystalType::POWER_UP && TierTwoCrystal != Crystal));
+	return Crystal != ECGCrystalType::NONE &&
+		((Crystal > ECGCrystalType::POWER_UP && TierOneCrystal != Crystal) ||
+		(Crystal <= ECGCrystalType::POWER_UP && TierTwoCrystal != Crystal));
 }
 
-void ACGInventory::LoadCrystal(ECrystalType Crystal)
+void ACGInventory::LoadCrystal(ECGCrystalType Crystal)
 {
 	bool bIsDirty = false;
 
 	// Tier1 crystal
-	if (Crystal > ECrystalType::POWER_UP && TierOneCrystal != Crystal)
+	if (Crystal > ECGCrystalType::POWER_UP && TierOneCrystal != Crystal)
 	{
 		TierOneCrystal = Crystal;
 		bIsDirty = true;
 	}
-	else if (Crystal > ECrystalType::NONE && TierTwoCrystal != Crystal)
+	else if (Crystal > ECGCrystalType::NONE && TierTwoCrystal != Crystal)
 	{
 		TierTwoCrystal = Crystal;
 		bIsDirty = true;

@@ -4,144 +4,11 @@
 
 #include "GameFramework/Character.h"
 #include "Pickups/CGCrystal.h"
+#include "Misc/CGTypes.h"
 #include "CGCharacter.generated.h"
 
 // TODO move me somewhere sane.
-#pragma region Enums
-UENUM(BlueprintType)
-enum class ECGAmmoType : uint8
-{
-	NONE UMETA(DisplayName = "None"),
-	T_ZERO UMETA(DisplayName = "Tier Zero"),
-	T_ONE  UMETA(DisplayName = "Tier One"),
-	T_TWO  UMETA(DisplayName = "Tier Two")
-};
-#pragma endregion
 
-#pragma region Structs
-
-USTRUCT()
-struct FCGZoom
-{
-	GENERATED_USTRUCT_BODY()
-	/** The factor that this zoom.*/
-	UPROPERTY(EditDefaultsOnly)
-	float ZoomFactor;
-
-	/**Speed of the interpolation from zoomed to zoomed out and vice versa. TODO make this seconds!*/
-	UPROPERTY(EditDefaultsOnly)
-	float ZoomSpeed;
-
-	// Used in the zoom operation.
-	///////////////////////////////////////////
-	UPROPERTY(Transient)
-	float TargetZoom;
-	///////////////////////////////////////////
-
-	FCGZoom()
-	{
-		ZoomFactor = 1.5f;
-		ZoomSpeed = 20.f;
-	}
-
-public:
-	/** Preps the variables of the struct for use. */
-	void InitZoom()
-	{
-		ZoomFactor = 1 / ZoomFactor;
-	}
-
-	/** Sets the target zoom and start zoom up properly. Reduces the number of if statements per.*/
-	void BeginZoom(float BaseFOV, bool bZoomIn)
-	{
-		TargetZoom = bZoomIn ? BaseFOV * ZoomFactor : BaseFOV;
-	}
-
-};
-
-// TODO move this somewhere sane!
-#pragma region WeaponConfigStructs
-
-
-USTRUCT()
-struct FCGCrystalAmmo
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditDefaultsOnly, Category = Ammo)
-	int32 MaxAmmoCarried;
-
-	UPROPERTY(EditAnywhere, Category = Ammo)
-	int32 AmmoCarried;
-
-	UPROPERTY(EditAnywhere, Category = Ammo)
-	int32 AmmoInClip;
-
-
-	FCGCrystalAmmo()
-	{
-		MaxAmmoCarried = 120;
-		AmmoCarried = 80;
-		AmmoInClip = 0;
-	}
-
-};
-
-
-USTRUCT()
-struct FCGDDefaultCrystalTreeConfig
-{
-	GENERATED_USTRUCT_BODY()
-	
-	/** The Tier One Gun, Available when the player has a tier one crystal.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TSubclassOf<class ACGCrystalGun> TierOneGun;
-
-	/** The Tier Two Gun, Available when the player has a tier one and two crystal.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TSubclassOf<class ACGCrystalGun> TierTwoGun;
-
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	ECrystalType TierOneCrystalType;
-};
-
-USTRUCT()
-struct FCGDefaultWeaponConfig
-{
-	GENERATED_USTRUCT_BODY()
-
-	/** An ammo free side arm.*/
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
-	TSubclassOf<class ACGWeapon> CoreWeapon;
-	
-	/** The baseline crystal gun, this is always present for the player.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TSubclassOf<class ACGCrystalGun> CoreCrystalGun;
-
-	/** Defines the Tiers for the Crystal Guns.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TArray<FCGDDefaultCrystalTreeConfig> CrystalGunGroups;
-
-	/**Defines the max ammo for the assault rife.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	FCGCrystalAmmo TierZeroAmmoConfig;
-
-	/**Defines the max ammo for the tier one weapons.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	FCGCrystalAmmo TierOneAmmoConfig;
-
-	/**Defines the max ammo for the tier two weapons.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	FCGCrystalAmmo TierTwoAmmoConfig;
-
-	FCGDefaultWeaponConfig()
-	{
-	}
-};
-
-#pragma endregion
-
-#pragma endregion
 
 /**
  * 
@@ -165,6 +32,8 @@ public:
 	bool Die(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser);
 
 	void OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser);
+
+	void StopAllAnim();
 
 	/**Invoked on player death.*/
 	virtual void TornOff() override;
@@ -231,7 +100,7 @@ public:
 
 	/** Defines the zoom factor for the weapon. */
 	UPROPERTY(Transient)
-	FCGZoom CurrentZoom;
+	struct FCGZoom CurrentZoom;
 
 	/** The FOV in the general case for the player.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -392,7 +261,7 @@ public:
 	 * Invokes the weapon's OnEnterInventory.
 	 * @param NewWeapon the candidate weapon for addition.
 	 */
-	void AddWeapon(ACGWeapon* Weapon, ECrystalType Type = ECrystalType::NONE);
+	void AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
 
 	/**
 	 * [server,client] Equips the supplied weapon to the player.

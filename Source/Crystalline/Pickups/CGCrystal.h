@@ -3,25 +3,8 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Misc/CGTypes.h"
 #include "CGCrystal.generated.h"
-
-
-UENUM(BlueprintType)
-enum class ECrystalType : uint8
-{
-	NONE UMETA(DisplayName = "None"),
-	POWER_UP UMETA(DisplayName = "Power Up"),
-	FORCE UMETA(DisplayName = "Force"),
-	ACCURACY  UMETA(DisplayName = "Accuracy"),
-	UTILITY	 UMETA(DisplayName = "Utility")
-};
-
-// TODO find out what the overhead on this is.
-/** Implemented for TMap.*/
-inline uint8 GetTypeHash(const ECrystalType A)
-{
-	return (uint8)A;
-}
 
 /**
  * 
@@ -55,13 +38,13 @@ public:
 	UFUNCTION()
 	void OnRep_Active();
 
-	FORCEINLINE ECrystalType GetCrystalType() const { return CrystalType; };
+	FORCEINLINE ECGCrystalType GetCrystalType() const { return CrystalType; };
 
 protected:
 
 	/** The Crystal type of the pickup. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	ECrystalType CrystalType;
+		ECGCrystalType CrystalType;
 
 	/** Crystal Mesh, defines the Noteworthy portion of the crystal.*/
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
