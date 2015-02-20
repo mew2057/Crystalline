@@ -21,6 +21,7 @@ ACGAmmoPickup::ACGAmmoPickup(const FObjectInitializer& ObjectInitializer) : Supe
 	OverlapVolume->SetIsReplicated(true);
 	RootComponent = OverlapVolume;
 	*/
+	// TODO this may cause mismatch.
 	AmmoMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AmmoMesh"));
 	AmmoMesh->bReceivesDecals = false;
 	AmmoMesh->CastShadow = true;
