@@ -33,6 +33,11 @@ public:
 
 	void OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser);
 
+	void ReplicateHit(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser, bool bKilled);
+
+	UFUNCTION()
+	void OnRep_LastHit();
+
 	void StopAllAnim();
 
 	/**Invoked on player death.*/
@@ -73,6 +78,9 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	float CurrentHealth;
 	
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastHit )
+	FCGHitInfo LastHit;
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USkeletalMeshComponent* Mesh1P;

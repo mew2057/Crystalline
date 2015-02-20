@@ -339,11 +339,11 @@ struct FCGInstantHit
 {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY()
-		FVector Origin;
+	UPROPERTY()
+	FVector Origin;
 
 	UPROPERTY()
-		FVector Direction;
+	FVector Direction;
 };
 
 /** VFX and SFX related to the weapon.*/
@@ -437,6 +437,42 @@ struct FCGWeaponHUDData
 		FullAmmoColor = FLinearColor(0, 1, 0, 1); // Green
 
 		AmmoGuageWidth = 256.0f;
+	}
+};
+
+USTRUCT()
+struct FCGHitInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	float Damage;
+
+	UPROPERTY()
+	uint32 bKillingHit: 1;
+
+	UPROPERTY()
+	TWeakObjectPtr<class ACGCharacter> Instigator;
+
+	UPROPERTY()
+	TWeakObjectPtr<class AActor> DamageCauser;
+	// TODO learn how to do this damage event better.
+	UPROPERTY()
+	FDamageEvent DamageEvent;
+
+private:
+	UPROPERTY()
+	uint8 ReplicationByte;
+
+public:
+	FCGHitInfo()
+	{
+		bKillingHit = false;
+		Damage = 0;
+	}
+	void EnsureReplication()
+	{
+		ReplicationByte++;
 	}
 };
 

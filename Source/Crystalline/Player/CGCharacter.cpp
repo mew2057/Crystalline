@@ -200,6 +200,9 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	if (Role == ROLE_Authority)
 	{
 		// Play death feedback.
+		ReplicateHit(KillingDamage, DamageEvent, PawnInstigator, DamageCauser, true);
+		
+		// TODO force feedback.
 	}
 
 
@@ -254,6 +257,34 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	/////////////////////////////////////////////////////
 
 	SetLifeSpan(5.f);
+}
+
+void ACGCharacter::ReplicateHit(float Damage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser, bool bKilled)
+{
+	// TODO manage Same Frame Damage.
+	// Don't replicate again.
+	if (bKilled && LastHit.bKillingHit)
+	{
+		return;
+	}
+
+	LastHit.Damage = Damage;
+	LastHit.Instigator = Cast<ACGCharacter>(PawnInstigator);
+	LastHit.DamageCauser = DamageCauser;
+	LastHit.bKillingHit = bKilled;
+	LastHit.DamageEvent = DamageEvent;
+	LastHit.EnsureReplication();
+}
+
+void ACGCharacter::OnRep_LastHit()
+{
+	UE_LOG(LogTemp, Log, TEXT("Replicating"));
+
+	if (LastHit.bKillingHit)
+	{
+		// TODO Clean up damage event stuff.
+		OnDeath(LastHit.Damage, LastHit.DamageEvent, LastHit.Instigator.Get(), LastHit.DamageCauser.Get());
+	}
 }
 
 void ACGCharacter::StopAllAnim()
@@ -748,7 +779,7 @@ void ACGCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	DOREPLIFETIME_CONDITION(ACGCharacter, PendingCrystalPickup, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, Inventory, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGCharacter, bZoomed, COND_SkipOwner);
-
+	DOREPLIFETIME_CONDITION(ACGCharacter, LastHit, COND_Custom);
 
 	// Everyone.
 	DOREPLIFETIME(ACGCharacter, CurrentWeapon);
