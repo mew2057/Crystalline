@@ -11,3 +11,11 @@ ACGBot::ACGBot(const FObjectInitializer& ObjectInitializer)
 
 	bUseControllerRotationYaw = true;
 }
+
+void ACGBot::FaceRotation(FRotator NewRotation, float DeltaTime)
+{
+	// Prevents the rotation from being instant (technique from framework game.
+	FRotator CurrentRotation = FMath::RInterpTo(GetActorRotation(), NewRotation, DeltaTime, 8.0f);
+
+	Super::FaceRotation(CurrentRotation, DeltaTime);
+}

@@ -19,5 +19,6 @@ public:
 
 	ACGBot(const FObjectInitializer& ObjectInitializer);
 	
-	
+	virtual void FaceRotation(FRotator NewRotation, float DeltaTime) override;
+
 };

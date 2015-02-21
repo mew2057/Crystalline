@@ -40,6 +40,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 	void ShootEnemy();
 
+	/** Makes the bot look at the player.*/
+	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn = true) override;
 
 private:
 

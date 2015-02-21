@@ -120,5 +120,24 @@ ACGCharacter* ACGBotController::GetEnemy()
 
 void ACGBotController::ShootEnemy()
 {
+	// Get pawn and weapon, get enemy and LOS, shoot or not.
 
+}
+
+void ACGBotController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
+{
+	const FVector Focus = GetFocalPoint();
+	
+	if (!Focus.IsZero() && GetPawn())
+	{
+		FRotator DirRotation = (Focus - GetPawn()->GetActorLocation()).Rotation();
+
+		//Clamp so the player doesn't spin wildly.
+		DirRotation.Yaw = FRotator::ClampAxis(DirRotation.Yaw);
+		SetControlRotation(DirRotation);
+		if (bUpdatePawn)
+		{
+			GetPawn()->FaceRotation(DirRotation, DeltaTime);
+		}
+	}
 }
