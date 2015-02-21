@@ -660,7 +660,6 @@ void ACGWeapon::SpawnHitEffect(const FHitResult& Impact)
 			WeaponFXConfig.ImpactEffect,
 			Impact.ImpactPoint,
 			(Impact.ImpactNormal * FVector::ForwardVector).Rotation());
-
 	}
 }
 

@@ -31,6 +31,7 @@ ACGAmmoPickup::ACGAmmoPickup(const FObjectInitializer& ObjectInitializer) : Supe
 	AmmoMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	AmmoMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	AmmoMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	AmmoMesh->SetCollisionObjectType(COLLISION_AMMO_DROP);
 	AmmoMesh->SetHiddenInGame(false);
 	AmmoMesh->SetIsReplicated(true);
 	AmmoMesh->SetSimulatePhysics(false);
