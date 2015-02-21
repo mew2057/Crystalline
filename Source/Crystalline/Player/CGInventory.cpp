@@ -124,9 +124,14 @@ void ACGInventory::DestroyInventory()
 		CachedWeapon = Weapons[i];
 		if (CachedWeapon)
 		{
+			if (CachedWeapon->WeaponConfig.AmmoType>ECGAmmoType::NONE)
+				UE_LOG(LogTemp, Log, TEXT("Ammo Type : %d"), (uint8)CachedWeapon->WeaponConfig.AmmoType);
+
 			// TODO refactor, this is a quick and dirty ammo pickuip spawner.
 			if (AmmoPickupTemplate && CachedWeapon->WeaponConfig.AmmoType > ECGAmmoType::NONE)
 			{
+				UE_LOG(LogTemp, Log, TEXT("Ammo Type Spawn: %d"), (uint8)CachedWeapon->WeaponConfig.AmmoType);
+
 				TempPickup = GetWorld()->SpawnActor<ACGAmmoPickup>(
 					AmmoPickupTemplate, 
 					CGOwner->GetActorLocation(),
