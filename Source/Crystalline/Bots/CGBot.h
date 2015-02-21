@@ -12,7 +12,7 @@ UCLASS()
 class CRYSTALLINE_API ACGBot : public ACGCharacter
 {
 	GENERATED_BODY()
-
+public:
 	/** Defines all of the behavior for the AI.*/
 	UPROPERTY(EditAnywhere, Category = Behavior)
 	class UBehaviorTree* BotBehavior;
