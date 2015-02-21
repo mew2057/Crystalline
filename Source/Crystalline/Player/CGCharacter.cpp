@@ -29,6 +29,8 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	Mesh1P->bReceivesDecals = false;
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Mesh1P->SetCollisionResponseToAllChannels(ECR_Ignore);
+	AmmoMesh->SetHiddenInGame(false);
+
 
 	GetMesh()->bOnlyOwnerSee = false;
 	GetMesh()->bOwnerNoSee = true;
