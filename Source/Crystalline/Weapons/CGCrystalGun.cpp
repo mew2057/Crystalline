@@ -20,8 +20,6 @@ void ACGCrystalGun::PostInitializeComponents()
 
 void ACGCrystalGun::GiveAmmo(int32 NewAmmo)
 {
-	UE_LOG(LogTemp, Log, TEXT("Give Ammo %d"), NewAmmo);
-
 	Ammo = FMath::Min(AmmoConfig.AmmoCapacity, Ammo + NewAmmo);
 }
 
@@ -38,7 +36,7 @@ bool ACGCrystalGun::CanFire(bool InitFireCheck) const
 
 float ACGCrystalGun::GetClipPercent() const
 {
-	return (float)(AmmoInClip * AmmoConfig.AmmoPerShot) / AmmoConfig.ShotsPerClip;
+	return (float)AmmoInClip / (AmmoConfig.ShotsPerClip * AmmoConfig.AmmoPerShot);
 }
 
 float ACGCrystalGun::GetReloadTime() const
@@ -49,7 +47,7 @@ float ACGCrystalGun::GetReloadTime() const
 bool ACGCrystalGun::CanReload() const
 {
 	// If we have ammo and we've actually fired something.
-	return Ammo > 0 && (AmmoInClip * AmmoConfig.AmmoPerShot) < AmmoConfig.ShotsPerClip;
+	return Ammo > 0 && AmmoInClip < (AmmoConfig.ShotsPerClip* AmmoConfig.AmmoPerShot);
 }
 
 void ACGCrystalGun::ApplyReload()
