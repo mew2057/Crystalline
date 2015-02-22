@@ -20,7 +20,7 @@ EBTNodeResult::Type UCGBTTask_FindPointNearEnemy::ExecuteTask(UBehaviorTreeCompo
 	APawn* Pawn = Controller->GetPawn();
 	ACGCharacter* Enemy = Controller->GetEnemy();
 
-	if (Pawn && Enemy)
+	if (Pawn && Enemy && Enemy->IsAlive())
 	{
 		// Find a point between the actors to serve as an origin.
 		const FVector PointBetweenActors = Enemy->GetActorLocation() + 400.f * (Pawn->GetActorLocation() - Enemy->GetActorLocation()).SafeNormal();

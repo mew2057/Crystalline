@@ -80,7 +80,7 @@ void ACGBotController::SearchForEnemy()
 		TempEnemy = Cast<ACGCharacter>(*It);
 		
 		// TODO improve robustness for team game types.
-		if (TempEnemy && TempEnemy->Controller != this)
+		if (TempEnemy && TempEnemy->Controller != this && TempEnemy->IsAlive())
 		{
 			// TODO Check to see if DistSquared or SizeSquared is faster.
 			TempDist = FVector::DistSquared(MyLoc, TempEnemy->GetActorLocation());
@@ -121,7 +121,28 @@ ACGCharacter* ACGBotController::GetEnemy()
 void ACGBotController::ShootEnemy()
 {
 	// Get pawn and weapon, get enemy and LOS, shoot or not.
+	ACGCharacter* MyBot = Cast<ACGCharacter>(GetPawn());
 
+	if (MyBot == nullptr || MyBot->GetCurrentWeapon() == nullptr)
+	{
+		return;
+	}
+	
+	ACGWeapon* CurrentWeapon = MyBot->GetCurrentWeapon();
+	ACGCharacter* Enemy = GetEnemy();
+
+	if (Enemy && Enemy->IsAlive() && LineOfSightTo(Enemy, MyBot->GetActorLocation()))
+	{
+		MyBot->StartFire();
+		//CurrentWeapon->StartFiring();
+	}
+	else
+	{
+		MyBot->StopFire();
+
+	//	CurrentWeapon->StopFiring();
+	}
+	
 }
 
 void ACGBotController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)

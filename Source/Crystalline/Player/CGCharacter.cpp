@@ -73,18 +73,7 @@ void ACGCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	// XXX ZOOM
-	// Init the Zoom to be sure.
-	CurrentZoom.InitZoom();
-	FirstPersonCameraComponent->FieldOfView = FOVDefault;
 
-	// Only the authority should spwan the inventory.
-	if (Role == ROLE_Authority)
-	{
-		CurrentShield = MaxShield;
-		CurrentHealth = MaxHealth;
-		SpawnBaseInventory();
-		
-	}
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -115,6 +104,22 @@ void ACGCharacter::Tick(float DeltaSeconds)
 		FirstPersonCameraComponent->FieldOfView = CurrentFOV;
 	}
 }
+
+void ACGCharacter::SetPlayerDefaults()
+{
+	// Init the Zoom to be sure.
+	CurrentZoom.InitZoom();
+	FirstPersonCameraComponent->FieldOfView = FOVDefault;
+
+	// Only the authority should spwan the inventory.
+	if (Role == ROLE_Authority)
+	{
+		CurrentShield = MaxShield;
+		CurrentHealth = MaxHealth;
+		SpawnBaseInventory();
+	}
+}
+
 
 float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
@@ -365,6 +370,17 @@ void ACGCharacter::Destroyed()
 }
 
 #pragma endregion
+
+
+bool ACGCharacter::IsFirstPerson()
+{
+	return Controller && Controller->IsLocalPlayerController();
+}
+
+bool ACGCharacter::IsAlive()
+{
+	return CurrentHealth > 0;
+}
 
 
 

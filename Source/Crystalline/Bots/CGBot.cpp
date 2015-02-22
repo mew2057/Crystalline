@@ -19,3 +19,8 @@ void ACGBot::FaceRotation(FRotator NewRotation, float DeltaTime)
 
 	Super::FaceRotation(CurrentRotation, DeltaTime);
 }
+
+bool ACGBot::IsFirstPerson()
+{
+	return false;
+}

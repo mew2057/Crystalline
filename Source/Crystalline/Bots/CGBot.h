@@ -21,4 +21,6 @@ public:
 	
 	virtual void FaceRotation(FRotator NewRotation, float DeltaTime) override;
 
+	virtual bool IsFirstPerson() override;
+
 };
