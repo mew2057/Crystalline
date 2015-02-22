@@ -18,11 +18,11 @@ public:
 
 	void PostInitializeComponents();
 
-	void InitializeInventory(const FCGDefaultWeaponConfig& Config);
+	virtual void InitializeInventory(const FCGDefaultWeaponConfig& Config);
 
 	void AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
 
-	void DestroyInventory();
+	virtual void DestroyInventory();
 
 	void ReconstructInventory();
 

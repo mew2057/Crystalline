@@ -794,19 +794,6 @@ void ACGWeapon::AttachMeshToPawn()
 		USkeletalMeshComponent * PawnMesh1P = CGOwner->IsFirstPerson() ? CGOwner->GetMesh1P() : CGOwner->GetMesh();
 		Mesh1P->SetHiddenInGame(false);
 		Mesh1P->AttachTo(PawnMesh1P, ConnectionPoint, EAttachLocation::SnapToTarget);
-		/*
-		if (CGOwner->IsLocallyControlled())
-		{
-			// TODO First person check.
-			// This lets the flags for the mesh handle everything.
-			USkeletalMeshComponent * PawnMesh1P = CGOwner->GetMesh1P();
-			Mesh1P->SetHiddenInGame(false);
-			Mesh1P->AttachTo(PawnMesh1P, ConnectionPoint, EAttachLocation::SnapToTarget);
-		}
-		else
-		{
-			
-		}*/
 	}
 }
 
