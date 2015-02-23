@@ -12,12 +12,15 @@ UCLASS()
 class CRYSTALLINE_API ACGBot : public ACGCharacter
 {
 	GENERATED_BODY()
-
+public:
 	/** Defines all of the behavior for the AI.*/
 	UPROPERTY(EditAnywhere, Category = Behavior)
 	class UBehaviorTree* BotBehavior;
 
 	ACGBot(const FObjectInitializer& ObjectInitializer);
 	
-	
+	virtual void FaceRotation(FRotator NewRotation, float DeltaTime) override;
+
+	virtual bool IsFirstPerson() override;
+
 };

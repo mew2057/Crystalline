@@ -25,6 +25,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void SetPlayerDefaults() override;
+
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 	
 	bool CantDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
@@ -49,6 +51,12 @@ public:
 
 	/** Make Sure the inventory is destroyed. */
 	virtual void Destroyed() override;
+
+	virtual bool IsFirstPerson();
+
+	bool IsAlive();
+
+
 
 
 protected:
@@ -162,7 +170,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region Input
-protected:
+public:
 	/** Initiates the fire for current weapon. */
 	void StartFire();
 

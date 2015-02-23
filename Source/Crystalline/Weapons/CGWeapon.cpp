@@ -791,13 +791,9 @@ void ACGWeapon::AttachMeshToPawn()
 
 		const FName ConnectionPoint = CGOwner->GetWeaponAttachPoint();
 
-		// This lets the flags for the mesh handle everything.
-		USkeletalMeshComponent * PawnMesh1P = CGOwner->GetMesh1P();
+		USkeletalMeshComponent * PawnMesh1P = CGOwner->IsFirstPerson() ? CGOwner->GetMesh1P() : CGOwner->GetMesh();
 		Mesh1P->SetHiddenInGame(false);
 		Mesh1P->AttachTo(PawnMesh1P, ConnectionPoint, EAttachLocation::SnapToTarget);
-
-		// TODO attach the 3rd person weapon.
-		// FIXME At Some point get the locally controlled gate workng.
 	}
 }
 

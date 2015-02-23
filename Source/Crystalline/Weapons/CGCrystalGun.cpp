@@ -13,15 +13,13 @@ ACGCrystalGun::ACGCrystalGun(const FObjectInitializer& ObjectInitializer) :Super
 void ACGCrystalGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	ClipPercentPerShot = AmmoConfig.AmmoPerShot / AmmoConfig.ClipSize;
+	ClipPercentPerShot = 1 / AmmoConfig.ShotsPerClip;
 }
 
 #pragma region Ammo
 
 void ACGCrystalGun::GiveAmmo(int32 NewAmmo)
 {
-	UE_LOG(LogTemp, Log, TEXT("Give Ammo %d"), NewAmmo);
-
 	Ammo = FMath::Min(AmmoConfig.AmmoCapacity, Ammo + NewAmmo);
 }
 
@@ -38,7 +36,7 @@ bool ACGCrystalGun::CanFire(bool InitFireCheck) const
 
 float ACGCrystalGun::GetClipPercent() const
 {
-	return (float)AmmoInClip / AmmoConfig.ClipSize;
+	return (float)AmmoInClip / (AmmoConfig.ShotsPerClip * AmmoConfig.AmmoPerShot);
 }
 
 float ACGCrystalGun::GetReloadTime() const
@@ -49,12 +47,12 @@ float ACGCrystalGun::GetReloadTime() const
 bool ACGCrystalGun::CanReload() const
 {
 	// If we have ammo and we've actually fired something.
-	return Ammo > 0 && AmmoInClip < AmmoConfig.ClipSize;
+	return Ammo > 0 && AmmoInClip < (AmmoConfig.ShotsPerClip* AmmoConfig.AmmoPerShot);
 }
 
 void ACGCrystalGun::ApplyReload()
 {
-	int32 Difference = AmmoConfig.ClipSize - AmmoInClip;
+	int32 Difference = (AmmoConfig.ShotsPerClip * AmmoConfig.AmmoPerShot ) - AmmoInClip;
 	Difference = Ammo < Difference ? Ammo : Difference;
 
 	Ammo -= Difference;
@@ -63,17 +61,10 @@ void ACGCrystalGun::ApplyReload()
 
 void ACGCrystalGun::InitializeAmmo(const FCGCrystalAmmo& AmmoStruct)
 {
-	AmmoInClip = AmmoStruct.AmmoInClip;
 	Ammo = AmmoStruct.AmmoCarried;
 	AmmoConfig.AmmoCapacity = AmmoStruct.MaxAmmoCarried;
 
-
-	//XXX Should this exist?
-	// Reload the gun if the base ammo isn't set.
-	if (AmmoInClip <= 0)
-	{
-		ApplyReload();
-	}
+	ApplyReload();
 };
 
 void ACGCrystalGun::CopyAmmo(const ACGCrystalGun* Other)
@@ -82,7 +73,7 @@ void ACGCrystalGun::CopyAmmo(const ACGCrystalGun* Other)
 	Ammo = Other->Ammo;
 
 	// TODO Modify so the energy doesn't exceed the Clipsize.
-	const int32 Overflow = AmmoInClip - AmmoConfig.ClipSize;
+	const int32 Overflow = AmmoInClip - (AmmoConfig.ShotsPerClip * AmmoConfig.AmmoPerShot);
 	if (Overflow > 0)
 	{
 		AmmoInClip -= Overflow;

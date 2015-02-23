@@ -4,7 +4,7 @@
 #include "CGBaseGameMode.h"
 #include "Player/CGCharacter.h"
 #include "Player/CGPlayerController.h"
-
+#include "Bots/CGBotController.h"
 #include "GUI/CGPlayerHUD.h"
 
 
@@ -24,6 +24,21 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) : 
 	RoundTime = 300;
 	ScorePerKill = 1;
 	SuicidePenalty = 1; 
+	bSpawnBots = true;
+	BotsInRound = 2;
+
+}
+
+void ACGBaseGameMode::HandleMatchIsWaitingToStart()
+{
+
+	Super::HandleMatchIsWaitingToStart();
+
+	if (bSpawnBots)
+	{
+		// Create Bots
+		CreateBots();
+	}
 
 }
 
@@ -37,6 +52,9 @@ void ACGBaseGameMode::HandleMatchHasStarted()
 	{
 		CGGameState->RemainingTime = RoundTime;
 	}
+
+	// Kicks off the bot players.
+	StartBots();
 
 	// XXX notify the players?
 }
@@ -65,6 +83,19 @@ void ACGBaseGameMode::DefaultTimer()
 		}
 	}
 }
+
+UClass* ACGBaseGameMode::GetDefaultPawnClassForController(AController* InController)
+{
+
+	// If we have a bot controller, tell the game mode we need a bot pawn.
+	if (Cast<ACGBotController>(InController))
+	{
+		return BotPawn;
+	}
+
+	return Super::GetDefaultPawnClassForController(InController);
+}
+
 
 
 void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
@@ -122,4 +153,55 @@ void ACGBaseGameMode::EndGame(ACGPlayerState* Winner)
 bool ACGBaseGameMode::IsWinner(ACGPlayerState* Player) 
 { 
 	return false;
+}
+
+void ACGBaseGameMode::CreateBots()
+{
+	int32 BotsActive = 0;
+	// Iterate over the controllers.
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		
+		if (Cast<ACGBotController>(*It))
+		{
+			BotsActive++;
+		}
+	}
+
+	for (; BotsActive < BotsInRound; BotsActive++)
+	{
+		SpawnBot(BotsActive);
+	}
+
+}
+
+void ACGBaseGameMode::SpawnBot(int32 BotId)
+{
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+	SpawnInfo.Instigator = nullptr;
+	SpawnInfo.OverrideLevel = nullptr;
+
+	ACGBotController* Bot = GetWorld()->SpawnActor<ACGBotController>(SpawnInfo);
+
+	if (Bot && Bot->PlayerState)
+	{
+		Bot->PlayerState->PlayerName = FString::Printf(TEXT("Bottisimo #%d"), BotId);
+	}
+	
+}
+
+
+void ACGBaseGameMode::StartBots()
+{
+	ACGBotController* Bot;
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		Bot = Cast<ACGBotController>(*It);
+		if (Bot)
+		{
+			RestartPlayer(Bot);
+		}
+	}
 }
