@@ -25,8 +25,8 @@ public:
 	virtual void SpawnTrailEffect(const FVector& EndPoint) override;
 
 protected:
-	UPROPERTY(Transient, Replicated)
-	class AActor* Target;
+	UPROPERTY(Transient)
+	class APawn* Target;
 
 	/** The maximum angle that the beam can be pointed away from it's target.*/
 	UPROPERTY(EditDefaultsOnly, Category=Config)

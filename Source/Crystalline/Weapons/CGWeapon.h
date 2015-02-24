@@ -149,7 +149,6 @@ public:
 	UFUNCTION(client, reliable)
 	void ClientCheckQueuedInput();
 
-
 	// This is managed by the weapon, not the state at the present.
 	// FIXME
 	virtual void StartOverheat();
@@ -163,7 +162,8 @@ public:
 		
 	virtual void ApplyReload();
 
-
+	// Can't zoom if Equipping or Unequipping.
+	FORCEINLINE bool CanZoom() { return CurrentState != EquippingState && CurrentState != UnequippingState;  }
 
 #pragma endregion
 
