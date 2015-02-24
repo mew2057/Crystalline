@@ -284,7 +284,7 @@ void ACGPlayerHUD::DrawGameInfo()
 		const int32 NumElements = RoundDataElement.GameDataElements.Num();
 		FCGGameElement TempElement;
 
-		for (int i = NumElements - CGGameState->PlayerArray.Num(); i < NumElements; ++i)
+		for (int i = 0; i < NumElements; ++i)
 		{
 
 			TempElement = RoundDataElement.GameDataElements[i];
