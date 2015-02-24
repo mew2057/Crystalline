@@ -55,7 +55,7 @@ void ACGPlayerHUD::DrawHUD()
 
 			DrawWeaponHUD();
 			DrawPrompt();
-
+			/*
 			// State Print out
 			float SizeX, SizeY;
 			FString Text = Weapon->CurrentState->GetName();
@@ -70,7 +70,7 @@ void ACGPlayerHUD::DrawHUD()
 			TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
 			//TextItem.FontRenderInfo = ShadowedFont;
 
-			Canvas->DrawItem(TextItem, 50, 150);
+			Canvas->DrawItem(TextItem, 50, 150);*/
 		}
 	}
 
@@ -124,6 +124,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	
 		// Debug Ammo Text 
 		////////////////////////////////////////////////////
+		/*
 		float SizeX, SizeY;
 		FString Text = FString::SanitizeFloat(CurrentWeapon->GetAmmoInClip());
 	
@@ -142,7 +143,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		Text = FString::SanitizeFloat(CurrentWeapon->GetAmmo());
 		TextItem.Text = FText::FromString(Text);
 	
-		Canvas->DrawItem(TextItem, 50, 10);
+		Canvas->DrawItem(TextItem, 50, 10);*/
 		////////////////////////////////////////////////////
 	
 		// FIXME this crashes when both players are dead and respawning. Seems to happen on client, this ONLY occurs in release mode.
@@ -228,20 +229,22 @@ void ACGPlayerHUD::DrawGameInfo()
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Time Output
 		//////////////////////////////////////////////////////////////////////////////////////
-
+		float SizeX, SizeY;
 		const int32 Minutes = CGGameState->RemainingTime / 60;
 		const int32 Seconds = CGGameState->RemainingTime % 60;
 		FString Text = FString::Printf(TEXT("%2d : %02d"), Minutes, Seconds);
-
 		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, RoundDataElement.TimeColor);
 		TextItem.Text = FText::FromString(Text);
-		// TODO get scale working properly.
-		TextItem.Scale.Set(RoundDataElement.TimeScale, RoundDataElement.TimeScale);
-			//PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent,
-			//PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent);
 
-		TextItem.EnableShadow(FLinearColor::Black);
-		Canvas->DrawItem(TextItem, X + RoundDataElement.TimeTransform.PercentX, Y + RoundDataElement.TimeTransform.PercentY);
+		// Get the actual size, this is to scale the text to our "Box"
+		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+
+		 // HUD Width.
+		// TODO get scale working properly.
+		TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent) / SizeX,
+			(PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent) / SizeY);
+
+		Canvas->DrawItem(TextItem, X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX, Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY);	
 
 
 		//////////////////////////////////////////////////////////////////////////////////////
@@ -282,13 +285,13 @@ void ACGPlayerHUD::DrawGameInfo()
 			Canvas->DrawTile(
 				RoundDataElement.FGIcon.Texture,
 				ElemX, ElemY,
-				ElemW, ElemH,
+				ElemW * TempElement.PercentToGoal, ElemH,
 				RoundDataElement.FGIcon.U, RoundDataElement.FGIcon.V,
 				RoundDataElement.FGIcon.UL * TempElement.PercentToGoal, RoundDataElement.FGIcon.VL,
 				EBlendMode::BLEND_Translucent);
 			
 			// Score goes here.
-			DrawText(FString::Printf(TEXT("%2d"), TempElement.Score), RoundDataElement.TimeColor, ElemX + ElemW, Y, BigFont, 1, false);
+			//DrawText(FString::Printf(TEXT("%2d"), TempElement.Score), RoundDataElement.TimeColor, ElemX + ElemW, Y, BigFont, 1, false);
 			
 			
 			if (TempElement.bIsOwner)
@@ -317,10 +320,10 @@ void ACGPlayerHUD::DrawPrompt()
 	TextItem.EnableShadow(FLinearColor::Black);
 	Canvas->StrLen(BigFont, PromptMessage, SizeX, SizeY);
 
-	const float TopTextScale = 0.73f; // of 51pt font
+	const float TopTextScale = 1.f; 
 
 	TextItem.Text = FText::FromString(PromptMessage);
-	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
+	TextItem.Scale = FVector2D(TopTextScale, TopTextScale);
 
 	Canvas->SetDrawColor(FColor::Yellow);
 
