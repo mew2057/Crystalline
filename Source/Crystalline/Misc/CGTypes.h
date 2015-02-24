@@ -170,7 +170,7 @@ struct FCGWeaponConfig
 		uint32 bHasManualReload : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		uint32 OverHeatWeapon : 1;
+		uint32 bOverHeatWeapon : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 		float TimeBetweenShots;
@@ -214,7 +214,7 @@ struct FCGWeaponConfig
 		BaseDamage = 10.f;
 		WeaponRange = 10000.f;
 
-		OverHeatWeapon = false;
+		bOverHeatWeapon = false;
 
 		AmmoType = ECGAmmoType::NONE;
 

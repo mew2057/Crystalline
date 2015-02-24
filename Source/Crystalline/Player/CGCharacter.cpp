@@ -89,7 +89,7 @@ void ACGCharacter::Tick(float DeltaSeconds)
 	}
 
 	// XXX ZOOM ZOOM ZOOM
-	if (IsLocallyControlled() && bZooming)
+	if (IsLocallyControlled() && bZooming )
 	{
 		float CurrentFOV = FirstPersonCameraComponent->FieldOfView;
 		//
@@ -382,6 +382,14 @@ bool ACGCharacter::IsAlive()
 	return CurrentHealth > 0;
 }
 
+FRotator ACGCharacter::GetAimOffsets() const
+{
+	const FVector AimDirWS = GetBaseAimRotation().Vector();
+	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
+	const FRotator AimRotLS = AimDirLS.Rotation();
+
+	return AimRotLS;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -471,6 +479,11 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 
 void ACGCharacter::WeaponChanged()
 {
+	// FIXME make this less jarring when you have time for polish -John.
+	// Reset the zoom.
+	bZoomed = bZooming = false;
+	FirstPersonCameraComponent->FieldOfView = FOVDefault;
+
 	if (PendingWeapon != NULL)
 	{
 		CurrentWeapon = PendingWeapon;
@@ -691,27 +704,35 @@ void ACGCharacter::PreviousWeapon()
 // TODO make sure that if this gets interrupted the player will always return to their default zoom.
 void ACGCharacter::StartZoom()
 {
-	SetZoom(!bZoomed);
-	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
-	bZooming = true;
-
-	// Tell the server about the state change.
-	if (Role < ROLE_Authority)
+	if (CurrentWeapon && CurrentWeapon->CanZoom())
 	{
-		ServerSetZoom(bZoomed);
+		SetZoom(!bZoomed);
+		CurrentZoom.BeginZoom(FOVDefault, bZoomed);
+		bZooming = true;
+
+		// Tell the server about the state change.
+		if (Role < ROLE_Authority)
+		{
+			ServerSetZoom(bZoomed);
+		}
 	}
 }
 
 void ACGCharacter::StopZoom()
 {
-	SetZoom(!bZoomed);
-	CurrentZoom.BeginZoom(FOVDefault, bZoomed);
-	bZooming = true;
-
-	// Tell the server about the state change.
-	if (Role < ROLE_Authority)
+	// FIXME This is DuctTape for the zoom mechanic!
+	// TODO replace with a state sytem.
+	if (bZoomed && CurrentWeapon && CurrentWeapon->CanZoom())
 	{
-		ServerSetZoom(bZoomed);
+		SetZoom(!bZoomed);
+		CurrentZoom.BeginZoom(FOVDefault, bZoomed);
+		bZooming = true;
+
+		// Tell the server about the state change.
+		if (Role < ROLE_Authority)
+		{
+			ServerSetZoom(bZoomed);
+		}
 	}
 }
 
