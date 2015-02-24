@@ -85,7 +85,7 @@ struct FCGGameElement
 	FCGGameElement()
 	{
 		Name = TEXT("Billy Bob Thorton");
-		Score = 10;
+		Score = 1;
 		PercentToGoal = .1f;
 		bIsOwner = true;
 	}
@@ -104,9 +104,12 @@ struct FCGRoundElement
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor TimeColor;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform ScoreTransform;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float TimeScale;
+	FLinearColor ScoreColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCanvasIcon FGIcon;
@@ -129,7 +132,7 @@ struct FCGRoundElement
 	FCGRoundElement()
 	{
 		TimeColor = FLinearColor::White;
-		TimeScale = 0.73f;
+		ScoreColor = FLinearColor::White;
 		FullColor = FLinearColor::Blue;
 		EmptyColor = FLinearColor::Red;
 	}
@@ -166,7 +169,6 @@ public:
 	void DrawPrompt();
 
 	void SetPromptMessage(const FString& Message);
-
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/

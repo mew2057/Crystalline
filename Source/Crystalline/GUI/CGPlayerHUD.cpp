@@ -232,6 +232,7 @@ void ACGPlayerHUD::DrawGameInfo()
 		float SizeX, SizeY;
 		const int32 Minutes = CGGameState->RemainingTime / 60;
 		const int32 Seconds = CGGameState->RemainingTime % 60;
+
 		FString Text = FString::Printf(TEXT("%2d : %02d"), Minutes, Seconds);
 		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, RoundDataElement.TimeColor);
 		TextItem.Text = FText::FromString(Text);
@@ -241,9 +242,7 @@ void ACGPlayerHUD::DrawGameInfo()
 
 		 // HUD Width.
 		// TODO get scale working properly.
-		TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent) / SizeX,
-			(PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent) / SizeY);
-
+		TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent) / SizeX, 	(PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent) / SizeY);
 		Canvas->DrawItem(TextItem, X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX, Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY);	
 
 
@@ -292,7 +291,19 @@ void ACGPlayerHUD::DrawGameInfo()
 			
 			// Score goes here.
 			//DrawText(FString::Printf(TEXT("%2d"), TempElement.Score), RoundDataElement.TimeColor, ElemX + ElemW, Y, BigFont, 1, false);
-			
+
+			Text = FString::Printf(TEXT("%02d"), TempElement.Score);
+			TextItem.SetColor(RoundDataElement.ScoreColor);
+			TextItem.Text = FText::FromString(Text);
+
+			// Get the actual size, this is to scale the text to our "Box"
+			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+
+			// HUD Width.
+			// TODO get scale working properly.
+			TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.ScoreTransform.WidthPercent) / SizeX, (PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent) / SizeY);
+			Canvas->DrawItem(TextItem, ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY);
+
 			
 			if (TempElement.bIsOwner)
 			{
@@ -307,7 +318,6 @@ void ACGPlayerHUD::DrawGameInfo()
 					RoundDataElement.OwnerIcon.UL, RoundDataElement.OwnerIcon.VL,
 					EBlendMode::BLEND_Translucent);
 			}
-
 		}
 	}
 }
@@ -329,8 +339,6 @@ void ACGPlayerHUD::DrawPrompt()
 
 	Canvas->DrawItem(TextItem, 50, 100);
 }
-
-
 
 void ACGPlayerHUD::SetPromptMessage(const FString& Message)
 {
