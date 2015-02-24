@@ -124,7 +124,6 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		if (CurrentWeapon->WeaponConfig.bOverHeatWeapon)
 		{
 			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
-			//AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
 
 			Canvas->DrawTile(
 				AmmoIcon.Texture,
@@ -139,11 +138,43 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		else
 		{
 			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.LowAmmoColor, WeaponHUDConfig.FullAmmoColor, Percent));
-			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
+
+			Canvas->DrawTile(
+				AmmoIcon.Texture,
+				X + PixelsPerWidth * WeaponElement.GuageTransform.PercentX,
+				Y + PixelsPerHeight * WeaponElement.GuageTransform.PercentY,
+				PixelsPerWidth * WeaponElement.GuageTransform.WidthPercent * Percent,
+				PixelsPerHeight * WeaponElement.GuageTransform.HeightPercent,
+				AmmoIcon.U, AmmoIcon.V,
+				AmmoIcon.UL * Percent, AmmoIcon.VL,
+				EBlendMode::BLEND_Translucent);
+
+			// Ammo Text only here.
+
+			// TODO improve Text scaling.
+			// Ammo in gun.
+			float SizeX, SizeY;
+			FString Text = FString::Printf(TEXT("%3d"), CurrentWeapon->GetAmmoInClip());
+			FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, WeaponElement.AmmoTextColor);
+			TextItem.Text = FText::FromString(Text);
+
+			// Get the actual size, this is to scale the text to our "Box"
+			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+			TextItem.Scale.Set((PixelsPerWidth * WeaponElement.InClipAmmoTransform.WidthPercent) / SizeX, (PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent) / SizeY);
+			Canvas->DrawItem(TextItem, X + PixelsPerWidth * WeaponElement.InClipAmmoTransform.PercentX, Y + PixelsPerHeight * WeaponElement.InClipAmmoTransform.PercentY);
+			
+			// Ammo held.
+			Text = FString::Printf(TEXT("%4d"), CurrentWeapon->GetAmmo());
+			TextItem.Text = FText::FromString(Text);
+
+			// Get the actual size, this is to scale the text to our "Box"
+			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
+			TextItem.Scale.Set((PixelsPerWidth * WeaponElement.HeldAmmoTransform.WidthPercent) / SizeX, (PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent) / SizeY);
+			Canvas->DrawItem(TextItem, X + PixelsPerWidth * WeaponElement.HeldAmmoTransform.PercentX, Y + PixelsPerHeight * WeaponElement.HeldAmmoTransform.PercentY);
+
 		}
 		
 		Canvas->SetDrawColor(FColor::White);	
-		Canvas->DrawIcon(WeaponHUDConfig.WeaponIcon, 40, 20, ScaleUIY);
 
 		Canvas->DrawTile(
 			WeaponHUDConfig.WeaponIcon.Texture,
@@ -155,31 +186,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 			WeaponHUDConfig.WeaponIcon.UL, WeaponHUDConfig.WeaponIcon.VL,
 			EBlendMode::BLEND_Translucent);
 
-	
-		// Debug Ammo Text 
-		////////////////////////////////////////////////////
-		/*
-		float SizeX, SizeY;
-		FString Text = FString::SanitizeFloat(CurrentWeapon->GetAmmoInClip());
-	
-		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
-		TextItem.EnableShadow(FLinearColor::Black);
-		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-	
-		const float TopTextScale = 0.73f; // of 51pt font
-	
-		TextItem.Text = FText::FromString(Text);
-		TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
-		//TextItem.FontRenderInfo = ShadowedFont;
-	
-		Canvas->DrawItem(TextItem, 20, 10);
-	
-		Text = FString::SanitizeFloat(CurrentWeapon->GetAmmo());
-		TextItem.Text = FText::FromString(Text);
-	
-		Canvas->DrawItem(TextItem, 50, 10);*/
-		////////////////////////////////////////////////////
-	
+		// TODO Crystal Display
 		// FIXME this crashes when both players are dead and respawning. Seems to happen on client, this ONLY occurs in release mode.
 		/*
 		if (Pawn && Pawn->Inventory)
@@ -193,22 +200,6 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		}*/
 	
 	}
-	
-	
-	/** Get the Secondary weapon for the player. */
-	/*
-	ACGWeapon* SecondaryWeapon = Pawn->GetSecondaryWeapon();
-	
-	if (SecondaryWeapon)
-	{
-	
-		WeaponIcon = SecondaryWeapon->WeaponHUDConfig.WeaponIcon;
-		Canvas->DrawIcon(WeaponIcon, 40, 60, ScaleUIY);
-	
-		// Output the icon.
-		// NOTE: Don't include ammunition on this one.	
-	}
-	*/
 }
 
 void ACGPlayerHUD::DrawShield()

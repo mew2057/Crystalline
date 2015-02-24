@@ -153,6 +153,9 @@ struct FCGWeaponElement
 	FCGHUDTransform HeldAmmoTransform;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor AmmoTextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform GuageTransform;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
@@ -161,7 +164,7 @@ struct FCGWeaponElement
 
 	FCGWeaponElement()
 	{
-
+		AmmoTextColor = FLinearColor::White;
 	}
 
 };
