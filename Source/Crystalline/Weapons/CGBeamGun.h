@@ -26,7 +26,7 @@ public:
 
 protected:
 	UPROPERTY(Transient, Replicated)
-	class AActor* Target;
+	class APawn* Target;
 
 	/** The maximum angle that the beam can be pointed away from it's target.*/
 	UPROPERTY(EditDefaultsOnly, Category=Config)

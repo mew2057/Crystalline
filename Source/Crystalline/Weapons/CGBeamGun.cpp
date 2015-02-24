@@ -54,7 +54,7 @@ void ACGBeamGun::FireHitScan()
 
 void ACGBeamGun::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread)
 {
-	Target = Impact.GetActor();
+	Target = Cast<APawn>(Impact.GetActor());
 
 	Super::ProcessHitScanConfirmed(Impact, Origin, ShootDir, RandSeed, Spread);	
 }
