@@ -18,37 +18,36 @@ void ACGBeamGun::PostInitializeComponents()
 
 void ACGBeamGun::FireHitScan()
 {
-	// If there's a target, then the gun should maintain its connection if the connection is broken check for a target.
+
+	// Perform a raycast from the crosshair in to the world space.
+	// Get the starting location and rotation for the player.
+	const FVector StartTrace = GetCameraLocation();
+	FVector ShootDir = GetCameraAim();
+	
+	// Specify the end point for the weapon's fire.
+	FVector EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
+
+	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
+	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
+	
+	APawn* TempTarget = Cast<APawn>(Impact.GetActor());
+
+	// If a new pawn has come "closer" change our target.
+	if (TempTarget)
+	{
+		Target = TempTarget;
+	}
+
 	if (Target)
 	{
-		const FVector AimDir = GetCameraAim();
-		const FVector Origin = GetCameraLocation();
-		FVector TargetDir = Target->GetActorLocation() - Origin;
-		const float Offset = AimDir.CosineAngle2D(TargetDir);
+		FVector TargetDir = Target->GetActorLocation() - StartTrace;
+		ShootDir = ShootDir.CosineAngle2D(TargetDir) >= MaxAngle ? TargetDir : ShootDir;
+		EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
 
+		Impact = WeaponTrace(StartTrace, EndTrace);
+	}	
 
-		if (Offset >= MaxAngle)
-		{
-			// This might be paranoia.
-			TargetDir.Normalize();
-			const FVector EndTrace = TargetDir * WeaponConfig.WeaponRange;
-			FHitResult Impact = WeaponTrace(Origin, EndTrace);
-			// This may be a point for error.
-			ProcessHitScan(Impact, Origin, TargetDir, 0, CurrentSpread);
-		}
-		else
-		{
-			// Null the target, because we aren't tracking them anymore.
-			Target = NULL;
-
-			// Break the connection
-			Super::FireHitScan();
-		}
-	}
-	else
-	{
-		Super::FireHitScan();
-	}
+	ProcessHitScan(Impact, StartTrace, ShootDir, 0, CurrentSpread);
 }
 
 
@@ -98,11 +97,10 @@ void ACGBeamGun::StopFire()
 
 
 
-
 void ACGBeamGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACGBeamGun, Target);
+	DOREPLIFETIME_CONDITION(ACGBeamGun, Target, COND_OwnerOnly);
 
 }

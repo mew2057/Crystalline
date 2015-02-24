@@ -57,6 +57,9 @@ public:
 	bool IsAlive();
 
 
+	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
+	FRotator GetAimOffsets() const;
+
 
 
 protected:
