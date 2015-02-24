@@ -31,10 +31,13 @@ void ACGPlayerHUD::DrawHUD()
 
 	// Find center of the Canvas. XXX Does this need to be a vector? -John
 	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
+
+	PixelsPerCent = FVector2D(Canvas->ClipX * .01f, Canvas->ClipY * 0.01f);
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	if (Pawn)
 	{
-		DrawHealth();
+		DrawShield();
+		
 
 		ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
@@ -81,8 +84,9 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	ACGWeapon* CurrentWeapon = Pawn ? Pawn->GetCurrentWeapon() : NULL;
-	FCanvasIcon WeaponIcon;
-	
+	ACGInventory* CurrentInventory = Pawn ? Pawn->Inventory : NULL;
+
+	FCanvasIcon WeaponIcon;	
 	FCanvasIcon AmmoIcon;
 
 	ACGCrystalGun* cG = Cast<ACGCrystalGun>(CurrentWeapon);
@@ -170,77 +174,138 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		// NOTE: Don't include ammunition on this one.	
 	}
 	*/
-
-
-
-
 }
 
-void ACGPlayerHUD::DrawHealth()
+void ACGPlayerHUD::DrawShield()
 {
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
-
-
-	// TODO replace this!
-	// Write a text function.
 	
-	float SizeX, SizeY;
-	FString Text = FString::SanitizeFloat(Pawn->GeCurrentShield());
+	Canvas->SetDrawColor(FColor::White);	
+	const FCGHUDTransform Transform = Shield.Transform;
 
-	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
-	TextItem.EnableShadow(FLinearColor::Black);
-	Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-
-	const float TopTextScale = 0.73f; // of 51pt font
-
-	TextItem.Text = FText::FromString(Text);
-	TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
-	//TextItem.FontRenderInfo = ShadowedFont;
-
-	Canvas->DrawItem(TextItem, 50, 300);
-
-	Text = FString::SanitizeFloat(Pawn->GetCurrentHealth());
-	TextItem.Text = FText::FromString(Text);
-
-	Canvas->DrawItem(TextItem, 50, 350);
+	Canvas->DrawTile(
+		Shield.BGIcon.Texture,
+		PixelsPerCent.X * Transform.PercentX,
+		PixelsPerCent.Y * Transform.PercentY,
+		PixelsPerCent.X * Transform.WidthPercent,
+		PixelsPerCent.Y * Transform.HeightPercent,
+		Shield.BGIcon.U, Shield.BGIcon.V,
+		Shield.BGIcon.UL, Shield.BGIcon.VL,
+		EBlendMode::BLEND_Translucent);
 
 
+	if (Pawn)
+	{
+		float Percent = Pawn->GetShieldPercent();
+		Canvas->SetDrawColor(FMath::Lerp(Shield.EmptyColor, Shield.FullColor, Percent));
+		
+		Canvas->DrawTile(
+			Shield.FGIcon.Texture,
+			PixelsPerCent.X * Transform.PercentX,
+			PixelsPerCent.Y * Transform.PercentY,
+			PixelsPerCent.X * Transform.WidthPercent * Percent,
+			PixelsPerCent.Y * Transform.HeightPercent,
+			Shield.FGIcon.U, Shield.FGIcon.V,
+			Shield.FGIcon.UL* Percent, Shield.FGIcon.VL,
+			EBlendMode::BLEND_Translucent);
+	}
+	
+	// TODO Flashing when health low.
 }
 
 void ACGPlayerHUD::DrawGameInfo()
 {
-
 	ACGGameState* const CGGameState = Cast<ACGGameState>(GetWorld()->GameState);
 	if (CGGameState)
 	{
+		// XXX Maybe cache this 
+		// Get the relative space for this module.
+		const float X = PixelsPerCent.X * RoundDataElement.Transform.PercentX;
+		const float Y = PixelsPerCent.Y * RoundDataElement.Transform.PercentY;
+		const float PixelsPerWidth  = PixelsPerCent.X * RoundDataElement.Transform.WidthPercent * .01f;
+		const float PixelsPerHeight = PixelsPerCent.Y * RoundDataElement.Transform.HeightPercent * .01f;
+		
+		//////////////////////////////////////////////////////////////////////////////////////
+		// Start Time Output
+		//////////////////////////////////////////////////////////////////////////////////////
 
-		float SizeX, SizeY;
-		FString Text = TEXT("Time: " + FString::SanitizeFloat(CGGameState->RemainingTime));
+		const int32 Minutes = CGGameState->RemainingTime / 60;
+		const int32 Seconds = CGGameState->RemainingTime % 60;
+		FString Text = FString::Printf(TEXT("%2d : %02d"), Minutes, Seconds);
 
-		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
-		TextItem.EnableShadow(FLinearColor::Black);
-		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-
-		const float TopTextScale = 0.73f; // of 51pt font
-
+		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, RoundDataElement.TimeColor);
 		TextItem.Text = FText::FromString(Text);
-		TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
-		//TextItem.FontRenderInfo = ShadowedFont;
+		// TODO get scale working properly.
+		TextItem.Scale.Set(RoundDataElement.TimeScale, RoundDataElement.TimeScale);
+			//PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent,
+			//PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent);
 
-		Canvas->DrawItem(TextItem, 50, 250);
+		TextItem.EnableShadow(FLinearColor::Black);
+		Canvas->DrawItem(TextItem, X + RoundDataElement.TimeTransform.PercentX, Y + RoundDataElement.TimeTransform.PercentY);
+
+
+		//////////////////////////////////////////////////////////////////////////////////////
+		// Start Score Output.
+		/////////////////////////////////////////////////////////////////////////////////////
 
 		AController* Controller = GetOwningPlayerController();
-		if (Controller && Cast<ACGPlayerState>(Controller->PlayerState))
+
+		// Poll Who's winning.
+		
+
+		// Check Dirty bit for game state.
+		//
+		const int32 NumElements = RoundDataElement.GameDataElements.Num();
+		FCGGameElement TempElement;
+
+		for (int i = NumElements - CGGameState->PlayerArray.Num(); i < NumElements; ++i)
 		{
-			ACGPlayerState* PlayerState = Cast<ACGPlayerState>(Controller->PlayerState);
 
-			Text = TEXT("Kills: "   + FString::SanitizeFloat(PlayerState->GetNumKills()) + 
-						" Deaths: " + FString::SanitizeFloat(PlayerState->GetNumDeaths())+
-						" Score: "  + FString::SanitizeFloat(PlayerState->Score) );
-			TextItem.Text = FText::FromString(Text);
+			TempElement = RoundDataElement.GameDataElements[i];
+			Canvas->SetDrawColor(FColor::White);
 
-			Canvas->DrawItem(TextItem, 50, 200);
-		}		
+			const float ElemX = X + PixelsPerWidth * TempElement.Transform.PercentX;
+			const float ElemY = Y + PixelsPerHeight * TempElement.Transform.PercentY;
+			const float ElemW = PixelsPerWidth * TempElement.Transform.WidthPercent;
+			const float ElemH = PixelsPerHeight * TempElement.Transform.HeightPercent;
+
+			Canvas->DrawTile(
+				RoundDataElement.BGIcon.Texture, 
+				ElemX, ElemY,
+				ElemW, ElemH,
+				RoundDataElement.BGIcon.U, RoundDataElement.BGIcon.V,
+				RoundDataElement.BGIcon.UL,RoundDataElement.BGIcon.VL,
+				EBlendMode::BLEND_Translucent);
+
+			Canvas->SetDrawColor(FColor::Blue);
+
+			Canvas->DrawTile(
+				RoundDataElement.FGIcon.Texture,
+				ElemX, ElemY,
+				ElemW, ElemH,
+				RoundDataElement.FGIcon.U, RoundDataElement.FGIcon.V,
+				RoundDataElement.FGIcon.UL * TempElement.PercentToGoal, RoundDataElement.FGIcon.VL,
+				EBlendMode::BLEND_Translucent);
+			
+			// Score goes here.
+			DrawText(FString::Printf(TEXT("%2d"), TempElement.Score), RoundDataElement.TimeColor, ElemX + ElemW, Y, BigFont, 1, false);
+			
+			
+			if (TempElement.bIsOwner)
+			{
+				Canvas->SetDrawColor(FColor::White);
+
+				Canvas->DrawTile(
+					RoundDataElement.OwnerIcon.Texture,	
+					X, ElemY,
+					PixelsPerWidth * TempElement.Transform.PercentX,
+					PixelsPerHeight * TempElement.Transform.HeightPercent,
+					RoundDataElement.OwnerIcon.U, RoundDataElement.OwnerIcon.V,
+					RoundDataElement.OwnerIcon.UL, RoundDataElement.OwnerIcon.VL,
+					EBlendMode::BLEND_Translucent);
+			}
+
+		}
 	}
 }
 
@@ -260,8 +325,9 @@ void ACGPlayerHUD::DrawPrompt()
 	Canvas->SetDrawColor(FColor::Yellow);
 
 	Canvas->DrawItem(TextItem, 50, 100);
-	
 }
+
+
 
 void ACGPlayerHUD::SetPromptMessage(const FString& Message)
 {

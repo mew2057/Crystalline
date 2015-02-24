@@ -9,6 +9,131 @@
 #define TARGET_Y_RESOLUTION 1080.0f
 #define TARGET_X_RESOLUTION 1920.0f
 #define ICON_FUDGE .0000001f
+USTRUCT()
+struct FCGHUDTransform
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float WidthPercent;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float HeightPercent;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float PercentX;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float PercentY;
+
+	FCGHUDTransform()
+	{
+		WidthPercent  = 0;
+		HeightPercent = 0;
+		PercentX	  = 0;
+		PercentY	  = 0;
+	}
+};
+
+USTRUCT()
+struct FCGHUDElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon FGIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon BGIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor FullColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor EmptyColor;
+
+	FCGHUDElement()
+	{
+		FullColor = FLinearColor::Blue;
+		EmptyColor = FLinearColor::Red;
+	}
+};
+
+USTRUCT()
+struct FCGGameElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+	
+	UPROPERTY(Transient)
+	FString Name;
+
+	UPROPERTY(Transient)
+	int32 Score;
+
+	UPROPERTY(Transient)
+	float PercentToGoal;
+
+	UPROPERTY(Transient)
+	uint32 bIsOwner : 1;
+
+	FCGGameElement()
+	{
+		Name = TEXT("Billy Bob Thorton");
+		Score = 10;
+		PercentToGoal = .1f;
+		bIsOwner = true;
+	}
+};
+
+USTRUCT()
+struct FCGRoundElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform TimeTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor TimeColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float TimeScale;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon FGIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon BGIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon OwnerIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor FullColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor EmptyColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	TArray<FCGGameElement> GameDataElements;
+
+	FCGRoundElement()
+	{
+		TimeColor = FLinearColor::White;
+		TimeScale = 0.73f;
+		FullColor = FLinearColor::Blue;
+		EmptyColor = FLinearColor::Red;
+	}
+};
 
 /**
  * 
@@ -30,8 +155,8 @@ public:
 	*/
 	void DrawWeaponHUD();
 
-	/** Draws the player's current health on the screen.*/
-	void DrawHealth();
+	/** Draws the player's current shield on the screen.*/
+	void DrawShield();
 
 	/** Draws Information regarding the current game type.*/
 	void DrawGameInfo();
@@ -42,8 +167,6 @@ public:
 
 	void SetPromptMessage(const FString& Message);
 
-	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-	UFont* BigFont;
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
@@ -56,7 +179,16 @@ private:
 	/** The Prompt Message, In the future this shouold be a struct.*/
 	FString PromptMessage;
 
-	
-	
-	
+	/**The number of pixels per percent.*/
+	FVector2D PixelsPerCent;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDElement Shield;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGRoundElement RoundDataElement;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
+		UFont* BigFont;
 };

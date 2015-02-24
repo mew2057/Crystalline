@@ -126,7 +126,7 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	FORCEINLINE float GeCurrentShield() const { return CurrentShield; }
 	FORCEINLINE float GetCurrentHealth() const{ return CurrentHealth; }
-	FORCEINLINE float GeMaxShieldP() const { return MaxShield; }
+	FORCEINLINE float GetShieldPercent() const { return CurrentShield/MaxShield; }
 	
 
 
