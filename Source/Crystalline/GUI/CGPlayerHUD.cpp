@@ -89,7 +89,13 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	FCanvasIcon WeaponIcon;	
 	FCanvasIcon AmmoIcon;
 
-	ACGCrystalGun* cG = Cast<ACGCrystalGun>(CurrentWeapon);
+	// Get the Main Anchor for our weapon Element.
+	const float X = PixelsPerCent.X * WeaponElement.Transform.PercentX;
+	const float Y = PixelsPerCent.Y * WeaponElement.Transform.PercentY;
+	const float PixelsPerWidth = PixelsPerCent.X * WeaponElement.Transform.WidthPercent * .01f;
+	const float PixelsPerHeight = PixelsPerCent.Y * WeaponElement.Transform.HeightPercent * .01f;
+
+
 	/** Get Primary weapon for the player. */
 	if (CurrentWeapon )
 	{
@@ -98,29 +104,57 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		Canvas->SetDrawColor(FColor::White);
 	
 		AmmoIcon = WeaponHUDConfig.AmmoGuageBGIcon;
-		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
-		
-		AmmoIcon = WeaponHUDConfig.AmmoGuageFGIcon;
+
+		Canvas->DrawTile(
+			AmmoIcon.Texture,
+			X + PixelsPerWidth * WeaponElement.GuageTransform.PercentX,
+			Y + PixelsPerHeight * WeaponElement.GuageTransform.PercentY,
+			PixelsPerWidth * WeaponElement.GuageTransform.WidthPercent,
+			PixelsPerHeight * WeaponElement.GuageTransform.HeightPercent,
+			AmmoIcon.U,  AmmoIcon.V,
+			AmmoIcon.UL, AmmoIcon.VL,
+			EBlendMode::BLEND_Translucent);
+
+
+		AmmoIcon = WeaponHUDConfig.AmmoGuageFGIcon;		
 	
 		const float Percent = CurrentWeapon->GetClipPercent();
 	
-		// Determine the appropriate color for the guage.
-	
-		if (CurrentWeapon->WeaponConfig.OverHeatWeapon)
+		// Determine the draw behavior.
+		if (CurrentWeapon->WeaponConfig.bOverHeatWeapon)
 		{
 			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
-			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
+			//AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
+
+			Canvas->DrawTile(
+				AmmoIcon.Texture,
+				X + PixelsPerWidth * WeaponElement.GuageTransform.PercentX,
+				Y + PixelsPerHeight * WeaponElement.GuageTransform.PercentY,
+				PixelsPerWidth * WeaponElement.GuageTransform.WidthPercent * Percent,
+				PixelsPerHeight * WeaponElement.GuageTransform.HeightPercent,
+				AmmoIcon.U, AmmoIcon.V,
+				AmmoIcon.UL * Percent, AmmoIcon.VL,
+				EBlendMode::BLEND_Translucent);
 		}
 		else
 		{
 			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.LowAmmoColor, WeaponHUDConfig.FullAmmoColor, Percent));
 			AmmoIcon.UL = WeaponHUDConfig.AmmoGuageWidth * Percent + ICON_FUDGE;
 		}
-	
-		Canvas->DrawIcon(AmmoIcon, 20, 20, ScaleUIY);
-	
+		
 		Canvas->SetDrawColor(FColor::White);	
 		Canvas->DrawIcon(WeaponHUDConfig.WeaponIcon, 40, 20, ScaleUIY);
+
+		Canvas->DrawTile(
+			WeaponHUDConfig.WeaponIcon.Texture,
+			X + PixelsPerWidth * WeaponElement.MainIconTransform.PercentX,
+			Y + PixelsPerHeight * WeaponElement.MainIconTransform.PercentY,
+			PixelsPerWidth * WeaponElement.MainIconTransform.WidthPercent,
+			PixelsPerHeight * WeaponElement.MainIconTransform.HeightPercent,
+			WeaponHUDConfig.WeaponIcon.U,  WeaponHUDConfig.WeaponIcon.V,
+			WeaponHUDConfig.WeaponIcon.UL, WeaponHUDConfig.WeaponIcon.VL,
+			EBlendMode::BLEND_Translucent);
+
 	
 		// Debug Ammo Text 
 		////////////////////////////////////////////////////
@@ -207,7 +241,7 @@ void ACGPlayerHUD::DrawShield()
 			PixelsPerCent.X * Transform.WidthPercent * Percent,
 			PixelsPerCent.Y * Transform.HeightPercent,
 			Shield.FGIcon.U, Shield.FGIcon.V,
-			Shield.FGIcon.UL* Percent, Shield.FGIcon.VL,
+			Shield.FGIcon.UL * Percent, Shield.FGIcon.VL,
 			EBlendMode::BLEND_Translucent);
 	}
 	
@@ -239,10 +273,9 @@ void ACGPlayerHUD::DrawGameInfo()
 
 		// Get the actual size, this is to scale the text to our "Box"
 		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-
-		 // HUD Width.
-		// TODO get scale working properly.
 		TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent) / SizeX, 	(PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent) / SizeY);
+
+		// TODO this Jitters slightly.
 		Canvas->DrawItem(TextItem, X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX, Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY);	
 
 
@@ -290,8 +323,6 @@ void ACGPlayerHUD::DrawGameInfo()
 				EBlendMode::BLEND_Translucent);
 			
 			// Score goes here.
-			//DrawText(FString::Printf(TEXT("%2d"), TempElement.Score), RoundDataElement.TimeColor, ElemX + ElemW, Y, BigFont, 1, false);
-
 			Text = FString::Printf(TEXT("%02d"), TempElement.Score);
 			TextItem.SetColor(RoundDataElement.ScoreColor);
 			TextItem.Text = FText::FromString(Text);

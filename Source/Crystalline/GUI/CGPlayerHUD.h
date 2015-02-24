@@ -138,6 +138,35 @@ struct FCGRoundElement
 	}
 };
 
+USTRUCT()
+struct FCGWeaponElement
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform InClipAmmoTransform;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform HeldAmmoTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform GuageTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform MainIconTransform;
+
+
+	FCGWeaponElement()
+	{
+
+	}
+
+};
+
+
 /**
  * 
  */
@@ -190,7 +219,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGRoundElement RoundDataElement;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGWeaponElement WeaponElement;
 
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-		UFont* BigFont;
+	UFont* BigFont;
 };
