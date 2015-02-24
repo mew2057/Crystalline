@@ -18,7 +18,8 @@ void ACGBeamGun::PostInitializeComponents()
 
 void ACGBeamGun::FireHitScan()
 {
-
+	Super::FireHitScan();
+	/*
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
 	const FVector StartTrace = GetCameraLocation();
@@ -48,12 +49,13 @@ void ACGBeamGun::FireHitScan()
 	}	
 
 	ProcessHitScan(Impact, StartTrace, ShootDir, 0, CurrentSpread);
+	*/
 }
 
 
 void ACGBeamGun::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread)
 {
-	Target = Cast<APawn>(Impact.GetActor());
+	//Target = Cast<APawn>(Impact.GetActor());
 
 	Super::ProcessHitScanConfirmed(Impact, Origin, ShootDir, RandSeed, Spread);	
 }
@@ -96,7 +98,7 @@ void ACGBeamGun::StopFire()
 }
 
 
-
+/*
 void ACGBeamGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -104,3 +106,4 @@ void ACGBeamGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	DOREPLIFETIME_CONDITION(ACGBeamGun, Target, COND_OwnerOnly);
 
 }
+*/

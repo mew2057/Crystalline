@@ -285,7 +285,6 @@ void ACGCharacter::ReplicateHit(float Damage, struct FDamageEvent const& DamageE
 
 void ACGCharacter::OnRep_LastHit()
 {
-	UE_LOG(LogTemp, Log, TEXT("Replicating"));
 
 	if (LastHit.bKillingHit)
 	{
