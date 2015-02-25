@@ -68,27 +68,14 @@ struct FCGGameElement
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform Transform;
-	
-	UPROPERTY(Transient)
-	FString Name;
-
-	UPROPERTY(Transient)
-	int32 Score;
-
-	UPROPERTY(Transient)
-	float PercentToGoal;
-
-	UPROPERTY(Transient)
-	uint32 bIsOwner : 1;
+	FCGHUDTransform Transform;	
 
 	FCGGameElement()
 	{
-		Name = TEXT("Billy Bob Thorton");
-		Score = 1;
-		PercentToGoal = .1f;
-		bIsOwner = true;
+	
 	}
+
+
 };
 
 USTRUCT()
@@ -183,6 +170,8 @@ public:
 
 	/** Primary draw call for the HUD */
 	virtual void DrawHUD() override;
+	virtual void PostRender() override;
+	virtual void PostInitializeComponents() override;
 
 	/**
 	* Draws the ammo, overheat gauge, and other relavant information.
@@ -227,4 +216,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
 	UFont* BigFont;
+
+	UPROPERTY(Transient)
+	float ScoreToWinInv;
 };

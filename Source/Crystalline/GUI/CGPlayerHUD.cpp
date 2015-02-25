@@ -17,6 +17,26 @@ ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(
 	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
 	BigFont = BigFontOb.Object;
 
+	ScoreToWinInv = .000001f;
+}
+
+void ACGPlayerHUD::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+}
+
+// TODO add a dirty bit for player Scoring.
+void ACGPlayerHUD::PostRender()
+{
+	// FIXME This is a point for optimization.
+	ACGGameState* GS = GetWorld()->GetGameState<ACGGameState>();
+	if (GS != NULL)
+	{
+		GS->SortPlayers();
+	}
+
+	Super::PostRender();
 }
 
 
@@ -241,7 +261,7 @@ void ACGPlayerHUD::DrawShield()
 
 void ACGPlayerHUD::DrawGameInfo()
 {
-	ACGGameState* const CGGameState = Cast<ACGGameState>(GetWorld()->GameState);
+	ACGGameState* const CGGameState = GetWorld()->GetGameState<ACGGameState>();
 	if (CGGameState)
 	{
 		// XXX Maybe cache this 
@@ -274,20 +294,32 @@ void ACGPlayerHUD::DrawGameInfo()
 		// Start Score Output.
 		/////////////////////////////////////////////////////////////////////////////////////
 
-		AController* Controller = GetOwningPlayerController();
+		AController* const Controller = GetOwningPlayerController();
+		APlayerState* const PlayerState = Controller ? Controller->PlayerState : NULL;
+		// TODO get Score to win.
 
-		// Poll Who's winning.
-		
 
-		// Check Dirty bit for game state.
-		//
-		const int32 NumElements = RoundDataElement.GameDataElements.Num();
+		const int32 NumElements = FMath::Min(CGGameState->PlayerArray.Num(), RoundDataElement.GameDataElements.Num());
 		FCGGameElement TempElement;
+		APlayerState* TempPlayerState;
+		bool bPlayerFound = false;
 
 		for (int i = 0; i < NumElements; ++i)
 		{
 
 			TempElement = RoundDataElement.GameDataElements[i];
+
+			// On the last iteration this player is forcibly applied.
+			// XXX is there a more elegant solution?
+			if (i < (NumElements - 1) || bPlayerFound || PlayerState == NULL)
+			{
+				TempPlayerState = CGGameState->PlayerArray[i];
+			}
+			else
+			{
+				TempPlayerState = PlayerState ;
+			}
+
 			Canvas->SetDrawColor(FColor::White);
 
 			const float ElemX = X + PixelsPerWidth * TempElement.Transform.PercentX;
@@ -308,13 +340,14 @@ void ACGPlayerHUD::DrawGameInfo()
 			Canvas->DrawTile(
 				RoundDataElement.FGIcon.Texture,
 				ElemX, ElemY,
-				ElemW * TempElement.PercentToGoal, ElemH,
+				ElemW * ScoreToWinInv * TempPlayerState->Score, ElemH,
 				RoundDataElement.FGIcon.U, RoundDataElement.FGIcon.V,
-				RoundDataElement.FGIcon.UL * TempElement.PercentToGoal, RoundDataElement.FGIcon.VL,
+				RoundDataElement.FGIcon.UL * ScoreToWinInv * TempPlayerState->Score, RoundDataElement.FGIcon.VL,
 				EBlendMode::BLEND_Translucent);
 			
 			// Score goes here.
-			Text = FString::Printf(TEXT("%02d"), TempElement.Score);
+			// TODO this needs some kind of anchoring.
+			Text = FString::Printf(TEXT("%.0f"), TempPlayerState->Score);
 			TextItem.SetColor(RoundDataElement.ScoreColor);
 			TextItem.Text = FText::FromString(Text);
 
@@ -326,9 +359,9 @@ void ACGPlayerHUD::DrawGameInfo()
 			TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.ScoreTransform.WidthPercent) / SizeX, (PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent) / SizeY);
 			Canvas->DrawItem(TextItem, ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY);
 
-			
-			if (TempElement.bIsOwner)
+			if (TempPlayerState == PlayerState)
 			{
+				bPlayerFound = true;
 				Canvas->SetDrawColor(FColor::White);
 
 				Canvas->DrawTile(
