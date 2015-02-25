@@ -75,22 +75,6 @@ void ACGPlayerHUD::DrawHUD()
 
 			DrawWeaponHUD();
 			DrawPrompt();
-			/*
-			// State Print out
-			float SizeX, SizeY;
-			FString Text = Weapon->CurrentState->GetName();
-
-			FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
-			TextItem.EnableShadow(FLinearColor::Black);
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-
-			const float TopTextScale = 0.73f; // of 51pt font
-
-			TextItem.Text = FText::FromString(Text);
-			TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
-			//TextItem.FontRenderInfo = ShadowedFont;
-
-			Canvas->DrawItem(TextItem, 50, 150);*/
 		}
 	}
 
@@ -173,24 +157,26 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 			// TODO improve Text scaling.
 			// Ammo in gun.
-			float SizeX, SizeY;
 			FString Text = FString::Printf(TEXT("%3d"), CurrentWeapon->GetAmmoInClip());
-			FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, WeaponElement.AmmoTextColor);
-			TextItem.Text = FText::FromString(Text);
+			
+			DrawScaledText(
+				Text,
+				WeaponElement.AmmoTextColor,
+				X + PixelsPerWidth * WeaponElement.InClipAmmoTransform.PercentX,
+				Y + PixelsPerHeight * WeaponElement.InClipAmmoTransform.PercentY,
+				BigFont,
+				PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent);
 
-			// Get the actual size, this is to scale the text to our "Box"
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-			TextItem.Scale.Set((PixelsPerWidth * WeaponElement.InClipAmmoTransform.WidthPercent) / SizeX, (PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent) / SizeY);
-			Canvas->DrawItem(TextItem, X + PixelsPerWidth * WeaponElement.InClipAmmoTransform.PercentX, Y + PixelsPerHeight * WeaponElement.InClipAmmoTransform.PercentY);
 			
 			// Ammo held.
 			Text = FString::Printf(TEXT("%4d"), CurrentWeapon->GetAmmo());
-			TextItem.Text = FText::FromString(Text);
-
-			// Get the actual size, this is to scale the text to our "Box"
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-			TextItem.Scale.Set((PixelsPerWidth * WeaponElement.HeldAmmoTransform.WidthPercent) / SizeX, (PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent) / SizeY);
-			Canvas->DrawItem(TextItem, X + PixelsPerWidth * WeaponElement.HeldAmmoTransform.PercentX, Y + PixelsPerHeight * WeaponElement.HeldAmmoTransform.PercentY);
+			DrawScaledText(
+				Text,
+				WeaponElement.AmmoTextColor,
+				X + PixelsPerWidth * WeaponElement.HeldAmmoTransform.PercentX,
+				Y + PixelsPerHeight * WeaponElement.HeldAmmoTransform.PercentY,
+				BigFont,
+				PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent);
 
 		}
 		
@@ -274,21 +260,18 @@ void ACGPlayerHUD::DrawGameInfo()
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Time Output
 		//////////////////////////////////////////////////////////////////////////////////////
-		float SizeX, SizeY;
 		const int32 Minutes = CGGameState->RemainingTime / 60;
 		const int32 Seconds = CGGameState->RemainingTime % 60;
 
 		FString Text = FString::Printf(TEXT("%2d : %02d"), Minutes, Seconds);
-		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, RoundDataElement.TimeColor);
-		TextItem.Text = FText::FromString(Text);
 
-		// Get the actual size, this is to scale the text to our "Box"
-		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-		TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent) / SizeX, 	(PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent) / SizeY);
-
-		// TODO this Jitters slightly.
-		Canvas->DrawItem(TextItem, X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX, Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY);	
-
+		DrawScaledText(
+			Text,
+			RoundDataElement.TimeColor,
+			X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX,
+			Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY,
+			BigFont,
+			PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent);
 
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Score Output.
@@ -348,16 +331,8 @@ void ACGPlayerHUD::DrawGameInfo()
 			// Score goes here.
 			// TODO this needs some kind of anchoring.
 			Text = FString::Printf(TEXT("%.0f"), TempPlayerState->Score);
-			TextItem.SetColor(RoundDataElement.ScoreColor);
-			TextItem.Text = FText::FromString(Text);
+			DrawScaledText(Text, RoundDataElement.ScoreColor, ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY, BigFont, PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent);
 
-			// Get the actual size, this is to scale the text to our "Box"
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-
-			// HUD Width.
-			// TODO get scale working properly.
-			TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.ScoreTransform.WidthPercent) / SizeX, (PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent) / SizeY);
-			Canvas->DrawItem(TextItem, ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY);
 
 			if (TempPlayerState == PlayerState)
 			{
@@ -375,6 +350,24 @@ void ACGPlayerHUD::DrawGameInfo()
 			}
 		}
 	}
+}
+
+void ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight)
+{
+
+	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), Font, TextColor);
+	TextItem.Text = FText::FromString(Text);
+
+	// Get the size of the text.
+	float SizeX, SizeY;
+	Canvas->StrLen(Font, Text, SizeX, SizeY);
+
+	// Compute the scale for the final text.
+	const float Scale = TextHeight / SizeY;
+	TextItem.Scale.Set(Scale, Scale);
+
+	// TODO this Jitters slightly.
+	Canvas->DrawItem(TextItem, ScreenX, ScreenY);
 }
 
 void ACGPlayerHUD::DrawPrompt()

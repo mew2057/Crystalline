@@ -89,7 +89,7 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 	if (Hit.GetActor())
 	{
 		FPointDamageEvent PointDmg;
-		//PointDmg.DamageTypeClass = WeaponConfig.DamageType;
+		PointDmg.DamageTypeClass = DamageType;
 		PointDmg.HitInfo = Hit;
 		PointDmg.ShotDirection = Hit.ImpactNormal;
 		PointDmg.Damage = ImpactDamage; // This needs to move.

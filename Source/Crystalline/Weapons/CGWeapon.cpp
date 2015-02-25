@@ -480,6 +480,7 @@ void ACGWeapon::SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootD
 		Bullet->Instigator = Instigator;
 		Bullet->SetOwner(this);
 		Bullet->SetVelocity(ShootDir); // This ensures the behavior matches it's intended use case.
+		Bullet->DamageType = WeaponConfig.DamageType;
 		Bullet->ImpactDamage = WeaponConfig.BaseDamage;
 		Bullet->SetLifeSpan(ProjectileConfig.ProjectileLife);
 		UGameplayStatics::FinishSpawningActor(Bullet, BulletSpawn);

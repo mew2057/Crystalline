@@ -185,6 +185,8 @@ public:
 	/** Draws Information regarding the current game type.*/
 	void DrawGameInfo();
 
+	/**Draws text with the specified height.*/
+	FORCEINLINE void DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight);
 
 	/** Draws the prompt message.*/
 	void DrawPrompt();

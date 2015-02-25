@@ -41,8 +41,12 @@ public:
 
 	//TODO
 #pragma region ReplaceWithStruct
-	UPROPERTY()
+	/**Impact damage.*/
 	float ImpactDamage;
+
+	/**Type of Impact Damage*/
+	TSubclassOf<UDamageType> DamageType;
+
 	
 
 #pragma endregion
