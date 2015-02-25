@@ -148,6 +148,7 @@ float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 			GetWorldTimerManager().SetTimer(this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
 
 			// TODO Feedback from hit, e.g. force feedback and direction.
+			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
 		}		
 	}
 
@@ -266,6 +267,20 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	SetLifeSpan(5.f);
 }
 
+void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
+{
+	if (Role == ROLE_Authority)
+	{
+		// Play death feedback.
+		ReplicateHit(DamageTaken, DamageEvent, PawnInstigator, DamageCauser, false);
+
+		// TODO force feedback.
+	}
+
+
+
+}
+
 void ACGCharacter::ReplicateHit(float Damage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser, bool bKilled)
 {
 	// TODO manage Same Frame Damage.
@@ -290,8 +305,16 @@ void ACGCharacter::OnRep_LastHit()
 	{
 		// TODO Clean up damage event stuff.
 		OnDeath(LastHit.Damage, LastHit.DamageEvent, LastHit.Instigator.Get(), LastHit.DamageCauser.Get());
+
+		UE_LOG(LogTemp, Log, TEXT("Replicating Death on %s"), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Replicating Hit on %s"), *GetName());
+		PlayHit(LastHit.Damage, LastHit.DamageEvent, LastHit.Instigator.Get(), LastHit.DamageCauser.Get());
 	}
 }
+
 
 void ACGCharacter::StopAllAnim()
 {

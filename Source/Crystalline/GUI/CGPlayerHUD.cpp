@@ -281,7 +281,6 @@ void ACGPlayerHUD::DrawGameInfo()
 		APlayerState* const PlayerState = Controller ? Controller->PlayerState : NULL;
 		// TODO get Score to win.
 
-
 		const int32 NumElements = FMath::Min(CGGameState->PlayerArray.Num(), RoundDataElement.GameDataElements.Num());
 		FCGGameElement TempElement;
 		APlayerState* TempPlayerState;
@@ -289,7 +288,6 @@ void ACGPlayerHUD::DrawGameInfo()
 
 		for (int i = 0; i < NumElements; ++i)
 		{
-
 			TempElement = RoundDataElement.GameDataElements[i];
 
 			// On the last iteration this player is forcibly applied.

@@ -25,6 +25,16 @@ class CRYSTALLINE_API ACGGameState : public AGameState
 public:
 	ACGGameState(const FObjectInitializer& ObjectInitializer);
 
+
+	/** Sends kill (excluding self) to clients */
+	//UFUNCTION(Reliable, Client)
+	//void InformAboutKill(class AShooterPlayerState* KillerPlayerState, const UDamageType* KillerDamageType, class AShooterPlayerState* KilledPlayerState);
+	//
+	///** broadcast death to local clients */
+	//UFUNCTION(Reliable, NetMulticast)
+	//void BroadcastDeath(class AShooterPlayerState* KillerPlayerState, const UDamageType* KillerDamageType, class AShooterPlayerState* KilledPlayerState);
+
+
 	void SortPlayers();
 
 	/** Time left in the round, post game, pre game, etc.*/

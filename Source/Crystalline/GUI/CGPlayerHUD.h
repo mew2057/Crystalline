@@ -74,8 +74,6 @@ struct FCGGameElement
 	{
 	
 	}
-
-
 };
 
 USTRUCT()
@@ -221,4 +219,7 @@ private:
 
 	UPROPERTY(Transient)
 	float ScoreToWinInv;
+
+	UPROPERTY(Transient)
+	float TimeSinceLastHit;
 };
