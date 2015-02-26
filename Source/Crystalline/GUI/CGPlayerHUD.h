@@ -191,6 +191,9 @@ public:
 
 	void SetPromptMessage(const FString& Message);
 
+	/**Sets the TimeSinceLastHit for the hit notification.*/
+	void NotifyHitTaken();
+
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
 	float ScaleUIY;
@@ -214,12 +217,22 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGWeaponElement WeaponElement;
 
+	/** Expanded to fit across the player's FOV. */
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	UTexture2D* HitTakenOverlay;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor HitTakenColor;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float TimeToDisplayHitTaken;
+
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
 	UFont* BigFont;
 
 	UPROPERTY(Transient)
 	float ScoreToWinInv;
-
+	
 	UPROPERTY(Transient)
-	float TimeSinceLastHit;
+	float TimeSinceLastHitTaken;
 };

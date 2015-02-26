@@ -71,9 +71,6 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 void ACGCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	// XXX ZOOM
-
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -188,7 +185,6 @@ bool ACGCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, ACo
 	OnDeath(KillingDamage, DamageEvent, Killer ? Killer->GetPawn() : NULL, DamageCauser);
 
 	return true;
-
 }
 
 void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
@@ -277,6 +273,12 @@ void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageE
 		// TODO force feedback.
 	}
 
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->NotifyHit();
+	}
 
 
 }

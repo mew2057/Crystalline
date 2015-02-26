@@ -16,8 +16,9 @@ ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(
 	// TODO REPLACE THIS FONT!
 	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
 	BigFont = BigFontOb.Object;
-
+	HitTakenColor = FLinearColor::Red;
 	ScoreToWinInv = .000001f;
+	TimeSinceLastHitTaken = 0.f;
 }
 
 void ACGPlayerHUD::PostInitializeComponents()
@@ -76,6 +77,19 @@ void ACGPlayerHUD::DrawHUD()
 			DrawWeaponHUD();
 			DrawPrompt();
 		}
+
+		
+	}
+
+	// Draw the HitTaken if we've been hit recently.
+	if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitTaken < TimeToDisplayHitTaken)
+	{
+		Canvas->PopSafeZoneTransform();
+		HitTakenColor.A = 1.f - ((GetWorld()->GetTimeSeconds() - TimeSinceLastHitTaken) / TimeToDisplayHitTaken);
+		FCanvasTileItem TileItem(FVector2D(0, 0), HitTakenOverlay->Resource, FVector2D(Canvas->ClipX, Canvas->ClipY), HitTakenColor);
+		TileItem.BlendMode = SE_BLEND_Translucent;
+		Canvas->DrawItem(TileItem);
+		Canvas->ApplySafeZoneTransform();
 	}
 
 	DrawGameInfo();
@@ -389,4 +403,10 @@ void ACGPlayerHUD::DrawPrompt()
 void ACGPlayerHUD::SetPromptMessage(const FString& Message)
 {
 	PromptMessage = Message;
+}
+
+void ACGPlayerHUD::NotifyHitTaken()
+{
+	float TempTime = GetWorld()->GetTimeSeconds();
+	TimeSinceLastHit = TempTime - TimeSinceLastHit > TimeToDisplayHit ? TempTime : TimeSinceLastHitTaken;
 }
