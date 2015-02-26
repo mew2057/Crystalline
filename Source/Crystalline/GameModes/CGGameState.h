@@ -40,6 +40,11 @@ public:
 	/** Time left in the round, post game, pre game, etc.*/
 	UPROPERTY(Transient, Replicated)
 	int32 RemainingTime;
+
+	// TODO is there a better way?
+	/** Set at the start of the match by the game mode, then never touched again.*/
+	UPROPERTY(Transient, Replicated)
+	float GoalScore;
 private:
 	FComparePlayers PlayerPredicate;
 };

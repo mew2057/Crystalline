@@ -31,7 +31,6 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) : 
 
 void ACGBaseGameMode::HandleMatchIsWaitingToStart()
 {
-
 	Super::HandleMatchIsWaitingToStart();
 
 	if (bSpawnBots)
@@ -51,6 +50,7 @@ void ACGBaseGameMode::HandleMatchHasStarted()
 	if (CGGameState)
 	{
 		CGGameState->RemainingTime = RoundTime;
+		CGGameState->GoalScore = ScoreToWin;
 	}
 
 	// Kicks off the bot players.

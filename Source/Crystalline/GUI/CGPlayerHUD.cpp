@@ -17,8 +17,8 @@ ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(
 	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
 	BigFont = BigFontOb.Object;
 	HitTakenColor = FLinearColor::Red;
-	ScoreToWinInv = .000001f;
 	TimeSinceLastHitTaken = 0.f;
+	TimeSinceLastHitConfirmed = 0.f;
 }
 
 void ACGPlayerHUD::PostInitializeComponents()
@@ -341,12 +341,13 @@ void ACGPlayerHUD::DrawGameInfo()
 
 			Canvas->SetDrawColor(FColor::Blue);
 
+			// TODO verify Goal Score.
 			Canvas->DrawTile(
 				RoundDataElement.FGIcon.Texture,
 				ElemX, ElemY,
-				ElemW * ScoreToWinInv * TempPlayerState->Score, ElemH,
+				ElemW * TempPlayerState->Score / CGGameState->GoalScore, ElemH,
 				RoundDataElement.FGIcon.U, RoundDataElement.FGIcon.V,
-				RoundDataElement.FGIcon.UL * ScoreToWinInv * TempPlayerState->Score, RoundDataElement.FGIcon.VL,
+				RoundDataElement.FGIcon.UL * TempPlayerState->Score / CGGameState->GoalScore, RoundDataElement.FGIcon.VL,
 				EBlendMode::BLEND_Translucent);
 			
 			// Score goes here.

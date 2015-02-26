@@ -238,10 +238,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
 	UFont* BigFont;
-
-	UPROPERTY(Transient)
-	float ScoreToWinInv;
-	
+		
 	UPROPERTY(Transient)
 	float TimeSinceLastHitTaken;
 
