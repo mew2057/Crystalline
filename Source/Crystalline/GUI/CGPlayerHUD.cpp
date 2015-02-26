@@ -63,7 +63,7 @@ void ACGPlayerHUD::DrawHUD()
 		ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
 		{
-			Canvas->SetDrawColor(FColor::White);
+			Canvas->SetDrawColor(Weapon->CheckCanHit() ? FColor::Red : FColor::White);
 
 			//////////////////////////
 			// Crosshair	
@@ -82,7 +82,6 @@ void ACGPlayerHUD::DrawHUD()
 					(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
 					(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 			}
-
 
 			DrawWeaponHUD();
 			DrawPrompt();

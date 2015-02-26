@@ -69,7 +69,6 @@ void ACGBeamGun::StopWeaponFireSimulation()
 		TrailPSC->DeactivateSystem();
 		TrailPSC = NULL;
 	}
-
 }
 
 

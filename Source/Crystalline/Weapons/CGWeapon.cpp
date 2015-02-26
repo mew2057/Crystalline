@@ -242,6 +242,23 @@ void ACGWeapon::ApplyReload()
 
 }
 
+bool ACGWeapon::CheckCanHit()
+{
+	if (CurrentState != ActiveState && CurrentState != FiringState)
+	{
+		return false;
+	}
+	// TODO make this 4 casts!
+	const FVector StartTrace = GetCameraLocation();
+	const FVector AimDir = GetCameraAim();
+	const FVector EndTrace = StartTrace + AimDir * WeaponConfig.WeaponRange;
+	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
+	ACGCharacter* ImpactedPawn = Cast<ACGCharacter>(Impact.GetActor());
+
+	return ImpactedPawn != NULL && ImpactedPawn->IsAlive();
+}
+
+
 
 #pragma endregion
 

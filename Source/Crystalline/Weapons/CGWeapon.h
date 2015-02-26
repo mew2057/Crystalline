@@ -165,6 +165,9 @@ public:
 	// Can't zoom if Equipping or Unequipping.
 	FORCEINLINE bool CanZoom() { return CurrentState != EquippingState && CurrentState != UnequippingState;  }
 
+	/**Returns true if the gun is in the active state.*/
+	bool CheckCanHit();
+
 #pragma endregion
 
 #pragma region Fire Functions
