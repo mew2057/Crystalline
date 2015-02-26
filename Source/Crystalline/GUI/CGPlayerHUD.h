@@ -151,7 +151,6 @@ struct FCGWeaponElement
 	{
 		AmmoTextColor = FLinearColor::White;
 	}
-
 };
 
 
@@ -211,12 +210,15 @@ private:
 	/**The number of pixels per percent.*/
 	FVector2D PixelsPerCent;
 
+	/**The configuration for the Shield HUD Element.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDElement Shield;
 
+	/**The configuration for the Round HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGRoundElement RoundDataElement;
 
+	/**The configuration for the Weapon HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGWeaponElement WeaponElement;
 
@@ -224,24 +226,31 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	UTexture2D* HitTakenOverlay;
 	
+	/**The color for the hit taken texture.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor HitTakenColor;
 
+	/**Time to display the hit taken texture.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	float TimeToDisplayHitTaken;
 
+	/**Icon for hit confirmation.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCanvasIcon HitConfirmedIcon;
 
+	/**Time to display the hit confirmation.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	float TimeToDisplayHitConfirmed;
 
+	/**The Font for the HUD.*/
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
 	UFont* BigFont;
 		
+	/**Internal time since the player last took a hit.*/
 	UPROPERTY(Transient)
 	float TimeSinceLastHitTaken;
 
+	/**Time Since the last hit was confirmed.*/
 	UPROPERTY(Transient)
 	float TimeSinceLastHitConfirmed;
 };
