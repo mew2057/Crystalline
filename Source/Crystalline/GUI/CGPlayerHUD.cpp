@@ -74,6 +74,16 @@ void ACGPlayerHUD::DrawHUD()
 				(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
 				(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 
+			// Play hit confirmation
+			if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed)
+			{
+				//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
+				Canvas->DrawIcon(HitConfirmedIcon,
+					(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
+					(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+			}
+
+
 			DrawWeaponHUD();
 			DrawPrompt();
 		}
@@ -408,5 +418,10 @@ void ACGPlayerHUD::SetPromptMessage(const FString& Message)
 void ACGPlayerHUD::NotifyHitTaken()
 {
 	float TempTime = GetWorld()->GetTimeSeconds();
-	TimeSinceLastHit = TempTime - TimeSinceLastHit > TimeToDisplayHit ? TempTime : TimeSinceLastHitTaken;
+	TimeSinceLastHitTaken = TempTime - TimeSinceLastHitTaken > TimeToDisplayHitTaken ? TempTime : TimeSinceLastHitTaken;
+}
+
+void ACGPlayerHUD::NotifyHitConfirmed()
+{
+	TimeSinceLastHitConfirmed = GetWorld()->GetTimeSeconds();
 }

@@ -254,13 +254,22 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->DisableMovement();
 		GetCharacterMovement()->SetComponentTickEnabled(false);
-
-
 	}
 	
 	/////////////////////////////////////////////////////
 
 	SetLifeSpan(5.f);
+
+	// Play the hit notifier for killer.
+	if (PawnInstigator && PawnInstigator != this && PawnInstigator->IsLocallyControlled())
+	{
+		APlayerController* InstigatorPC = Cast<APlayerController>(PawnInstigator->Controller);
+		ACGPlayerHUD* InstHUD = InstigatorPC ? Cast<ACGPlayerHUD>(InstigatorPC->GetHUD()) : NULL;
+		if (InstHUD)
+		{
+			InstHUD->NotifyHitConfirmed();
+		}
+	}
 }
 
 void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser)
@@ -277,10 +286,18 @@ void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageE
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
 	if (HUD)
 	{
-		HUD->NotifyHit();
+		HUD->NotifyHitTaken();
 	}
 
-
+	if (PawnInstigator && PawnInstigator != this && PawnInstigator->IsLocallyControlled())
+	{
+		APlayerController* InstigatorPC = Cast<APlayerController>(PawnInstigator->Controller);
+		ACGPlayerHUD* InstHUD = InstigatorPC ? Cast<ACGPlayerHUD>(InstigatorPC->GetHUD()) : NULL;
+		if (InstHUD)
+		{
+			InstHUD->NotifyHitConfirmed();
+		}
+	}
 }
 
 void ACGCharacter::ReplicateHit(float Damage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser, bool bKilled)

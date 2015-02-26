@@ -194,6 +194,9 @@ public:
 	/**Sets the TimeSinceLastHit for the hit notification.*/
 	void NotifyHitTaken();
 
+	void NotifyHitConfirmed();
+
+
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
 	float ScaleUIY;
@@ -223,9 +226,15 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor HitTakenColor;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	float TimeToDisplayHitTaken;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon HitConfirmedIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float TimeToDisplayHitConfirmed;
 
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
 	UFont* BigFont;
@@ -235,4 +244,7 @@ private:
 	
 	UPROPERTY(Transient)
 	float TimeSinceLastHitTaken;
+
+	UPROPERTY(Transient)
+	float TimeSinceLastHitConfirmed;
 };
