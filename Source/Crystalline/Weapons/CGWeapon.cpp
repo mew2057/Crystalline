@@ -794,6 +794,11 @@ void ACGWeapon::GotoEquippingState()
 	GotoState(EquippingState);
 }
 
+bool ACGWeapon::IsReloading()const
+{
+	 return CurrentState == ReloadingState; 
+}
+
 
 #pragma endregion
 
