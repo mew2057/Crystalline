@@ -27,46 +27,93 @@ void ACGPlayerHUD::PostInitializeComponents()
 	
 	// Initialize icons.
 	ButtonIcons.Initialize();
-
-	int32 StrLen;
-	int32 Key;
-	int32 Num;
-	TArray<FInputActionKeyMapping> Keys;
+	
+	// TODO Remove hard coding.
 	bool GamepadConnected = false;
 
-	// Set Action Button Icon.
+	// Set Button Icons up.	
+	DetermineKeyCodeForAction("ActionButton", ACTION_BUTTON, GamepadConnected);
+	DetermineKeyCodeForAction("PopCrystalButton", POP_BUTTON, GamepadConnected);
+}
 
-	Keys = PlayerOwner->PlayerInput->GetKeysForAction("ActionButton");
-	Num = Keys.Num();
+//XXX This is Janky code.
+void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID, bool GamepadConnected)
+{
+	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
+	int32 Num = Keys.Num();;
+	int32 Key;
 
 	for (int32 i = 0; i < Num; ++i)
 	{
 		if (Keys[i].Key.IsGamepadKey() && GamepadConnected)
 		{
-		//	Keys[i].Key
+			//	Keys[i].Key
 			break;
 		}
 		else if (!GamepadConnected)
 		{
 			FString KeyString = Keys[i].Key.ToString();
-			StrLen = KeyString.Len();
-			if (StrLen == 1 )
+			const float StrLen = KeyString.Len();
+
+			if (StrLen == 1)
 			{
-				Key = (int32)KeyString[0];// -BUTTON_ICON_OFFSET;
+				Key = (int32)KeyString[0] - ALPHA_BUTTON_ICON_OFFSET;
+			}
+			else
+			{
+				// I can't believe Unreal encoded it like this.
+				if (KeyString == "Zero")
+				{
+					Key = NUM_BUTTON_OFFSET;
+				}
+				else if (KeyString == "One")
+				{
+					Key = NUM_BUTTON_OFFSET + 1;
+				}
+				else if (KeyString == "Two")
+				{
+					Key = NUM_BUTTON_OFFSET + 2;
+				}
+				else if (KeyString == "Three")
+				{
+					Key = NUM_BUTTON_OFFSET + 3;
+				}
+				else if (KeyString == "Four")
+				{
+					Key = NUM_BUTTON_OFFSET + 4;
+				}
+				else if (KeyString == "Five")
+				{
+					Key = NUM_BUTTON_OFFSET + 5;
+				}
+				else if (KeyString == "Six")
+				{
+					Key = NUM_BUTTON_OFFSET + 6;
+				}
+				else if (KeyString == "Seven")
+				{
+					Key = NUM_BUTTON_OFFSET + 7;
+				}
+				else if (KeyString == "Eight")
+				{
+					Key = NUM_BUTTON_OFFSET + 8;
+				}
+				else if (KeyString == "Nine")
+				{
+					Key = NUM_BUTTON_OFFSET + 9;
+				}
+			}
 
-				Key -= Key >= ALPHA_BUTTON_ICON_OFFSET ? ALPHA_BUTTON_ICON_OFFSET : NUM_ALPHA_BUTTON_OFFSET;
-
-				UE_LOG(LogTemp, Log, TEXT("KeyId : %d"), Key);
-				ButtonIcons.SetKeyboardActionIcon(Key);
+			// Kick out if the key was found.
+			if (Key > 0)
+			{
+				ButtonIcons.SetKeyboardIcon(Key, ButtonID);
 				break;
 			}
 		}
-	}
-
-
-	// Prioritize
-	
+	}	
 }
+
 
 // TODO add a dirty bit for player Scoring.
 void ACGPlayerHUD::PostRender()

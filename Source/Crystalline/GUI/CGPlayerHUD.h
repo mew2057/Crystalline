@@ -10,7 +10,7 @@
 #define TARGET_X_RESOLUTION 1920.0f
 #define ICON_FUDGE .0000001f
 #define ALPHA_BUTTON_ICON_OFFSET 65
-#define NUM_ALPHA_BUTTON_OFFSET 22
+#define NUM_BUTTON_OFFSET 25
 
 UENUM(BlueprintType)
 enum class ECGJustification : uint8
@@ -225,17 +225,16 @@ struct FCGButtonIcons
 		}
 	}
 	
-	void SetKeyboardActionIcon(int32 Position)
-	{
-	
+	void SetKeyboardIcon(int32 Position, int32 ButtonID)
+	{	
 		if (IconsX > 0)
 		{
 			int32 Row = Position % IconsX;
 			int32 Col = Position / IconsX;
 
 			
-			ButtonIcons[ACTION_BUTTON].X = (float)(Row *  IconWidth);
-			ButtonIcons[ACTION_BUTTON].Y = (float)(Col *  IconHeight);
+			ButtonIcons[ButtonID].X = (float)(Row *  IconWidth);
+			ButtonIcons[ButtonID].Y = (float)(Col *  IconHeight);
 		}
 	}
 };
@@ -299,6 +298,8 @@ public:
 	virtual void PostRender() override;
 	virtual void PostInitializeComponents() override;
 
+	void DetermineKeyCodeForAction(const FName& Action, int32 ButtonID, bool GamepadConnected);
+
 	/**
 	* Draws the ammo, overheat gauge, and other relavant information.
 	* Note this assumes that the player only has two weapons, more weapons require modifications.
@@ -342,51 +343,51 @@ private:
 
 	/**The configuration for the Shield HUD Element.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDElement Shield;
+		FCGHUDElement Shield;
 
 	/**The configuration for the Round HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGRoundElement RoundDataElement;
+		FCGRoundElement RoundDataElement;
 
 	/**The configuration for the Weapon HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGWeaponElement WeaponElement;
+		FCGWeaponElement WeaponElement;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGButtonIcons ButtonIcons;
+		FCGButtonIcons ButtonIcons;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGPrompt Prompt;
+		FCGPrompt Prompt;
 
 	/** Expanded to fit across the player's FOV. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	UTexture2D* HitTakenOverlay;
-	
+		UTexture2D* HitTakenOverlay;
+
 	/**The color for the hit taken texture.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor HitTakenColor;
+		FLinearColor HitTakenColor;
 
 	/**Time to display the hit taken texture.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float TimeToDisplayHitTaken;
+		float TimeToDisplayHitTaken;
 
 	/**Icon for hit confirmation.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon HitConfirmedIcon;
+		FCanvasIcon HitConfirmedIcon;
 
 	/**Time to display the hit confirmation.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float TimeToDisplayHitConfirmed;
+		float TimeToDisplayHitConfirmed;
 
 	/**The Font for the HUD.*/
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-	UFont* BigFont;
-		
+		UFont* BigFont;
+
 	/**Internal time since the player last took a hit.*/
 	UPROPERTY(Transient)
-	float TimeSinceLastHitTaken;
+		float TimeSinceLastHitTaken;
 
 	/**Time Since the last hit was confirmed.*/
 	UPROPERTY(Transient)
-	float TimeSinceLastHitConfirmed;
+		float TimeSinceLastHitConfirmed;
 };

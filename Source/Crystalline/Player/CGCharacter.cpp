@@ -653,7 +653,7 @@ void ACGCharacter::OnRep_PendingCrystalPickup()
 		}
 		else
 		{
-			HUD->SetPromptMessage(true, TEXT("Pickup Crystal " + FString::FromInt((int8)(PendingCrystalPickup->GetCrystalType()))), ACTION_BUTTON);
+			HUD->SetPromptMessage(true, TEXT("to pickup crystal " + FString::FromInt((int8)(PendingCrystalPickup->GetCrystalType()))), ACTION_BUTTON);
 		}
 	}
 }
@@ -710,6 +710,15 @@ void ACGCharacter::OnReload()
 	if (IsLocallyControlled() && CurrentWeapon != NULL && CurrentWeapon->HasManualReload())
 	{
 		CurrentWeapon->OnStartReload();
+	}
+}
+
+void ACGCharacter::OnPopCrystal()
+{
+	// Make sure we control this player and it has an inventory.
+	if (IsLocallyControlled() && Inventory != NULL)
+	{
+
 	}
 }
 

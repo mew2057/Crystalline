@@ -185,6 +185,9 @@ public:
 	/** Triggers the reload for current weapon. */
 	void OnReload();
 
+	/** Pops the most powerful crystal in the gun. */
+	void OnPopCrystal();
+
 	/** Changes the equipped weapon to the next one in the Inventory Weapon array. */
 	void NextWeapon();
 
