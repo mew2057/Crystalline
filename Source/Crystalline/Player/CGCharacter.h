@@ -230,7 +230,7 @@ protected:
 	TSubclassOf<class ACGInventory> DefaultInventoryClass;
 
 	/** The currently equipped weapon for the player. */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
+	UPROPERTY(BlueprintReadOnly, Transient, ReplicatedUsing = OnRep_CurrentWeapon)
 	class ACGWeapon* CurrentWeapon;
 
 	/** A pending weapon for equips. */
@@ -245,7 +245,7 @@ public:
 
 
 	//FIXME Move to private
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly,Transient, Replicated)
 	class ACGInventory* Inventory;
 
 	// TODO make me private
@@ -264,7 +264,7 @@ public:
 	void SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon = NULL);
 
 	FORCEINLINE ACGWeapon*  GetCurrentWeapon() const { return CurrentWeapon; };
-
+	
 	/*
 	 * Invoked when the weapon has been changed, the character performs the actual equip call.
 	 */

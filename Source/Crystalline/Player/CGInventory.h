@@ -30,6 +30,9 @@ public:
 
 	void LoadCrystal(ECGCrystalType Crystal);
 
+	UFUNCTION(BlueprintCallable, Category = "Game|Inventory")
+	void PopAllCrystals();
+
 	FORCEINLINE ACGWeapon* GetWeapon(int32 Index) const { return Weapons[Index]; }
 
 	FORCEINLINE int32 GetWeaponCount() const { return Weapons.Num(); }

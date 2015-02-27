@@ -313,6 +313,9 @@ public :
 	/**Switches the weapon to the firing state, Checks Ammo, Overheat, etc. May be overridem for this reason.*/
 	virtual void GotoFiringState();
 
+	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
+	bool IsReloading()const;
+
 public:
 
 	UPROPERTY(BlueprintReadOnly)

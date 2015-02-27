@@ -246,6 +246,16 @@ void ACGInventory::LoadCrystal(ECGCrystalType Crystal)
 	}
 }
 
+void ACGInventory::PopAllCrystals()
+{
+	// Clear the Crystals and rebuild inventory.
+	TierOneCrystal = ECGCrystalType::NONE;
+	TierTwoCrystal = ECGCrystalType::NONE;
+
+	ReconstructInventory();
+}
+
+
 void ACGInventory::OnRep_CGOwner()
 {
 	// TODO Replicate the inventory being loaded.
