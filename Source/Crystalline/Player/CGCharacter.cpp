@@ -324,12 +324,9 @@ void ACGCharacter::OnRep_LastHit()
 	{
 		// TODO Clean up damage event stuff.
 		OnDeath(LastHit.Damage, LastHit.DamageEvent, LastHit.Instigator.Get(), LastHit.DamageCauser.Get());
-
-		UE_LOG(LogTemp, Log, TEXT("Replicating Death on %s"), *GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Replicating Hit on %s"), *GetName());
 		PlayHit(LastHit.Damage, LastHit.DamageEvent, LastHit.Instigator.Get(), LastHit.DamageCauser.Get());
 	}
 }
@@ -364,6 +361,7 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ACGCharacter::OnReload);
 
 	InputComponent->BindAction("ActionButton", IE_Pressed, this, &ACGCharacter::OnActionButton);
+	InputComponent->BindAction("PopCrystalButton", IE_Pressed, this, &ACGCharacter::OnPopCrystal);
 
 	InputComponent->BindAction("Zoom", IE_Pressed, this, &ACGCharacter::StartZoom);
 	InputComponent->BindAction("Zoom", IE_Released, this, &ACGCharacter::StopZoom);
@@ -421,6 +419,17 @@ bool ACGCharacter::IsFirstPerson()
 bool ACGCharacter::IsAlive()
 {
 	return CurrentHealth > 0;
+}
+
+
+void ACGCharacter::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
+{
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->SetPromptMessage(bSetPrompt, Message, ButtonID);
+	}
 }
 
 FRotator ACGCharacter::GetAimOffsets() const
@@ -713,15 +722,6 @@ void ACGCharacter::OnReload()
 	}
 }
 
-void ACGCharacter::OnPopCrystal()
-{
-	// Make sure we control this player and it has an inventory.
-	if (IsLocallyControlled() && Inventory != NULL)
-	{
-
-	}
-}
-
 /** Changes the equipped weapon to the next one in the Inventory Weapon array. */
 void ACGCharacter::NextWeapon()
 {
@@ -845,6 +845,41 @@ void ACGCharacter::PickupCrystal()
 	}
 }
 
+void ACGCharacter::OnPopCrystal()
+{
+	if (Inventory && Inventory->TierOneCrystal != ECGCrystalType::NONE || Inventory->TierTwoCrystal != ECGCrystalType::NONE)
+	{
+		// Make sure we control this player and it has an inventory.
+		if (Role < ROLE_Authority)
+		{
+			ServerPopCrystal();
+		}
+		else
+		{
+			PopCrystal();
+		}
+	}
+}
+
+bool ACGCharacter::ServerPopCrystal_Validate()
+{
+	return true;
+}
+
+void ACGCharacter::ServerPopCrystal_Implementation()
+{
+	PopCrystal();
+}
+
+void ACGCharacter::PopCrystal()
+{
+	// Make sure the PendingCrystal is still there.
+	// TODO work on the pop controls.
+	if (Inventory)
+	{
+		Inventory->PopBestCrystal();
+	}
+}
 
 #pragma endregion
 

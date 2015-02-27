@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Game|Inventory")
 	void PopAllCrystals();
 
+	/**Pops the Crystals in reverse order, e.g. T2 -> T1*/
+	void PopBestCrystal();
+
 	FORCEINLINE ACGWeapon* GetWeapon(int32 Index) const { return Weapons[Index]; }
 
 	FORCEINLINE int32 GetWeaponCount() const { return Weapons.Num(); }

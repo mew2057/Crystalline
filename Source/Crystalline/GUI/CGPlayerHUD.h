@@ -319,7 +319,8 @@ public:
 	/** Draws the prompt message.*/
 	void DrawPrompt();
 
-	void SetPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = ACTION_BUTTON);
+	UFUNCTION(BlueprintCallable, Category = "Game|HUD")
+	void SetPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
 
 	/**Sets the TimeSinceLastHit for the hit notification.*/
 	void NotifyHitTaken();

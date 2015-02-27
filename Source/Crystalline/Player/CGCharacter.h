@@ -58,11 +58,11 @@ public:
 
 	bool IsAlive();
 
+	UFUNCTION(BlueprintCallable, Category = "Game|HUD")
+	void SetPlayerPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	FRotator GetAimOffsets() const;
-
-
 
 protected:
 	/** Max player shield amount. This is decayed before the health.*/
@@ -185,9 +185,6 @@ public:
 	/** Triggers the reload for current weapon. */
 	void OnReload();
 
-	/** Pops the most powerful crystal in the gun. */
-	void OnPopCrystal();
-
 	/** Changes the equipped weapon to the next one in the Inventory Weapon array. */
 	void NextWeapon();
 
@@ -213,6 +210,13 @@ public:
 	void ServerPickUpCrystal();
 
 	void PickupCrystal();
+
+	/** Pops the most powerful crystal in the gun. */
+	void OnPopCrystal();
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerPopCrystal();
+
+	void PopCrystal();
 
 
 #pragma endregion

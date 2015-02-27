@@ -255,6 +255,20 @@ void ACGInventory::PopAllCrystals()
 	ReconstructInventory();
 }
 
+void ACGInventory::PopBestCrystal()
+{
+	if (TierTwoCrystal != ECGCrystalType::NONE)
+	{
+		TierTwoCrystal = ECGCrystalType::NONE;
+	}
+	else if (TierOneCrystal != ECGCrystalType::NONE)
+	{
+		TierOneCrystal = ECGCrystalType::NONE;
+	}
+
+	ReconstructInventory();
+}
+
 
 void ACGInventory::OnRep_CGOwner()
 {
