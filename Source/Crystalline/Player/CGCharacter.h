@@ -245,7 +245,7 @@ public:
 
 
 	//FIXME Move to private
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly,Transient, Replicated)
 	class ACGInventory* Inventory;
 
 	// TODO make me private

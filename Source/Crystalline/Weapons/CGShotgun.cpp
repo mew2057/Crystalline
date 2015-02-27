@@ -33,6 +33,7 @@ void ACGShotgun :: SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal Sho
 			SGBullet->SetOwner(this);
 			SGBullet->SetVelocity(InitialRotation); // This ensures the behavior matches it's intended use case.
 			SGBullet->ImpactDamage = WeaponConfig.BaseDamage;
+			SGBullet->DamageType = WeaponConfig.DamageType;
 			SGBullet->SetLifeSpan(ProjectileConfig.ProjectileLife);
 			UGameplayStatics::FinishSpawningActor(SGBullet, BulletSpawn);
 			SGBullet = NULL;
