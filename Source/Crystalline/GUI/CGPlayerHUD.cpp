@@ -460,7 +460,7 @@ void ACGPlayerHUD::DrawPrompt()
 			FVector2D ButtonUV = ButtonIcons.ButtonIcons[PromptIcon.CurrentButton];
 
 			Canvas->DrawTile(
-				ButtonIcons.ButtonIconTexture,
+				ButtonIcons.ButtonIcon.Texture,
 				X + CurrentX, Y,
 				Height,	Height,
 				ButtonUV.X, ButtonUV.Y,

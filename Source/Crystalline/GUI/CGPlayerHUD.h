@@ -166,7 +166,7 @@ struct FCGButtonIcons
 
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	UTexture2D* ButtonIconTexture;
+	FCanvasIcon ButtonIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform IconTransform;
@@ -184,8 +184,8 @@ struct FCGButtonIcons
 
 	FCGButtonIcons()
 	{
-		IconWidth = 16;
-		IconHeight = 16;
+		IconWidth = 64;
+		IconHeight = 64;
 
 		// TODO remove hardcoding.
 		ButtonIcons.Init(NUM_MAPPED_BUTTONS);
@@ -193,21 +193,23 @@ struct FCGButtonIcons
 
 	void Initialize()
 	{
-		if (ButtonIconTexture != NULL)
+		if (ButtonIcon.Texture != NULL)
 		{
-			IconsX = ButtonIconTexture->GetSizeX() % IconWidth;
-			IconsY = ButtonIconTexture->GetSizeY() % IconHeight;
+		//	IconsX = ButtonIcon.Texture->GetSizeX() % IconWidth;
+		// IconsY = ButtonIcon.Texture->GetSizeY() % IconHeight;
 		}
 	}
 	
 	void SetKeyboardActionIcon(int32 Position)
 	{
+		UE_LOG(LogTemp, Log, TEXT("IconsY : %d"), IconsY);
+		UE_LOG(LogTemp, Log, TEXT("IconsX : %d"), IconsX);
 		if (IconsX > 0 && IconsY > 0)
 		{
 			int32 Row = Position % IconsX;
 			int32 Col = Position / IconsY;
 			UE_LOG(LogTemp, Log, TEXT("Row : %d"), Row);
-						UE_LOG(LogTemp, Log, TEXT("Row : %d"), Row);
+			UE_LOG(LogTemp, Log, TEXT("Col : %d"), Col);
 
 			
 			ButtonIcons[ACTION_BUTTON].X = (float)(Row *  IconWidth);
