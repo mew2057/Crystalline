@@ -25,6 +25,47 @@ void ACGPlayerHUD::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	
+	// Initialize icons.
+	ButtonIcons.Initialize();
+
+	int32 StrLen;
+	int32 Key;
+	int32 Num;
+	TArray<FInputActionKeyMapping> Keys;
+	bool GamepadConnected = false;
+
+	// Set Action Button Icon.
+
+	Keys = PlayerOwner->PlayerInput->GetKeysForAction("ActionButton");
+	Num = Keys.Num();
+
+	for (int32 i = 0; i < Num; ++i)
+	{
+		if (Keys[i].Key.IsGamepadKey() && GamepadConnected)
+		{
+		//	Keys[i].Key
+			break;
+		}
+		else if (!GamepadConnected)
+		{
+			FString KeyString = Keys[i].Key.ToString();
+			StrLen = KeyString.Len();
+			if (StrLen == 1 )
+			{
+				Key = (int32)KeyString[0];// -BUTTON_ICON_OFFSET;
+
+				Key -= Key > ALPHA_BUTTON_ICON_OFFSET ? ALPHA_BUTTON_ICON_OFFSET : NUM_ALPHA_BUTTON_OFFSET;
+
+				UE_LOG(LogTemp, Log, TEXT("KeyId : %d"), Key);
+				ButtonIcons.SetKeyboardActionIcon(Key);
+				break;
+			}
+		}
+	}
+
+
+	// Prioritize
+	
 }
 
 // TODO add a dirty bit for player Scoring.
@@ -374,7 +415,7 @@ void ACGPlayerHUD::DrawGameInfo()
 	}
 }
 
-void ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight)
+float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight)
 {
 
 	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), Font, TextColor);
@@ -390,11 +431,47 @@ void ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, 
 
 	// TODO this Jitters slightly.
 	Canvas->DrawItem(TextItem, ScreenX, ScreenY);
+
+	return SizeX * Scale;
 }
 
 void ACGPlayerHUD::DrawPrompt()
 {
+	if (PromptIcon.bPrompt)
+	{
+		// Get the Main Anchor for our weapon Element.
+		const float X = PixelsPerCent.X * PromptIcon.Transform.PercentX;
+		const float Y = PixelsPerCent.Y * PromptIcon.Transform.PercentY;
+		const float Width = PixelsPerCent.X * PromptIcon.Transform.WidthPercent;
+		const float Height = PixelsPerCent.Y * PromptIcon.Transform.HeightPercent;
+
+		float CurrentX = DrawScaledText(
+			PromptIcon.BasePrompt,
+			PromptIcon.PromptTextColor,
+			X, Y,
+			BigFont,
+			Height);
+
+		
+		Canvas->SetDrawColor(FColor::White);
+
+		if (ButtonIcons.ButtonIcons.Num() > PromptIcon.CurrentButton)
+		{
+			FVector2D ButtonUV = ButtonIcons.ButtonIcons[PromptIcon.CurrentButton];
+
+			Canvas->DrawTile(
+				ButtonIcons.ButtonIconTexture,
+				X + CurrentX, Y,
+				Height,	Height,
+				ButtonUV.X, ButtonUV.Y,
+				ButtonIcons.IconWidth, ButtonIcons.IconHeight,
+				EBlendMode::BLEND_Translucent);
+		}
+	}
+
+
 	// TODO Make this print out images and whatnot.
+	/*
 	float SizeX, SizeY;
 	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
 	TextItem.EnableShadow(FLinearColor::Black);
@@ -408,11 +485,15 @@ void ACGPlayerHUD::DrawPrompt()
 	Canvas->SetDrawColor(FColor::Yellow);
 
 	Canvas->DrawItem(TextItem, 50, 100);
+*/
 }
 
-void ACGPlayerHUD::SetPromptMessage(const FString& Message)
+void ACGPlayerHUD::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
 {
-	PromptMessage = Message;
+	PromptIcon.PromptMessage = Message;
+	PromptIcon.bPrompt = bSetPrompt;
+	PromptIcon.CurrentButton = ButtonID;
+
 }
 
 void ACGPlayerHUD::NotifyHitTaken()

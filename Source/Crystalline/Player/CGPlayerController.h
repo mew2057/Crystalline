@@ -15,6 +15,9 @@ class CRYSTALLINE_API ACGPlayerController : public APlayerController
 	
 public:
 
+	/***/
+	virtual void SpawnDefaultHUD() override;
+
 	/**Restarts the player*/
 	virtual void UnFreeze() override;
 

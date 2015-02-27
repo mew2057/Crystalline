@@ -30,6 +30,7 @@ public:
 
 
 protected:
+
 	
 	virtual void HandleMatchIsWaitingToStart() override;
 

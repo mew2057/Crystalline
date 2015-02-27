@@ -230,7 +230,7 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
 	if (HUD)
 	{
-		HUD->SetPromptMessage(TEXT(""));
+		HUD->SetPromptMessage(false);
 	}
 	// Once the Pawn is destroyed the playercontroller will spawn a new pawn, see UnFreeze() 
 
@@ -649,11 +649,11 @@ void ACGCharacter::OnRep_PendingCrystalPickup()
 
 		if (PendingCrystalPickup == NULL)
 		{
-			HUD->SetPromptMessage(TEXT(""));
+			HUD->SetPromptMessage(false);
 		}
 		else
 		{
-			HUD->SetPromptMessage(TEXT("Pickup Crystal " + FString::FromInt((int8)(PendingCrystalPickup->GetCrystalType()))));
+			HUD->SetPromptMessage(true, TEXT("Pickup Crystal " + FString::FromInt((int8)(PendingCrystalPickup->GetCrystalType()))), ACTION_BUTTON);
 		}
 	}
 }

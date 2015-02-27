@@ -9,6 +9,9 @@
 #define TARGET_Y_RESOLUTION 1080.0f
 #define TARGET_X_RESOLUTION 1920.0f
 #define ICON_FUDGE .0000001f
+#define ALPHA_BUTTON_ICON_OFFSET 65
+#define NUM_ALPHA_BUTTON_OFFSET 22
+
 USTRUCT()
 struct FCGHUDTransform
 {
@@ -153,7 +156,101 @@ struct FCGWeaponElement
 	}
 };
 
+USTRUCT()
+struct FCGButtonIcons
+{
+	GENERATED_USTRUCT_BODY()
 
+	#define NUM_MAPPED_BUTTONS 1
+	#define ACTION_BUTTON 0
+
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	UTexture2D* ButtonIconTexture;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform IconTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	int32 IconWidth;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	int32 IconHeight;
+	
+	int32 IconsX;
+	int32 IconsY;
+
+	TArray<FVector2D> ButtonIcons;
+
+	FCGButtonIcons()
+	{
+		IconWidth = 16;
+		IconHeight = 16;
+
+		// TODO remove hardcoding.
+		ButtonIcons.Init(NUM_MAPPED_BUTTONS);
+	}
+
+	void Initialize()
+	{
+		if (ButtonIconTexture != NULL)
+		{
+			IconsX = ButtonIconTexture->GetSizeX() % IconWidth;
+			IconsY = ButtonIconTexture->GetSizeY() % IconHeight;
+		}
+	}
+	
+	void SetKeyboardActionIcon(int32 Position)
+	{
+		if (IconsX > 0 && IconsY > 0)
+		{
+			int32 Row = Position % IconsX;
+			int32 Col = Position / IconsY;
+			UE_LOG(LogTemp, Log, TEXT("Row : %d"), Row);
+						UE_LOG(LogTemp, Log, TEXT("Row : %d"), Row);
+
+			
+			ButtonIcons[ACTION_BUTTON].X = (float)(Row *  IconWidth);
+			ButtonIcons[ACTION_BUTTON].Y = (float)(Col *  IconHeight);
+		}
+	}
+};
+
+USTRUCT()
+struct FCGPrompt
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FString BasePrompt;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor PromptTextColor;
+
+	/** The Prompt Message.*/
+	FString PromptMessage;
+
+	/** The UV for the prompt on the HUD Icons.*/
+	FVector2D PromptIconUV;
+
+	bool bPrompt;
+
+	int32 CurrentButton;
+
+	FCGPrompt()
+	{
+		BasePrompt = "Hold";
+		PromptMessage = "";
+		PromptTextColor = FLinearColor::White;
+		bPrompt = false; 
+	}
+
+
+
+};
 /**
  * 
  */
@@ -182,13 +279,14 @@ public:
 	/** Draws Information regarding the current game type.*/
 	void DrawGameInfo();
 
-	/**Draws text with the specified height.*/
-	FORCEINLINE void DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight);
+	/**Draws text with the specified height.
+	@return The Horizontal scale.*/
+	FORCEINLINE float DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight);
 
 	/** Draws the prompt message.*/
 	void DrawPrompt();
 
-	void SetPromptMessage(const FString& Message);
+	void SetPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = ACTION_BUTTON);
 
 	/**Sets the TimeSinceLastHit for the hit notification.*/
 	void NotifyHitTaken();
@@ -221,6 +319,12 @@ private:
 	/**The configuration for the Weapon HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGWeaponElement WeaponElement;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGButtonIcons ButtonIcons;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGPrompt PromptIcon;
 
 	/** Expanded to fit across the player's FOV. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
