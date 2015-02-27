@@ -459,14 +459,28 @@ void ACGPlayerHUD::DrawPrompt()
 		{
 			FVector2D ButtonUV = ButtonIcons.ButtonIcons[PromptIcon.CurrentButton];
 
+			CurrentX = X + CurrentX + PixelsPerCent.X * PromptIcon.PromptKeyOffset;
+
 			Canvas->DrawTile(
-				ButtonIcons.ButtonIcon.Texture,
-				X + CurrentX, Y,
+				ButtonIcons.ButtonIconTexture,
+				CurrentX, Y,
 				Height,	Height,
 				ButtonUV.X, ButtonUV.Y,
 				ButtonIcons.IconWidth, ButtonIcons.IconHeight,
 				EBlendMode::BLEND_Translucent);
+			CurrentX += Height;
+
 		}
+
+		CurrentX += PixelsPerCent.X * PromptIcon.PromptKeyOffset;
+
+
+		DrawScaledText(
+			PromptIcon.PromptMessage,
+			PromptIcon.PromptTextColor,
+			CurrentX, Y,
+			BigFont,
+			Height);
 	}
 
 

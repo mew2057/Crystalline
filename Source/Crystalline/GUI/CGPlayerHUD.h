@@ -156,20 +156,17 @@ struct FCGWeaponElement
 	}
 };
 
+#define NUM_MAPPED_BUTTONS 1
+#define ACTION_BUTTON 0
+
 USTRUCT()
 struct FCGButtonIcons
 {
 	GENERATED_USTRUCT_BODY()
 
-	#define NUM_MAPPED_BUTTONS 1
-	#define ACTION_BUTTON 0
-
-
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon ButtonIcon;
+	UTexture2D* ButtonIconTexture;
 
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform IconTransform;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	int32 IconWidth;
@@ -178,13 +175,12 @@ struct FCGButtonIcons
 	int32 IconHeight;
 	
 	int32 IconsX;
-	int32 IconsY;
 
 	TArray<FVector2D> ButtonIcons;
 
 	FCGButtonIcons()
 	{
-		IconWidth = 64;
+		IconWidth  = 64;
 		IconHeight = 64;
 
 		// TODO remove hardcoding.
@@ -193,23 +189,19 @@ struct FCGButtonIcons
 
 	void Initialize()
 	{
-		if (ButtonIcon.Texture != NULL)
+		if (ButtonIconTexture != NULL)
 		{
-		//	IconsX = ButtonIcon.Texture->GetSizeX() % IconWidth;
-		// IconsY = ButtonIcon.Texture->GetSizeY() % IconHeight;
+			IconsX = ButtonIconTexture->GetSizeX() / IconWidth;
 		}
 	}
 	
 	void SetKeyboardActionIcon(int32 Position)
 	{
-		UE_LOG(LogTemp, Log, TEXT("IconsY : %d"), IconsY);
-		UE_LOG(LogTemp, Log, TEXT("IconsX : %d"), IconsX);
-		if (IconsX > 0 && IconsY > 0)
+	
+		if (IconsX > 0)
 		{
 			int32 Row = Position % IconsX;
-			int32 Col = Position / IconsY;
-			UE_LOG(LogTemp, Log, TEXT("Row : %d"), Row);
-			UE_LOG(LogTemp, Log, TEXT("Col : %d"), Col);
+			int32 Col = Position / IconsX;
 
 			
 			ButtonIcons[ACTION_BUTTON].X = (float)(Row *  IconWidth);
@@ -231,6 +223,9 @@ struct FCGPrompt
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor PromptTextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float PromptKeyOffset;
 
 	/** The Prompt Message.*/
 	FString PromptMessage;
