@@ -12,6 +12,14 @@
 #define ALPHA_BUTTON_ICON_OFFSET 65
 #define NUM_ALPHA_BUTTON_OFFSET 22
 
+UENUM(BlueprintType)
+enum class ECGJustification : uint8
+{
+	LEFT   UMETA(DisplayName = "Left"),
+	CENTER UMETA(DisplayName = "Center"),
+	RIGHT  UMETA(DisplayName = "Right")
+};
+
 USTRUCT()
 struct FCGHUDTransform
 {
@@ -88,7 +96,13 @@ struct FCGRoundElement
 	FCGHUDTransform Transform;
 	
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor DataElementColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform TimeTransform;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float TimeAnchor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor TimeColor;
@@ -98,6 +112,9 @@ struct FCGRoundElement
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor ScoreColor;
+	
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float ScoreAnchor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCanvasIcon FGIcon;
@@ -119,10 +136,13 @@ struct FCGRoundElement
 
 	FCGRoundElement()
 	{
+		DataElementColor = FLinearColor::White;
 		TimeColor = FLinearColor::White;
 		ScoreColor = FLinearColor::White;
 		FullColor = FLinearColor::Blue;
-		EmptyColor = FLinearColor::Red;
+		EmptyColor = FLinearColor::Blue;
+		TimeAnchor = 0.f;
+		ScoreAnchor = 0.f;
 	}
 };
 
@@ -136,9 +156,15 @@ struct FCGWeaponElement
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform InClipAmmoTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float InClipAnchor;
 	
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform HeldAmmoTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float HeldAmmoAnchor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor AmmoTextColor;
@@ -153,11 +179,15 @@ struct FCGWeaponElement
 	FCGWeaponElement()
 	{
 		AmmoTextColor = FLinearColor::White;
+		InClipAnchor   = 0.f;
+		HeldAmmoAnchor = 0.f;
+
 	}
 };
 
-#define NUM_MAPPED_BUTTONS 1
+#define NUM_MAPPED_BUTTONS 2
 #define ACTION_BUTTON 0
+#define POP_BUTTON 1
 
 USTRUCT()
 struct FCGButtonIcons
@@ -210,11 +240,14 @@ struct FCGButtonIcons
 	}
 };
 
+
+
+
 USTRUCT()
 struct FCGPrompt
 {
 	GENERATED_USTRUCT_BODY()
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
 
@@ -227,26 +260,28 @@ struct FCGPrompt
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	float PromptKeyOffset;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float Anchor;
+
 	/** The Prompt Message.*/
 	FString PromptMessage;
 
 	/** The UV for the prompt on the HUD Icons.*/
 	FVector2D PromptIconUV;
 
-	bool bPrompt;
+	uint32 bPrompt : 1;
 
+	/**The Index of the current button in the prompt.*/
 	int32 CurrentButton;
 
 	FCGPrompt()
 	{
-		BasePrompt = "Hold";
+		BasePrompt = "Press";
 		PromptMessage = "";
 		PromptTextColor = FLinearColor::White;
-		bPrompt = false; 
+		bPrompt = false;
+		Anchor = .5f;
 	}
-
-
-
 };
 /**
  * 
@@ -278,7 +313,7 @@ public:
 
 	/**Draws text with the specified height.
 	@return The Horizontal scale.*/
-	FORCEINLINE float DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight);
+	FORCEINLINE float DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight, float Anchor = 0.f);
 
 	/** Draws the prompt message.*/
 	void DrawPrompt();
@@ -321,7 +356,7 @@ private:
 	FCGButtonIcons ButtonIcons;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGPrompt PromptIcon;
+	FCGPrompt Prompt;
 
 	/** Expanded to fit across the player's FOV. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)

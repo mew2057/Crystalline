@@ -219,7 +219,6 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 			// Ammo Text only here.
 
-			// TODO improve Text scaling.
 			// Ammo in gun.
 			FString Text = FString::Printf(TEXT("%3d"), CurrentWeapon->GetAmmoInClip());
 			
@@ -229,7 +228,8 @@ void ACGPlayerHUD::DrawWeaponHUD()
 				X + PixelsPerWidth * WeaponElement.InClipAmmoTransform.PercentX,
 				Y + PixelsPerHeight * WeaponElement.InClipAmmoTransform.PercentY,
 				BigFont,
-				PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent);
+				PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent,
+				WeaponElement.InClipAnchor);
 
 			
 			// Ammo held.
@@ -240,7 +240,8 @@ void ACGPlayerHUD::DrawWeaponHUD()
 				X + PixelsPerWidth * WeaponElement.HeldAmmoTransform.PercentX,
 				Y + PixelsPerHeight * WeaponElement.HeldAmmoTransform.PercentY,
 				BigFont,
-				PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent);
+				PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent,
+				WeaponElement.HeldAmmoAnchor);
 
 		}
 		
@@ -335,7 +336,8 @@ void ACGPlayerHUD::DrawGameInfo()
 			X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX,
 			Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY,
 			BigFont,
-			PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent);
+			PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent,
+			RoundDataElement.TimeAnchor);
 
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Score Output.
@@ -365,7 +367,7 @@ void ACGPlayerHUD::DrawGameInfo()
 				TempPlayerState = PlayerState ;
 			}
 
-			Canvas->SetDrawColor(FColor::White);
+			Canvas->SetDrawColor(RoundDataElement.DataElementColor);
 
 			const float ElemX = X + PixelsPerWidth * TempElement.Transform.PercentX;
 			const float ElemY = Y + PixelsPerHeight * TempElement.Transform.PercentY;
@@ -394,7 +396,13 @@ void ACGPlayerHUD::DrawGameInfo()
 			// Score goes here.
 			// TODO this needs some kind of anchoring.
 			Text = FString::Printf(TEXT("%.0f"), TempPlayerState->Score);
-			DrawScaledText(Text, RoundDataElement.ScoreColor, ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY, BigFont, PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent);
+			DrawScaledText(
+				Text, 
+				RoundDataElement.ScoreColor, 
+				ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, 
+				ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY, 
+				BigFont, PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent,
+				RoundDataElement.ScoreAnchor);
 
 
 			if (TempPlayerState == PlayerState)
@@ -415,7 +423,7 @@ void ACGPlayerHUD::DrawGameInfo()
 	}
 }
 
-float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight)
+float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight, float Anchor)
 {
 
 	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), Font, TextColor);
@@ -429,6 +437,9 @@ float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor,
 	const float Scale = TextHeight / SizeY;
 	TextItem.Scale.Set(Scale, Scale);
 
+	// Anchor offset.
+	ScreenX -= SizeX * Scale * Anchor;
+
 	// TODO this Jitters slightly.
 	Canvas->DrawItem(TextItem, ScreenX, ScreenY);
 
@@ -437,29 +448,41 @@ float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor,
 
 void ACGPlayerHUD::DrawPrompt()
 {
-	if (PromptIcon.bPrompt)
+	if (Prompt.bPrompt)
 	{
 		// Get the Main Anchor for our weapon Element.
-		const float X = PixelsPerCent.X * PromptIcon.Transform.PercentX;
-		const float Y = PixelsPerCent.Y * PromptIcon.Transform.PercentY;
-		const float Width = PixelsPerCent.X * PromptIcon.Transform.WidthPercent;
-		const float Height = PixelsPerCent.Y * PromptIcon.Transform.HeightPercent;
+		float X = PixelsPerCent.X * Prompt.Transform.PercentX;
+		const float Y = PixelsPerCent.Y * Prompt.Transform.PercentY;
+		const float Height = PixelsPerCent.Y * Prompt.Transform.HeightPercent;
+		const bool bDisplayButton = ButtonIcons.ButtonIcons.Num() > Prompt.CurrentButton;
 
+		////////////////////////////////////////////////////////////////////////////////////////////
+		if (Prompt.Anchor > 0.f)
+		{
+			// Compute the total size of the message for justification.
+			float SizeX, SizeY;
+			Canvas->StrLen(BigFont, Prompt.BasePrompt + Prompt.PromptMessage, SizeX, SizeY);
+			const float Scale = Height / SizeY;
+
+			SizeX = (SizeX * Scale) + PixelsPerCent.X * Prompt.PromptKeyOffset + bDisplayButton * (PixelsPerCent.X * Prompt.PromptKeyOffset + Height);
+			X -= SizeX * Prompt.Anchor;
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////
 		float CurrentX = DrawScaledText(
-			PromptIcon.BasePrompt,
-			PromptIcon.PromptTextColor,
+			Prompt.BasePrompt,
+			Prompt.PromptTextColor,
 			X, Y,
 			BigFont,
 			Height);
 
-		
-		Canvas->SetDrawColor(FColor::White);
-
-		if (ButtonIcons.ButtonIcons.Num() > PromptIcon.CurrentButton)
+		if (bDisplayButton)
 		{
-			FVector2D ButtonUV = ButtonIcons.ButtonIcons[PromptIcon.CurrentButton];
+			Canvas->SetDrawColor(FColor::White);
 
-			CurrentX = X + CurrentX + PixelsPerCent.X * PromptIcon.PromptKeyOffset;
+			FVector2D ButtonUV = ButtonIcons.ButtonIcons[Prompt.CurrentButton];
+
+			CurrentX = X + CurrentX + PixelsPerCent.X * Prompt.PromptKeyOffset;
 
 			Canvas->DrawTile(
 				ButtonIcons.ButtonIconTexture,
@@ -468,16 +491,15 @@ void ACGPlayerHUD::DrawPrompt()
 				ButtonUV.X, ButtonUV.Y,
 				ButtonIcons.IconWidth, ButtonIcons.IconHeight,
 				EBlendMode::BLEND_Translucent);
-			CurrentX += Height;
 
+			CurrentX += Height;
 		}
 
-		CurrentX += PixelsPerCent.X * PromptIcon.PromptKeyOffset;
-
+		CurrentX += PixelsPerCent.X * Prompt.PromptKeyOffset;
 
 		DrawScaledText(
-			PromptIcon.PromptMessage,
-			PromptIcon.PromptTextColor,
+			Prompt.PromptMessage,
+			Prompt.PromptTextColor,
 			CurrentX, Y,
 			BigFont,
 			Height);
@@ -504,9 +526,9 @@ void ACGPlayerHUD::DrawPrompt()
 
 void ACGPlayerHUD::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
 {
-	PromptIcon.PromptMessage = Message;
-	PromptIcon.bPrompt = bSetPrompt;
-	PromptIcon.CurrentButton = ButtonID;
+	Prompt.PromptMessage = Message;
+	Prompt.bPrompt = bSetPrompt;
+	Prompt.CurrentButton = ButtonID;
 
 }
 
