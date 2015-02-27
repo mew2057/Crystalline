@@ -68,26 +68,11 @@ struct FCGGameElement
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform Transform;
-	
-	UPROPERTY(Transient)
-	FString Name;
-
-	UPROPERTY(Transient)
-	int32 Score;
-
-	UPROPERTY(Transient)
-	float PercentToGoal;
-
-	UPROPERTY(Transient)
-	uint32 bIsOwner : 1;
+	FCGHUDTransform Transform;	
 
 	FCGGameElement()
 	{
-		Name = TEXT("Billy Bob Thorton");
-		Score = 1;
-		PercentToGoal = .1f;
-		bIsOwner = true;
+	
 	}
 };
 
@@ -166,7 +151,6 @@ struct FCGWeaponElement
 	{
 		AmmoTextColor = FLinearColor::White;
 	}
-
 };
 
 
@@ -183,6 +167,8 @@ public:
 
 	/** Primary draw call for the HUD */
 	virtual void DrawHUD() override;
+	virtual void PostRender() override;
+	virtual void PostInitializeComponents() override;
 
 	/**
 	* Draws the ammo, overheat gauge, and other relavant information.
@@ -196,11 +182,19 @@ public:
 	/** Draws Information regarding the current game type.*/
 	void DrawGameInfo();
 
+	/**Draws text with the specified height.*/
+	FORCEINLINE void DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight);
 
 	/** Draws the prompt message.*/
 	void DrawPrompt();
 
 	void SetPromptMessage(const FString& Message);
+
+	/**Sets the TimeSinceLastHit for the hit notification.*/
+	void NotifyHitTaken();
+
+	void NotifyHitConfirmed();
+
 
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
@@ -216,15 +210,47 @@ private:
 	/**The number of pixels per percent.*/
 	FVector2D PixelsPerCent;
 
+	/**The configuration for the Shield HUD Element.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDElement Shield;
 
+	/**The configuration for the Round HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGRoundElement RoundDataElement;
 
+	/**The configuration for the Weapon HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGWeaponElement WeaponElement;
 
+	/** Expanded to fit across the player's FOV. */
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	UTexture2D* HitTakenOverlay;
+	
+	/**The color for the hit taken texture.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor HitTakenColor;
+
+	/**Time to display the hit taken texture.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float TimeToDisplayHitTaken;
+
+	/**Icon for hit confirmation.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon HitConfirmedIcon;
+
+	/**Time to display the hit confirmation.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float TimeToDisplayHitConfirmed;
+
+	/**The Font for the HUD.*/
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
 	UFont* BigFont;
+		
+	/**Internal time since the player last took a hit.*/
+	UPROPERTY(Transient)
+	float TimeSinceLastHitTaken;
+
+	/**Time Since the last hit was confirmed.*/
+	UPROPERTY(Transient)
+	float TimeSinceLastHitConfirmed;
 };

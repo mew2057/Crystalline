@@ -36,6 +36,7 @@ void ACGPlayerState::ScoreKill( int32 Points)
 {
 	NumKills++;
 	Score += Points;
+	ForceNetUpdate();
 }
 
 void ACGPlayerState::ScoreDeath()
@@ -46,6 +47,7 @@ void ACGPlayerState::ScoreDeath()
 void ACGPlayerState::ScoreSuicide(int32 Points)
 {
 	Score -= Points;
+	ForceNetUpdate();
 }
 
 

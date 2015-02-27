@@ -7,6 +7,8 @@
 ACGGameState::ACGGameState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	RemainingTime = 0;
+	GoalScore = 1;
+	PlayerPredicate = FComparePlayers();
 }
 
 void ACGGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -14,11 +16,11 @@ void ACGGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACGGameState, RemainingTime);
+	DOREPLIFETIME(ACGGameState, GoalScore);	
 }
 
-/**
-void AGameState::GetPlayerRanks(PlayerRankMap& OutPlayerRanks)
+void ACGGameState::SortPlayers()
 {
-	// TODO build ranks, map is unecessary.
-
-}*/
+	// TODO this may not be the fastest way to do things, Noticable lag on kill confirm.
+	PlayerArray.StableSort(PlayerPredicate);
+}

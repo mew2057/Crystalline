@@ -18,8 +18,8 @@ void ACGBeamGun::PostInitializeComponents()
 
 void ACGBeamGun::FireHitScan()
 {
-	Super::FireHitScan();
-	/*
+	//Super::FireHitScan();
+	
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
 	const FVector StartTrace = GetCameraLocation();
@@ -31,14 +31,15 @@ void ACGBeamGun::FireHitScan()
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 	
-	APawn* TempTarget = Cast<APawn>(Impact.GetActor());
+	ACGCharacter* TempTarget = Cast<ACGCharacter>(Impact.GetActor());
 
 	// If a new pawn has come "closer" change our target.
-	if (TempTarget)
+	if (TempTarget && TempTarget->IsAlive())
 	{
 		Target = TempTarget;
 	}
 
+	// TODO move this to the server.
 	if (Target)
 	{
 		FVector TargetDir = Target->GetActorLocation() - StartTrace;
@@ -49,7 +50,6 @@ void ACGBeamGun::FireHitScan()
 	}	
 
 	ProcessHitScan(Impact, StartTrace, ShootDir, 0, CurrentSpread);
-	*/
 }
 
 
@@ -69,7 +69,6 @@ void ACGBeamGun::StopWeaponFireSimulation()
 		TrailPSC->DeactivateSystem();
 		TrailPSC = NULL;
 	}
-
 }
 
 

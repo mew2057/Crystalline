@@ -21,6 +21,13 @@ void ACGCrystalGun::PostInitializeComponents()
 void ACGCrystalGun::GiveAmmo(int32 NewAmmo)
 {
 	Ammo = FMath::Min(AmmoConfig.AmmoCapacity, Ammo + NewAmmo);
+
+	// Give the player enough ammo to fill up.
+	int32 AmmoOverFlow = Ammo % AmmoConfig.AmmoPerShot;
+	if (AmmoOverFlow > 0)
+	{
+		Ammo += AmmoConfig.AmmoPerShot - AmmoOverFlow;
+	}
 }
 
 
@@ -70,7 +77,22 @@ void ACGCrystalGun::InitializeAmmo(const FCGCrystalAmmo& AmmoStruct)
 void ACGCrystalGun::CopyAmmo(const ACGCrystalGun* Other)
 {
 	AmmoInClip = Other->AmmoInClip;
+
+	// Make sure the player always has "round numbers" for ammo.
+	int32 AmmoOverFlow = AmmoInClip % AmmoConfig.AmmoPerShot;
+	if (AmmoOverFlow > 0)
+	{
+		AmmoInClip += AmmoConfig.AmmoPerShot - AmmoOverFlow;
+	}
+
 	Ammo = Other->Ammo;
+
+	// Make sure the player always has "round numbers" for ammo.
+	AmmoOverFlow = Ammo % AmmoConfig.AmmoPerShot;
+	if (AmmoOverFlow > 0)
+	{
+		Ammo += AmmoConfig.AmmoPerShot - AmmoOverFlow;
+	}
 
 	// TODO Modify so the energy doesn't exceed the Clipsize.
 	const int32 Overflow = AmmoInClip - (AmmoConfig.ShotsPerClip * AmmoConfig.AmmoPerShot);

@@ -16,7 +16,28 @@ ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(
 	// TODO REPLACE THIS FONT!
 	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
 	BigFont = BigFontOb.Object;
+	HitTakenColor = FLinearColor::Red;
+	TimeSinceLastHitTaken = 0.f;
+	TimeSinceLastHitConfirmed = 0.f;
+}
 
+void ACGPlayerHUD::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+}
+
+// TODO add a dirty bit for player Scoring.
+void ACGPlayerHUD::PostRender()
+{
+	// FIXME This is a point for optimization.
+	ACGGameState* GS = GetWorld()->GetGameState<ACGGameState>();
+	if (GS != NULL)
+	{
+		GS->SortPlayers();
+	}
+
+	Super::PostRender();
 }
 
 
@@ -42,7 +63,7 @@ void ACGPlayerHUD::DrawHUD()
 		ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
 		{
-			Canvas->SetDrawColor(FColor::White);
+			Canvas->SetDrawColor(Weapon->CheckCanHit() ? FColor::Red : FColor::White);
 
 			//////////////////////////
 			// Crosshair	
@@ -53,25 +74,31 @@ void ACGPlayerHUD::DrawHUD()
 				(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
 				(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 
+			// Play hit confirmation
+			if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed)
+			{
+				//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
+				Canvas->DrawIcon(HitConfirmedIcon,
+					(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
+					(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+			}
+
 			DrawWeaponHUD();
 			DrawPrompt();
-			/*
-			// State Print out
-			float SizeX, SizeY;
-			FString Text = Weapon->CurrentState->GetName();
-
-			FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
-			TextItem.EnableShadow(FLinearColor::Black);
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-
-			const float TopTextScale = 0.73f; // of 51pt font
-
-			TextItem.Text = FText::FromString(Text);
-			TextItem.Scale = FVector2D(TopTextScale * ScaleUIY, TopTextScale * ScaleUIY);
-			//TextItem.FontRenderInfo = ShadowedFont;
-
-			Canvas->DrawItem(TextItem, 50, 150);*/
 		}
+
+		
+	}
+
+	// Draw the HitTaken if we've been hit recently.
+	if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitTaken < TimeToDisplayHitTaken)
+	{
+		Canvas->PopSafeZoneTransform();
+		HitTakenColor.A = 1.f - ((GetWorld()->GetTimeSeconds() - TimeSinceLastHitTaken) / TimeToDisplayHitTaken);
+		FCanvasTileItem TileItem(FVector2D(0, 0), HitTakenOverlay->Resource, FVector2D(Canvas->ClipX, Canvas->ClipY), HitTakenColor);
+		TileItem.BlendMode = SE_BLEND_Translucent;
+		Canvas->DrawItem(TileItem);
+		Canvas->ApplySafeZoneTransform();
 	}
 
 	DrawGameInfo();
@@ -153,24 +180,26 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 			// TODO improve Text scaling.
 			// Ammo in gun.
-			float SizeX, SizeY;
 			FString Text = FString::Printf(TEXT("%3d"), CurrentWeapon->GetAmmoInClip());
-			FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, WeaponElement.AmmoTextColor);
-			TextItem.Text = FText::FromString(Text);
+			
+			DrawScaledText(
+				Text,
+				WeaponElement.AmmoTextColor,
+				X + PixelsPerWidth * WeaponElement.InClipAmmoTransform.PercentX,
+				Y + PixelsPerHeight * WeaponElement.InClipAmmoTransform.PercentY,
+				BigFont,
+				PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent);
 
-			// Get the actual size, this is to scale the text to our "Box"
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-			TextItem.Scale.Set((PixelsPerWidth * WeaponElement.InClipAmmoTransform.WidthPercent) / SizeX, (PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent) / SizeY);
-			Canvas->DrawItem(TextItem, X + PixelsPerWidth * WeaponElement.InClipAmmoTransform.PercentX, Y + PixelsPerHeight * WeaponElement.InClipAmmoTransform.PercentY);
 			
 			// Ammo held.
 			Text = FString::Printf(TEXT("%4d"), CurrentWeapon->GetAmmo());
-			TextItem.Text = FText::FromString(Text);
-
-			// Get the actual size, this is to scale the text to our "Box"
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-			TextItem.Scale.Set((PixelsPerWidth * WeaponElement.HeldAmmoTransform.WidthPercent) / SizeX, (PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent) / SizeY);
-			Canvas->DrawItem(TextItem, X + PixelsPerWidth * WeaponElement.HeldAmmoTransform.PercentX, Y + PixelsPerHeight * WeaponElement.HeldAmmoTransform.PercentY);
+			DrawScaledText(
+				Text,
+				WeaponElement.AmmoTextColor,
+				X + PixelsPerWidth * WeaponElement.HeldAmmoTransform.PercentX,
+				Y + PixelsPerHeight * WeaponElement.HeldAmmoTransform.PercentY,
+				BigFont,
+				PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent);
 
 		}
 		
@@ -241,7 +270,7 @@ void ACGPlayerHUD::DrawShield()
 
 void ACGPlayerHUD::DrawGameInfo()
 {
-	ACGGameState* const CGGameState = Cast<ACGGameState>(GetWorld()->GameState);
+	ACGGameState* const CGGameState = GetWorld()->GetGameState<ACGGameState>();
 	if (CGGameState)
 	{
 		// XXX Maybe cache this 
@@ -254,40 +283,47 @@ void ACGPlayerHUD::DrawGameInfo()
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Time Output
 		//////////////////////////////////////////////////////////////////////////////////////
-		float SizeX, SizeY;
 		const int32 Minutes = CGGameState->RemainingTime / 60;
 		const int32 Seconds = CGGameState->RemainingTime % 60;
 
 		FString Text = FString::Printf(TEXT("%2d : %02d"), Minutes, Seconds);
-		FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, RoundDataElement.TimeColor);
-		TextItem.Text = FText::FromString(Text);
 
-		// Get the actual size, this is to scale the text to our "Box"
-		Canvas->StrLen(BigFont, Text, SizeX, SizeY);
-		TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.TimeTransform.WidthPercent) / SizeX, 	(PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent) / SizeY);
-
-		// TODO this Jitters slightly.
-		Canvas->DrawItem(TextItem, X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX, Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY);	
-
+		DrawScaledText(
+			Text,
+			RoundDataElement.TimeColor,
+			X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX,
+			Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY,
+			BigFont,
+			PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent);
 
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Score Output.
 		/////////////////////////////////////////////////////////////////////////////////////
 
-		AController* Controller = GetOwningPlayerController();
+		AController* const Controller = GetOwningPlayerController();
+		APlayerState* const PlayerState = Controller ? Controller->PlayerState : NULL;
+		// TODO get Score to win.
 
-		// Poll Who's winning.
-		
-
-		// Check Dirty bit for game state.
-		//
-		const int32 NumElements = RoundDataElement.GameDataElements.Num();
+		const int32 NumElements = FMath::Min(CGGameState->PlayerArray.Num(), RoundDataElement.GameDataElements.Num());
 		FCGGameElement TempElement;
+		APlayerState* TempPlayerState;
+		bool bPlayerFound = false;
 
 		for (int i = 0; i < NumElements; ++i)
 		{
-
 			TempElement = RoundDataElement.GameDataElements[i];
+
+			// On the last iteration this player is forcibly applied.
+			// XXX is there a more elegant solution?
+			if (i < (NumElements - 1) || bPlayerFound || PlayerState == NULL)
+			{
+				TempPlayerState = CGGameState->PlayerArray[i];
+			}
+			else
+			{
+				TempPlayerState = PlayerState ;
+			}
+
 			Canvas->SetDrawColor(FColor::White);
 
 			const float ElemX = X + PixelsPerWidth * TempElement.Transform.PercentX;
@@ -305,30 +341,24 @@ void ACGPlayerHUD::DrawGameInfo()
 
 			Canvas->SetDrawColor(FColor::Blue);
 
+			// TODO verify Goal Score.
 			Canvas->DrawTile(
 				RoundDataElement.FGIcon.Texture,
 				ElemX, ElemY,
-				ElemW * TempElement.PercentToGoal, ElemH,
+				ElemW * TempPlayerState->Score / CGGameState->GoalScore, ElemH,
 				RoundDataElement.FGIcon.U, RoundDataElement.FGIcon.V,
-				RoundDataElement.FGIcon.UL * TempElement.PercentToGoal, RoundDataElement.FGIcon.VL,
+				RoundDataElement.FGIcon.UL * TempPlayerState->Score / CGGameState->GoalScore, RoundDataElement.FGIcon.VL,
 				EBlendMode::BLEND_Translucent);
 			
 			// Score goes here.
-			Text = FString::Printf(TEXT("%02d"), TempElement.Score);
-			TextItem.SetColor(RoundDataElement.ScoreColor);
-			TextItem.Text = FText::FromString(Text);
+			// TODO this needs some kind of anchoring.
+			Text = FString::Printf(TEXT("%.0f"), TempPlayerState->Score);
+			DrawScaledText(Text, RoundDataElement.ScoreColor, ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY, BigFont, PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent);
 
-			// Get the actual size, this is to scale the text to our "Box"
-			Canvas->StrLen(BigFont, Text, SizeX, SizeY);
 
-			// HUD Width.
-			// TODO get scale working properly.
-			TextItem.Scale.Set((PixelsPerWidth * RoundDataElement.ScoreTransform.WidthPercent) / SizeX, (PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent) / SizeY);
-			Canvas->DrawItem(TextItem, ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY);
-
-			
-			if (TempElement.bIsOwner)
+			if (TempPlayerState == PlayerState)
 			{
+				bPlayerFound = true;
 				Canvas->SetDrawColor(FColor::White);
 
 				Canvas->DrawTile(
@@ -342,6 +372,24 @@ void ACGPlayerHUD::DrawGameInfo()
 			}
 		}
 	}
+}
+
+void ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight)
+{
+
+	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), Font, TextColor);
+	TextItem.Text = FText::FromString(Text);
+
+	// Get the size of the text.
+	float SizeX, SizeY;
+	Canvas->StrLen(Font, Text, SizeX, SizeY);
+
+	// Compute the scale for the final text.
+	const float Scale = TextHeight / SizeY;
+	TextItem.Scale.Set(Scale, Scale);
+
+	// TODO this Jitters slightly.
+	Canvas->DrawItem(TextItem, ScreenX, ScreenY);
 }
 
 void ACGPlayerHUD::DrawPrompt()
@@ -365,4 +413,15 @@ void ACGPlayerHUD::DrawPrompt()
 void ACGPlayerHUD::SetPromptMessage(const FString& Message)
 {
 	PromptMessage = Message;
+}
+
+void ACGPlayerHUD::NotifyHitTaken()
+{
+	float TempTime = GetWorld()->GetTimeSeconds();
+	TimeSinceLastHitTaken = TempTime - TimeSinceLastHitTaken > TimeToDisplayHitTaken ? TempTime : TimeSinceLastHitTaken;
+}
+
+void ACGPlayerHUD::NotifyHitConfirmed()
+{
+	TimeSinceLastHitConfirmed = GetWorld()->GetTimeSeconds();
 }
