@@ -54,7 +54,7 @@ void ACGPlayerHUD::PostInitializeComponents()
 			{
 				Key = (int32)KeyString[0];// -BUTTON_ICON_OFFSET;
 
-				Key -= Key > ALPHA_BUTTON_ICON_OFFSET ? ALPHA_BUTTON_ICON_OFFSET : NUM_ALPHA_BUTTON_OFFSET;
+				Key -= Key >= ALPHA_BUTTON_ICON_OFFSET ? ALPHA_BUTTON_ICON_OFFSET : NUM_ALPHA_BUTTON_OFFSET;
 
 				UE_LOG(LogTemp, Log, TEXT("KeyId : %d"), Key);
 				ButtonIcons.SetKeyboardActionIcon(Key);
