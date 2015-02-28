@@ -38,6 +38,8 @@ public:
 	// XXX Maybe make the ammo convert wholesale?
 	virtual int32 GetAmmo() const override { return Ammo / AmmoConfig.AmmoPerShot; }
 
+	virtual int32 GetDroppableAmmo() const override { return Ammo + AmmoInClip; }
+
 	// XXX Maybe make the ammo convert wholesale?
 	virtual int32 GetAmmoInClip() const override { return AmmoInClip / AmmoConfig.AmmoPerShot; }
 
