@@ -252,6 +252,9 @@ public:
 
 	virtual int32 GetAmmo() const { return 0; }
 
+	virtual int32 GetDroppableAmmo() const { return 0; }
+
+
 	virtual int32 GetAmmoInClip() const { return 0; }
 
 

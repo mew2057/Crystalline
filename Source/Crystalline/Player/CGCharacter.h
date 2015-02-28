@@ -58,8 +58,8 @@ public:
 
 	bool IsAlive();
 
-	UFUNCTION(BlueprintCallable, Category = "Game|HUD")
-	void SetPlayerPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
+	//UFUNCTION(BlueprintCallable, Category = "Game|HUD")
+	//void SetPlayerPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	FRotator GetAimOffsets() const;

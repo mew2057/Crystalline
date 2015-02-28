@@ -421,7 +421,7 @@ bool ACGCharacter::IsAlive()
 	return CurrentHealth > 0;
 }
 
-
+/*
 void ACGCharacter::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
 {
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -430,7 +430,7 @@ void ACGCharacter::SetPromptMessage(bool bSetPrompt, const FString& Message, int
 	{
 		HUD->SetPromptMessage(bSetPrompt, Message, ButtonID);
 	}
-}
+}*/
 
 FRotator ACGCharacter::GetAimOffsets() const
 {

@@ -133,7 +133,7 @@ void ACGInventory::DestroyInventory()
 					CGOwner->GetActorLocation(),
 					FRotator::ZeroRotator,
 					SpawnInfo);
-				TempPickup->Initialize(CGOwner, CachedWeapon->GetAmmo(), CachedWeapon->WeaponConfig.AmmoType);
+				TempPickup->Initialize(CGOwner, CachedWeapon->GetDroppableAmmo(), CachedWeapon->WeaponConfig.AmmoType);
 			}
 			 
 
