@@ -65,6 +65,9 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	PendingWeapon = NULL;
 	bWantsToFire  = false;
 	bIsDying = false;
+	HeadRadius = 16.f;
+	HeadOffset = 6.f;
+	HeadBone = FName("Skull");
 	// TODO preload Inventory!
 }
 
@@ -317,6 +320,18 @@ void ACGCharacter::ReplicateHit(float Damage, struct FDamageEvent const& DamageE
 	LastHit.EnsureReplication();
 }
 
+bool ACGCharacter::IsHeadShot(const FVector& ImpactLocation, const FVector& ShotDir)
+{
+	// Offset the head.
+	FVector Head = GetMesh()->GetSocketLocation(HeadBone);
+	Head.Z += HeadOffset;
+
+	// PointDistToLine is used because it effectively provides penetration for the bullet (if I'm understanding it right).
+	// Due to the capsule collider we don't always have the impact location touching the head radius.
+	// Computes the distance, but this is not called every frame.
+	return FMath::PointDistToLine(Head, ShotDir, ImpactLocation) <= HeadRadius;
+}
+
 void ACGCharacter::OnRep_LastHit()
 {
 
@@ -421,16 +436,6 @@ bool ACGCharacter::IsAlive()
 	return CurrentHealth > 0;
 }
 
-/*
-void ACGCharacter::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
-{
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
-	if (HUD)
-	{
-		HUD->SetPromptMessage(bSetPrompt, Message, ButtonID);
-	}
-}*/
 
 FRotator ACGCharacter::GetAimOffsets() const
 {

@@ -12,9 +12,13 @@ UCLASS()
 class CRYSTALLINE_API ACGMarksmanRifle : public ACGCrystalGun
 {
 	GENERATED_BODY()
-	
-	ACGMarksmanRifle(const FObjectInitializer& ObjectInitializer);
 
+	ACGMarksmanRifle(const FObjectInitializer& ObjectInitializer);
+	
+	virtual void DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
+	float HeadShotModifier;
 	
 	
 };

@@ -6,12 +6,6 @@
 void ACGPlayerController::SpawnDefaultHUD()
 {
 	Super::SpawnDefaultHUD();
-
-	if (MyHUD)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Spawned HUD"));
-	}
-
 }
 
 

@@ -39,6 +39,9 @@ public:
 
 	void ReplicateHit(float KillingDamage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser, bool bKilled);
 
+	/**Determines if an impact is a head shot.*/
+	bool IsHeadShot(const FVector& ImpactLocation, const FVector& ShotDir);
+
 	UFUNCTION()
 	void OnRep_LastHit();
 
@@ -58,15 +61,24 @@ public:
 
 	bool IsAlive();
 
-	//UFUNCTION(BlueprintCallable, Category = "Game|HUD")
-	//void SetPlayerPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
-
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	FRotator GetAimOffsets() const;
 
 protected:
+	/** The name of the Socket/Bone on the skeleton that constitutes the player head.. */
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
+	FName HeadBone;
+
+	/**The radius of the head.*/
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
+	float HeadRadius;
+
+	/** The offset in the Z plane for the head from the head bone. XXX HACK!*/
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
+	float HeadOffset;
+
 	/** Max player shield amount. This is decayed before the health.*/
-	UPROPERTY(EditDefaultsOnly, Category=Config)
+	UPROPERTY(EditDefaultsOnly, Category = Config)
 	float MaxShield;
 	
 	/** The rate of regeneration for the shield. */

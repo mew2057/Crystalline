@@ -233,7 +233,7 @@ public:
 
 	bool ShouldDealDamage_Instant(AActor* TestActor) const;
 
-	void DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir);
+	virtual void DealDamage_Instant(const FHitResult& Impact, const FVector& ShootDir);
 
 #pragma endregion
 
