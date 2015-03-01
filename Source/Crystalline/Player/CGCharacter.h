@@ -57,6 +57,9 @@ public:
 	/** Make Sure the inventory is destroyed. */
 	virtual void Destroyed() override;
 
+	UFUNCTION(BlueprintCallable, Category = "Game|HUD")
+		void SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID);
+
 	virtual bool IsFirstPerson();
 
 	bool IsAlive();

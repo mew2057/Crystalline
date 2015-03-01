@@ -381,6 +381,16 @@ void ACGCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAction("Zoom", IE_Pressed, this, &ACGCharacter::StartZoom);
 	InputComponent->BindAction("Zoom", IE_Released, this, &ACGCharacter::StopZoom);
 
+/*
+void ACGCharacter::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
+{
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->SetPromptMessage(bSetPrompt, Message, ButtonID);
+	}
+}*/
 
 	InputComponent->BindAction("NextWeapon",     IE_Pressed, this, &ACGCharacter::NextWeapon);
 	InputComponent->BindAction("PreviousWeapon", IE_Pressed, this, &ACGCharacter::PreviousWeapon);
@@ -425,6 +435,16 @@ void ACGCharacter::Destroyed()
 
 #pragma endregion
 
+
+void ACGCharacter::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
+{
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
+	if (HUD)
+	{
+		HUD->SetPromptMessage(bSetPrompt, Message, ButtonID);
+	}
+}
 
 bool ACGCharacter::IsFirstPerson()
 {

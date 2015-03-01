@@ -21,10 +21,5 @@ void ACGMarksmanRifle::DealDamage_Instant(const FHitResult& Impact, const FVecto
 	PointDmg.ShotDirection = ShootDir;
 	PointDmg.Damage = bHeadShot ? HeadShotModifier * WeaponConfig.BaseDamage : WeaponConfig.BaseDamage;
 
-	if (bHeadShot)
-	{
-		UE_LOG(LogTemp, Log, TEXT("HEAD SHOT!"));
-	}
-
 	Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, CGOwner->Controller, this);
 }
