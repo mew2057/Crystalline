@@ -317,7 +317,6 @@ struct FCGScoreboardElement
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	float ColumnOffsetPercent;
-
 	
 	// Alignments.
 
