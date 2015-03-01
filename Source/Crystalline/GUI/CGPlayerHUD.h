@@ -4,7 +4,10 @@
 
 
 #include "GameFramework/HUD.h"
+#include "CGScoreboard.h"
+
 #include "CGPlayerHUD.generated.h"
+
 
 #define TARGET_Y_RESOLUTION 1080.0f
 #define TARGET_X_RESOLUTION 1920.0f
@@ -12,6 +15,7 @@
 #define ALPHA_BUTTON_ICON_OFFSET 65
 #define NUM_BUTTON_OFFSET 25
 
+#pragma region Structs
 UENUM(BlueprintType)
 enum class ECGJustification : uint8
 {
@@ -239,9 +243,6 @@ struct FCGButtonIcons
 	}
 };
 
-
-
-
 USTRUCT()
 struct FCGPrompt
 {
@@ -282,6 +283,9 @@ struct FCGPrompt
 		Anchor = .5f;
 	}
 };
+
+#pragma endregion
+
 /**
  * 
  */
@@ -326,6 +330,12 @@ public:
 	void NotifyHitTaken();
 
 	void NotifyHitConfirmed();
+
+	/**Add the scoreboard widget to the hud.*/
+	void ShowScoreboard();
+
+	/**Remove the scoreboard widget from the hud.*/
+	void HideScoreboard();
 
 
 private:
@@ -390,5 +400,11 @@ private:
 
 	/**Time Since the last hit was confirmed.*/
 	UPROPERTY(Transient)
-		float TimeSinceLastHitConfirmed;
+	float TimeSinceLastHitConfirmed;
+
+	UPROPERTY(Transient)
+	uint32 bScoreboardDisplayed: 1;
+
+	TSharedPtr<class SCGScoreboardWidget> ScoreboardWidget;
+
 };

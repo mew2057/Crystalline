@@ -41,7 +41,7 @@ void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID
 {
 	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
 	int32 Num = Keys.Num();;
-	int32 Key;
+	int32 Key = -1;
 
 	for (int32 i = 0; i < Num; ++i)
 	{
@@ -589,3 +589,30 @@ void ACGPlayerHUD::NotifyHitConfirmed()
 {
 	TimeSinceLastHitConfirmed = GetWorld()->GetTimeSeconds();
 }
+
+/**Add the scoreboard widget to the hud.*/
+void ACGPlayerHUD::ShowScoreboard()
+{
+	// EARLY RETURN, the scoreboard is already existant on the screen.
+	if (bScoreboardDisplayed)
+	{
+		return;
+	}
+
+	bScoreboardDisplayed = true;
+
+	SAssignNew(ScoreboardWidget, SCGScoreboardWidget).OwnerHUD(this);
+}
+
+/**Remove the scoreboard widget from the hud.*/
+void ACGPlayerHUD::HideScoreboard()
+{
+	// EARLY RETURN, the scoreboard is already not on the screen.
+	if (!bScoreboardDisplayed)
+	{
+		return;
+	}
+
+	bScoreboardDisplayed = false;
+}
+

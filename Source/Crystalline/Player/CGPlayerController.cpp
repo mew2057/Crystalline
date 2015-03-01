@@ -25,3 +25,28 @@ void ACGPlayerController::FailedToSpawnPawn()
 }
 
 
+void ACGPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("Scoreboard", IE_Pressed, this, &ACGPlayerController::OnShowScoreboard);
+	InputComponent->BindAction("Scoreboard", IE_Released, this, &ACGPlayerController::OnHideScoreboard);
+}
+
+void ACGPlayerController::OnShowScoreboard()
+{
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+
+	}
+}
+
+void ACGPlayerController::OnHideScoreboard()
+{
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+
+	}
+}
