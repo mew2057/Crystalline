@@ -71,4 +71,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Config)
 	float TimeToRespawn;
 
+
+	/**Timer Handle for the Respawn timer.*/
+	FTimerHandle TimerHandle_Respawn;
+
 };

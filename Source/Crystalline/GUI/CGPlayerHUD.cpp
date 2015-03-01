@@ -41,7 +41,7 @@ void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID
 {
 	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
 	int32 Num = Keys.Num();;
-	int32 Key;
+	int32 Key = -1;
 
 	for (int32 i = 0; i < Num; ++i)
 	{

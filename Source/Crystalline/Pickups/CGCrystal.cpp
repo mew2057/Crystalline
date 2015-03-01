@@ -112,7 +112,8 @@ bool ACGCrystal::Pickup()
 	if (Role == ROLE_Authority)
 	{
 		bIsActive = false;
-		GetWorldTimerManager().SetTimer(this, &ACGCrystal::OnRespawn, TimeToRespawn, false);
+		
+		GetWorldTimerManager().SetTimer(TimerHandle_Respawn, this, &ACGCrystal::OnRespawn, TimeToRespawn, false);
 	}
 
 	return true;
@@ -122,6 +123,7 @@ void ACGCrystal::OnRespawn()
 {
 	ShowCrystal();
 
+	GetWorldTimerManager().ClearTimer(TimerHandle_Respawn);
 	if (Role == ROLE_Authority)
 	{
 		bIsActive = true;

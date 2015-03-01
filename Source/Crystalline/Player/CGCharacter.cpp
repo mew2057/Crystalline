@@ -145,8 +145,8 @@ float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 		else
 		{
 			// Set a timer for to start the shield regeneration for the player, if one is set this should reset the time elapsed to zero.
-			GetWorldTimerManager().SetTimer(this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
-
+			GetWorldTimerManager().SetTimer(TimerHandle_ShieldRegen, this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
+			
 			// TODO Feedback from hit, e.g. force feedback and direction.
 			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
 		}		
@@ -473,6 +473,9 @@ FRotator ACGCharacter::GetAimOffsets() const
 
 void ACGCharacter::StartShieldRegen()
 {
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_ShieldRegen);
+
 	bShieldRegenerating = true;
 
 	// TODO Document why I decided to do this in the wiki or something. -John

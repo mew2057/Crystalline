@@ -38,4 +38,8 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	UMeshComponent* AmmoMesh;
 
+	/**Timer Handle for the Ammo Destroy.*/
+	FTimerHandle TimerHandle_Destroy;
+
+
 };

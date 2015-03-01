@@ -15,7 +15,7 @@ void UCGWeaponFiringState::EnterState()
 	// XXX verify this!
 	if (TimeRemaining > 0 && GetOuterACGWeapon()->LastFireTime > 0.f)
 	{
-		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponFiringState::FireShot, TimeRemaining, false);	// Time for the first iteration.
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Refire, this, &UCGWeaponFiringState::FireShot, TimeRemaining, false);	// Time for the first iteration.
 	}
 	else
 	{
@@ -48,7 +48,7 @@ void UCGWeaponFiringState::FireShot()
 		// If the gun has automatic fire, set a timer to continue firing, IFF the fire was successful
 		if (GetOuterACGWeapon()->WeaponConfig.bAutomaticFire)
 		{
-			GetCGOwner()->GetWorldTimerManager().SetTimer(
+			GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Refire,
 				this,
 				&UCGWeaponFiringState::FireShot,
 				GetOuterACGWeapon()->WeaponConfig.TimeBetweenShots,

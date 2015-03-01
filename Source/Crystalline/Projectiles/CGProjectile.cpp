@@ -38,7 +38,6 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
-	bReplicateInstigator = true;
 	bReplicateMovement = true;
 }
 

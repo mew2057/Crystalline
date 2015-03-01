@@ -6,7 +6,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
-
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 
 
 
@@ -30,7 +30,7 @@ void ACGBotController::Possess(class APawn* InPawn)
 	if (Bot && Bot->BotBehavior)
 	{
 		// Give the Controller the Blackboard.
-		BlackboardComp->InitializeBlackboard(Bot->BotBehavior->BlackboardAsset);
+		BlackboardComp->InitializeBlackboard(*(Bot->BotBehavior->BlackboardAsset));
 
 		// Get the keys from the blackboard.
 		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
@@ -50,11 +50,12 @@ void ACGBotController::BeginInactiveState()
 
 	const float MinRespawnDelay = (GameState && GameState->GameModeClass) ? GetDefault<AGameMode>(GameState->GameModeClass)->MinRespawnDelay : 1.0f;
 
-	GetWorldTimerManager().SetTimer(this, &ACGBotController::Respawn, MinRespawnDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_Respawn, this, &ACGBotController::Respawn, MinRespawnDelay);
 }
 
 void ACGBotController::Respawn()
 {
+	GetWorldTimerManager().ClearTimer(TimerHandle_Respawn);
 	GetWorld()->GetAuthGameMode()->RestartPlayer(this);
 }
 
@@ -103,8 +104,9 @@ void ACGBotController::SetEnemy(class APawn* InPawn)
 {
 	if (BlackboardComp)
 	{
-		BlackboardComp->SetValueAsObject(EnemyKeyID, InPawn);
+		BlackboardComp->SetValue<UBlackboardKeyType_Object>(EnemyKeyID, InPawn);
 		SetFocus(InPawn);
+
 	}
 }
 
@@ -112,7 +114,8 @@ ACGCharacter* ACGBotController::GetEnemy()
 {
 	if (BlackboardComp)
 	{
-		return Cast<ACGCharacter>(BlackboardComp->GetValueAsObject(EnemyKeyID));
+		
+		return Cast<ACGCharacter>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(EnemyKeyID));
 	}
 
 	return nullptr;

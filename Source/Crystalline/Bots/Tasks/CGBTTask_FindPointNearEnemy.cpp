@@ -2,14 +2,15 @@
 
 #include "Crystalline.h"
 #include "CGBTTask_FindPointNearEnemy.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 
 
 
 
-EBTNodeResult::Type UCGBTTask_FindPointNearEnemy::ExecuteTask(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UCGBTTask_FindPointNearEnemy::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	// Verify the controller is valid, if not fail the task.
-	ACGBotController* Controller = OwnerComp ? Cast<ACGBotController>(OwnerComp->GetOwner()) : nullptr;
+	ACGBotController* Controller = Cast<ACGBotController>(OwnerComp.GetOwner());
 
 	if (Controller == nullptr)
 	{
@@ -23,7 +24,7 @@ EBTNodeResult::Type UCGBTTask_FindPointNearEnemy::ExecuteTask(UBehaviorTreeCompo
 	if (Pawn && Enemy && Enemy->IsAlive())
 	{
 		// Find a point between the actors to serve as an origin.
-		const FVector PointBetweenActors = Enemy->GetActorLocation() + 400.f * (Pawn->GetActorLocation() - Enemy->GetActorLocation()).SafeNormal();
+		const FVector PointBetweenActors = Enemy->GetActorLocation() + 400.f * (Pawn->GetActorLocation() - Enemy->GetActorLocation()).GetSafeNormal();
 
 		// Find a location on the nav mesh.
 		const FVector Target = UNavigationSystem::GetRandomPointInRadius(Controller, PointBetweenActors, 200.f);
@@ -31,7 +32,7 @@ EBTNodeResult::Type UCGBTTask_FindPointNearEnemy::ExecuteTask(UBehaviorTreeCompo
 		// Guard against bad locations.
 		if (Target != FVector::ZeroVector)
 		{
-			OwnerComp->GetBlackboardComponent()->SetValueAsVector(BlackboardKey.GetSelectedKeyID(), Target);
+			OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID(), Target);
 			return EBTNodeResult::Succeeded;
 		}
 	}
