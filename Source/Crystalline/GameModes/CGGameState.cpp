@@ -21,6 +21,32 @@ void ACGGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 
 void ACGGameState::SortPlayers()
 {
-	// TODO this may not be the fastest way to do things, Noticable lag on kill confirm.
-	PlayerArray.StableSort(PlayerPredicate);
+	int32 PlayerCount = PlayerArray.Num();
+
+	// Kick out if the player count is less than or equal to 1.
+	if (PlayerCount <= 1)
+	{
+		return;
+	}
+
+	int32 FarthestSwapped = 0;
+
+	// Replaced Merge Sort with an implementation of Bubble Sort. 
+	// Merge sort is stable and scales well, but this data is unlikely to change by more than one or two positions between sorts, meaning 
+	// typically we'll take advantage of the Adaptive nature of Bubble Sort.
+	do
+	{
+		FarthestSwapped = 0;
+		for (int32 i = 1; i < PlayerCount; ++i)
+		{
+			if (PlayerArray[i - 1]->Score < PlayerArray[i]->Score)
+			{
+				PlayerArray.SwapMemory(i - 1, i);
+				FarthestSwapped = i;
+			}
+		}
+		// Only iterate until the farthest swap on the next pass as the array is guaranteed to be sorted past that point.
+		PlayerCount = FarthestSwapped;
+	} while (FarthestSwapped > 0);
+
 }
