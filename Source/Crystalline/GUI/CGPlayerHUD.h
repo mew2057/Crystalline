@@ -12,6 +12,7 @@
 #define ALPHA_BUTTON_ICON_OFFSET 65
 #define NUM_BUTTON_OFFSET 25
 
+#pragma region Structs
 UENUM(BlueprintType)
 enum class ECGJustification : uint8
 {
@@ -282,6 +283,96 @@ struct FCGPrompt
 		Anchor = .5f;
 	}
 };
+
+
+USTRUCT()
+struct FCGScoreboardElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon RowBackground;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor HeaderBackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor RowBackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor OwnerBackgroundColor;
+
+	// Transform of the scoreboard "Box"
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float Alignment;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float RowHeightPercent;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float RowOffsetPercent;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float ColumnOffsetPercent;
+
+	
+	// Alignments.
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float RankAlignment;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float DesiredRankWidth;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float NameAlignment;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float DesiredNameWidth;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float ScoreAlignment;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float DesiredScoreWidth;
+
+	// Color.
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor TextColor;
+
+	FCGScoreboardElement()
+	{
+		Transform.WidthPercent = 20.f;
+		Transform.HeightPercent = 75.f;
+		Transform.PercentX = 50.f;
+		Transform.PercentY = 20.f;
+
+		Alignment = .5f;
+	
+		HeaderBackgroundColor = FLinearColor(.15f, 0.f, .0f);
+		OwnerBackgroundColor = FLinearColor(0.f, 0.f, .15f);
+		RowBackgroundColor = FLinearColor(.15f, .15f, .15f);
+
+		TextColor = FLinearColor::White;
+
+		RowHeightPercent = 4.f;
+		RowOffsetPercent = 1.f;
+		ColumnOffsetPercent = 2.5f;
+
+		RankAlignment = .5f;
+		NameAlignment = 0.03f;
+		ScoreAlignment = 1.f;
+
+		DesiredRankWidth = 15.f;
+		DesiredNameWidth = 50.f;
+		DesiredScoreWidth = 25.f;
+	}
+};
+
+#pragma endregion
 /**
  * 
  */
@@ -315,6 +406,7 @@ public:
 	/**Draws text with the specified height.
 	@return The Horizontal scale.*/
 	FORCEINLINE float DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight, float Anchor = 0.f);
+
 
 	/** Draws the prompt message.*/
 	void DrawPrompt();
@@ -365,6 +457,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 		FCGPrompt Prompt;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGScoreboardElement Scoreboard;
+
 	/** Expanded to fit across the player's FOV. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 		UTexture2D* HitTakenOverlay;
@@ -398,4 +493,6 @@ private:
 		float TimeSinceLastHitConfirmed;
 
 	uint32 bScoreboardVisible : 1;
+
+
 };

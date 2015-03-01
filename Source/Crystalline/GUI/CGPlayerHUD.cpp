@@ -19,6 +19,7 @@ ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(
 	HitTakenColor = FLinearColor::Red;
 	TimeSinceLastHitTaken = 0.f;
 	TimeSinceLastHitConfirmed = 0.f;
+	bScoreboardVisible = false;
 }
 
 void ACGPlayerHUD::PostInitializeComponents()
@@ -151,28 +152,35 @@ void ACGPlayerHUD::DrawHUD()
 		ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
 		{
-			Canvas->SetDrawColor(Weapon->CheckCanHit() ? FColor::Red : FColor::White);
+			// Weapon hud is always drawn.
+			DrawWeaponHUD();
+
 
 			//////////////////////////
 			// Crosshair	
-			FCanvasIcon CrosshairIcon = Weapon->WeaponHUDConfig.CrosshairIcon;
-			// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
-			// The UL and VL values indicate the width and length of the texture respectively.
-			Canvas->DrawIcon(CrosshairIcon,
-				(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
-				(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
-
-			// Play hit confirmation
-			if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed)
+			if (!bScoreboardVisible)
 			{
-				//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
-				Canvas->DrawIcon(HitConfirmedIcon,
+				Canvas->SetDrawColor(Weapon->CheckCanHit() ? FColor::Red : FColor::White);
+
+				FCanvasIcon CrosshairIcon = Weapon->WeaponHUDConfig.CrosshairIcon;
+				// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
+				// The UL and VL values indicate the width and length of the texture respectively.
+				Canvas->DrawIcon(CrosshairIcon,
 					(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
 					(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+
+				// Play hit confirmation
+				if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed)
+				{
+					//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
+					Canvas->DrawIcon(HitConfirmedIcon,
+						(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
+						(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+				}
+				DrawPrompt();
 			}
 
-			DrawWeaponHUD();
-			DrawPrompt();
+
 		}		
 	}
 
@@ -402,7 +410,7 @@ void ACGPlayerHUD::DrawGameInfo()
 		APlayerState* TempPlayerState;
 		bool bPlayerFound = false;
 
-		for (int i = 0; i < NumElements; ++i)
+		for (int32 i = 0; i < NumElements; ++i)
 		{
 			TempElement = RoundDataElement.GameDataElements[i];
 
@@ -487,8 +495,8 @@ float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor,
 	const float Scale = TextHeight / SizeY;
 	TextItem.Scale.Set(Scale, Scale);
 
-	// Anchor offset.
-	ScreenX -= SizeX * Scale * Anchor;
+	// Anchor offset. TODO Fix DesiredWidth, it doesn't work quite right.
+	ScreenX = ScreenX - (SizeX * Scale * Anchor);
 
 	// TODO this Jitters slightly.
 	Canvas->DrawItem(TextItem, ScreenX, ScreenY);
@@ -554,24 +562,6 @@ void ACGPlayerHUD::DrawPrompt()
 			BigFont,
 			Height);
 	}
-
-
-	// TODO Make this print out images and whatnot.
-	/*
-	float SizeX, SizeY;
-	FCanvasTextItem TextItem(FVector2D::ZeroVector, FText::GetEmpty(), BigFont, FLinearColor::White);
-	TextItem.EnableShadow(FLinearColor::Black);
-	Canvas->StrLen(BigFont, PromptMessage, SizeX, SizeY);
-
-	const float TopTextScale = 1.f; 
-
-	TextItem.Text = FText::FromString(PromptMessage);
-	TextItem.Scale = FVector2D(TopTextScale, TopTextScale);
-
-	Canvas->SetDrawColor(FColor::Yellow);
-
-	Canvas->DrawItem(TextItem, 50, 100);
-*/
 }
 
 void ACGPlayerHUD::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
@@ -595,5 +585,114 @@ void ACGPlayerHUD::NotifyHitConfirmed()
 
 void ACGPlayerHUD::DrawScoreboard()
 {
+	ACGGameState* const CGGameState = GetWorld()->GetGameState<ACGGameState>();
+	if (CGGameState)
+	{
+		const float Width =  PixelsPerCent.X * Scoreboard.Transform.WidthPercent;
+		const float X = (PixelsPerCent.X * Scoreboard.Transform.PercentX) - Scoreboard.Alignment * Width;
+		const float Y = PixelsPerCent.Y * Scoreboard.Transform.PercentY;
 
+		const float PercentWidth = Width * .01f;
+		const float PercentHeight = PixelsPerCent.Y * Scoreboard.Transform.HeightPercent * .01f;
+
+		// Compute the row height from the supplied transform.
+		const float RowHeight = PercentHeight * Scoreboard.RowHeightPercent;
+		const float RowSpacing = PercentHeight * Scoreboard.RowOffsetPercent + RowHeight;
+
+		const float RankWidth = Scoreboard.DesiredRankWidth  * PercentWidth;
+		const float NameWidth = Scoreboard.DesiredNameWidth  * PercentWidth;
+		const float ScoreWidth = Scoreboard.DesiredScoreWidth * PercentWidth;
+		const float ColOffset = Scoreboard.ColumnOffsetPercent  * PercentWidth;
+
+
+		// Tracks where the 
+		float CurrentX = X;
+		float CurrentY = Y;
+
+		// Draw the background of the header.
+		Canvas->SetDrawColor(Scoreboard.HeaderBackgroundColor);
+		Canvas->DrawTile(
+			Scoreboard.RowBackground.Texture,
+			CurrentX, CurrentY,
+			Width, RowHeight,
+			Scoreboard.RowBackground.U, Scoreboard.RowBackground.V,
+			Scoreboard.RowBackground.UL, Scoreboard.RowBackground.VL,
+			EBlendMode::BLEND_Translucent);
+
+		CurrentX += ColOffset;
+		DrawScaledText(
+			"Rank",
+			Scoreboard.TextColor,
+			CurrentX + RankWidth*Scoreboard.RankAlignment, Y, BigFont,
+			RowHeight,
+			Scoreboard.RankAlignment);
+		CurrentX += RankWidth + ColOffset;
+
+		DrawScaledText(
+			"Name",
+			Scoreboard.TextColor,
+			CurrentX + NameWidth * Scoreboard.NameAlignment, Y, BigFont,
+			RowHeight,
+			Scoreboard.NameAlignment);
+		CurrentX += NameWidth + ColOffset;
+
+		DrawScaledText(
+			"Score",
+			Scoreboard.TextColor,
+			CurrentX + ScoreWidth * Scoreboard.ScoreAlignment, Y, BigFont,
+			RowHeight,
+			Scoreboard.ScoreAlignment);
+
+		const int32 NumPlayers = CGGameState->PlayerArray.Num();
+		APlayerState* TempPlayerState;
+
+		AController* const Controller = GetOwningPlayerController();
+		APlayerState* const PlayerState = Controller ? Controller->PlayerState : NULL;
+
+		CurrentY += RowSpacing;
+
+		for (int32 i = 0; i < NumPlayers; ++i)
+		{
+			TempPlayerState = CGGameState->PlayerArray[i];
+			CurrentX = X;
+
+			// Set Color on the basis of who owns it.
+			Canvas->SetDrawColor(TempPlayerState != PlayerState ? Scoreboard.RowBackgroundColor : Scoreboard.OwnerBackgroundColor);
+			Canvas->DrawTile(
+				Scoreboard.RowBackground.Texture,
+				CurrentX, CurrentY,
+				Width, RowHeight,
+				Scoreboard.RowBackground.U, Scoreboard.RowBackground.V,
+				Scoreboard.RowBackground.UL, Scoreboard.RowBackground.VL,
+				EBlendMode::BLEND_Translucent);
+
+			// Fudge factor to make sure the column is not reight on the edge.
+			CurrentX += ColOffset;
+
+			DrawScaledText(
+				FString::Printf(TEXT("%d"), i + 1),
+				Scoreboard.TextColor,
+				CurrentX + RankWidth*Scoreboard.RankAlignment, CurrentY, BigFont,
+				RowHeight,
+				Scoreboard.RankAlignment);
+			CurrentX += RankWidth + ColOffset;
+
+			DrawScaledText(
+				TempPlayerState->PlayerName,
+				Scoreboard.TextColor,
+				CurrentX + NameWidth * Scoreboard.NameAlignment, CurrentY, BigFont,
+				RowHeight,
+				Scoreboard.NameAlignment);
+			CurrentX += NameWidth + ColOffset;
+
+			DrawScaledText(
+				FString::Printf(TEXT("%.0f"), TempPlayerState->Score),
+				Scoreboard.TextColor,
+				CurrentX + ScoreWidth * Scoreboard.ScoreAlignment, CurrentY, BigFont,
+				RowHeight,
+				Scoreboard.ScoreAlignment);
+
+			CurrentY += RowSpacing;
+		}
+	}
 }
