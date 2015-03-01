@@ -23,14 +23,4 @@ public:
 
 	/** If the pawn can't spawn, try the spawn again.*/
 	virtual void FailedToSpawnPawn() override;
-
-	/** Sets up UI related components.*/
-	virtual void SetupInputComponent() override;
-
-	/**Shows the in game scoreboard.*/
-	void ACGPlayerController::OnShowScoreboard();
-
-	/**Hides the in game scoreboard.*/
-	void ACGPlayerController::OnHideScoreboard();
-
 };
