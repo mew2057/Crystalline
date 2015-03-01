@@ -328,6 +328,11 @@ public:
 	void NotifyHitConfirmed();
 
 
+	FORCEINLINE void SetScoreboardVisibility(bool bVisible){ bScoreboardVisible = bVisible; }
+	FORCEINLINE void ToggleScoreboardVisibility(){ bScoreboardVisible = !bScoreboardVisible; }
+
+	void DrawScoreboard();
+
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
 	float ScaleUIY;
@@ -391,4 +396,6 @@ private:
 	/**Time Since the last hit was confirmed.*/
 	UPROPERTY(Transient)
 		float TimeSinceLastHitConfirmed;
+
+	uint32 bScoreboardVisible : 1;
 };

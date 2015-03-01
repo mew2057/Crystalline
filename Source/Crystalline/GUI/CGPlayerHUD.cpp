@@ -173,9 +173,7 @@ void ACGPlayerHUD::DrawHUD()
 
 			DrawWeaponHUD();
 			DrawPrompt();
-		}
-
-		
+		}		
 	}
 
 	// Draw the HitTaken if we've been hit recently.
@@ -190,6 +188,11 @@ void ACGPlayerHUD::DrawHUD()
 	}
 
 	DrawGameInfo();
+
+	if (bScoreboardVisible)
+	{
+		DrawScoreboard();
+	}
 }
 
 
@@ -588,4 +591,9 @@ void ACGPlayerHUD::NotifyHitTaken()
 void ACGPlayerHUD::NotifyHitConfirmed()
 {
 	TimeSinceLastHitConfirmed = GetWorld()->GetTimeSeconds();
+}
+
+void ACGPlayerHUD::DrawScoreboard()
+{
+
 }
