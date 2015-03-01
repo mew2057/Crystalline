@@ -11,26 +11,29 @@ void ACGBotInventory::DestroyInventory()
 {
 	Super::DestroyInventory();
 
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.bNoCollisionFail = true;
-	ACGAmmoPickup * TempPickup;
-
-	// Spawn T1
-	TempPickup = GetWorld()->SpawnActor<ACGAmmoPickup>(
-		AmmoPickupTemplate,
-		CGOwner->GetActorLocation(),
-		FRotator::ZeroRotator,
-		SpawnInfo);
-	TempPickup->Initialize(CGOwner, TierOneAmmo, ECGAmmoType::T_ONE);
-
-	// Spawn T2
-	TempPickup = GetWorld()->SpawnActor<ACGAmmoPickup>(
-		AmmoPickupTemplate,
-		CGOwner->GetActorLocation(),
-		FRotator::ZeroRotator,
-		SpawnInfo);
-	TempPickup->Initialize(CGOwner, TierTwoAmmo, ECGAmmoType::T_TWO);
-
+	// This code is buggy and can lead to crashes.
+	//FActorSpawnParameters SpawnInfo;
+	//SpawnInfo.bNoCollisionFail = true;
+	//ACGAmmoPickup * TempPickup;
+	//
+	//if (Role == ROLE_Authority)
+	//{
+	//	// Spawn T1
+	//	TempPickup = GetWorld()->SpawnActor<ACGAmmoPickup>(
+	//		AmmoPickupTemplate,
+	//		CGOwner->GetActorLocation(),
+	//		FRotator::ZeroRotator,
+	//		SpawnInfo);
+	//	TempPickup->Initialize(CGOwner, TierOneAmmo, ECGAmmoType::T_ONE);
+	//
+	//	// Spawn T2
+	//	TempPickup = GetWorld()->SpawnActor<ACGAmmoPickup>(
+	//		AmmoPickupTemplate,
+	//		CGOwner->GetActorLocation(),
+	//		FRotator::ZeroRotator,
+	//		SpawnInfo);
+	//	TempPickup->Initialize(CGOwner, TierTwoAmmo, ECGAmmoType::T_TWO);
+	//}
 
 }
 
