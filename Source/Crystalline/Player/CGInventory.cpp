@@ -133,7 +133,12 @@ void ACGInventory::DestroyInventory()
 					CGOwner->GetActorLocation(),
 					FRotator::ZeroRotator,
 					SpawnInfo);
-				TempPickup->Initialize(CGOwner, CachedWeapon->GetDroppableAmmo(), CachedWeapon->WeaponConfig.AmmoType);
+
+				// Sanity check, crashes on round restart.
+				if (TempPickup)
+				{
+					TempPickup->Initialize(CGOwner, CachedWeapon->GetDroppableAmmo(), CachedWeapon->WeaponConfig.AmmoType);
+				}
 			}
 			 
 
