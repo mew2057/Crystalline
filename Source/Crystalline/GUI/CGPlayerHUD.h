@@ -371,6 +371,42 @@ struct FCGScoreboardElement
 	}
 };
 
+USTRUCT()
+struct FCGEndGameMessage
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor TextColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float Alignment;
+
+	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
+	UFont* Font;
+
+	UPROPERTY(Transient)
+	FString Message;
+
+	uint32 bDisplay:1;
+
+	FCGEndGameMessage()
+	{
+		Transform.PercentX = 50.f;
+		Transform.PercentY = 11.f;
+		Transform.HeightPercent = 8.f;
+
+		TextColor = FLinearColor::White;
+		Message = "";
+		bDisplay = false;
+		Alignment = .5f;
+	}
+}; 
+
+
 #pragma endregion
 /**
  * 
@@ -424,6 +460,12 @@ public:
 
 	void DrawScoreboard();
 
+	UFUNCTION(BlueprintCallable, Category = "Game|HUD")
+	void SetEndGameMessage(bool bSetMessage, const FString& Message = "");
+
+	/** Draws the prompt message.*/
+	void DrawEndGameMessage();
+
 private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
 	float ScaleUIY;
@@ -458,6 +500,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGScoreboardElement Scoreboard;
+
+	/**Defines where the endgame message is displayed.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGEndGameMessage EndGameMessage;
 
 	/** Expanded to fit across the player's FOV. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)

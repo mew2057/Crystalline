@@ -42,7 +42,7 @@ void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID
 {
 	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
 	int32 Num = Keys.Num();;
-	int32 Key;
+	int32 Key = -1;
 
 	for (int32 i = 0; i < Num; ++i)
 	{
@@ -177,7 +177,11 @@ void ACGPlayerHUD::DrawHUD()
 						(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
 						(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 				}
-				DrawPrompt();
+
+				if (Prompt.bPrompt)
+				{
+					DrawPrompt();
+				}
 			}
 
 
@@ -200,6 +204,11 @@ void ACGPlayerHUD::DrawHUD()
 	if (bScoreboardVisible)
 	{
 		DrawScoreboard();
+	}
+
+	if (EndGameMessage.bDisplay)
+	{
+		DrawEndGameMessage();
 	}
 }
 
@@ -506,62 +515,61 @@ float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor,
 
 void ACGPlayerHUD::DrawPrompt()
 {
-	if (Prompt.bPrompt)
+	
+	// Get the Main Anchor for our weapon Element.
+	float X = PixelsPerCent.X * Prompt.Transform.PercentX;
+	const float Y = PixelsPerCent.Y * Prompt.Transform.PercentY;
+	const float Height = PixelsPerCent.Y * Prompt.Transform.HeightPercent;
+	const bool bDisplayButton = ButtonIcons.ButtonIcons.Num() > Prompt.CurrentButton;
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	if (Prompt.Anchor > 0.f)
 	{
-		// Get the Main Anchor for our weapon Element.
-		float X = PixelsPerCent.X * Prompt.Transform.PercentX;
-		const float Y = PixelsPerCent.Y * Prompt.Transform.PercentY;
-		const float Height = PixelsPerCent.Y * Prompt.Transform.HeightPercent;
-		const bool bDisplayButton = ButtonIcons.ButtonIcons.Num() > Prompt.CurrentButton;
+		// Compute the total size of the message for justification.
+		float SizeX, SizeY;
+		Canvas->StrLen(BigFont, Prompt.BasePrompt + Prompt.PromptMessage, SizeX, SizeY);
+		const float Scale = Height / SizeY;
 
-		////////////////////////////////////////////////////////////////////////////////////////////
-		if (Prompt.Anchor > 0.f)
-		{
-			// Compute the total size of the message for justification.
-			float SizeX, SizeY;
-			Canvas->StrLen(BigFont, Prompt.BasePrompt + Prompt.PromptMessage, SizeX, SizeY);
-			const float Scale = Height / SizeY;
-
-			SizeX = (SizeX * Scale) + PixelsPerCent.X * Prompt.PromptKeyOffset + bDisplayButton * (PixelsPerCent.X * Prompt.PromptKeyOffset + Height);
-			X -= SizeX * Prompt.Anchor;
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////
-		float CurrentX = DrawScaledText(
-			Prompt.BasePrompt,
-			Prompt.PromptTextColor,
-			X, Y,
-			BigFont,
-			Height);
-
-		if (bDisplayButton)
-		{
-			Canvas->SetDrawColor(FColor::White);
-
-			FVector2D ButtonUV = ButtonIcons.ButtonIcons[Prompt.CurrentButton];
-
-			CurrentX = X + CurrentX + PixelsPerCent.X * Prompt.PromptKeyOffset;
-
-			Canvas->DrawTile(
-				ButtonIcons.ButtonIconTexture,
-				CurrentX, Y,
-				Height,	Height,
-				ButtonUV.X, ButtonUV.Y,
-				ButtonIcons.IconWidth, ButtonIcons.IconHeight,
-				EBlendMode::BLEND_Translucent);
-
-			CurrentX += Height;
-		}
-
-		CurrentX += PixelsPerCent.X * Prompt.PromptKeyOffset;
-
-		DrawScaledText(
-			Prompt.PromptMessage,
-			Prompt.PromptTextColor,
-			CurrentX, Y,
-			BigFont,
-			Height);
+		SizeX = (SizeX * Scale) + PixelsPerCent.X * Prompt.PromptKeyOffset + bDisplayButton * (PixelsPerCent.X * Prompt.PromptKeyOffset + Height);
+		X -= SizeX * Prompt.Anchor;
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	float CurrentX = DrawScaledText(
+		Prompt.BasePrompt,
+		Prompt.PromptTextColor,
+		X, Y,
+		BigFont,
+		Height);
+
+	if (bDisplayButton)
+	{
+		Canvas->SetDrawColor(FColor::White);
+
+		FVector2D ButtonUV = ButtonIcons.ButtonIcons[Prompt.CurrentButton];
+
+		CurrentX = X + CurrentX + PixelsPerCent.X * Prompt.PromptKeyOffset;
+
+		Canvas->DrawTile(
+			ButtonIcons.ButtonIconTexture,
+			CurrentX, Y,
+			Height,	Height,
+			ButtonUV.X, ButtonUV.Y,
+			ButtonIcons.IconWidth, ButtonIcons.IconHeight,
+			EBlendMode::BLEND_Translucent);
+
+		CurrentX += Height;
+	}
+
+	CurrentX += PixelsPerCent.X * Prompt.PromptKeyOffset;
+
+	DrawScaledText(
+		Prompt.PromptMessage,
+		Prompt.PromptTextColor,
+		CurrentX, Y,
+		BigFont,
+		Height);
+	
 }
 
 void ACGPlayerHUD::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
@@ -695,4 +703,25 @@ void ACGPlayerHUD::DrawScoreboard()
 			CurrentY += RowSpacing;
 		}
 	}
+}
+
+void ACGPlayerHUD::SetEndGameMessage(bool bSetMessage, const FString& Message)
+{
+	EndGameMessage.bDisplay = bSetMessage;
+	EndGameMessage.Message = Message;
+}
+
+/** Draws the prompt message.*/
+void ACGPlayerHUD::DrawEndGameMessage()
+{
+	const float X = PixelsPerCent.X * EndGameMessage.Transform.PercentX;
+	const float Y = PixelsPerCent.Y * EndGameMessage.Transform.PercentY;
+	const float Height = PixelsPerCent.Y * EndGameMessage.Transform.HeightPercent;
+
+	DrawScaledText(
+		EndGameMessage.Message,
+		EndGameMessage.TextColor,
+		X, Y, EndGameMessage.Font,
+		Height,
+		EndGameMessage.Alignment);
 }

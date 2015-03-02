@@ -50,3 +50,37 @@ void ACGPlayerController::OnHideScoreboard()
 		HUD->SetScoreboardVisibility(false);
 	}
 }
+
+void ACGPlayerController::ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner)
+{
+	Super::ClientGameEnded_Implementation(EndGameFocus, bIsWinner);
+
+	// Tell player that they've won.
+
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+		HUD->SetScoreboardVisibility(true);
+
+		//TODO prevent scoreboard hiding.
+		if (bIsWinner)
+		{
+			HUD->SetEndGameMessage(true, "Game Over, You Win");
+		}
+		else
+		{			
+			// TODO *Winner Name* Wins.
+			HUD->SetEndGameMessage(true, "Game Over, You Lost");
+		}
+	}
+}
+
+void ACGPlayerController::ClientGameStarted_Implementation()
+{
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+		HUD->SetScoreboardVisibility(false);
+		HUD->SetEndGameMessage(false);
+	}
+}

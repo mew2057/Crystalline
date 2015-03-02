@@ -33,4 +33,13 @@ public:
 	/**Hides the in game scoreboard.*/
 	void ACGPlayerController::OnHideScoreboard();
 
+	/**Notifies the player that the round is over.*/
+	virtual void ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner) override;
+
+	/** notify player about started match */
+	UFUNCTION(reliable, client)
+	void ClientGameStarted();
+	//virtual void ClientGameStarted_Implementation();
+
+
 };
