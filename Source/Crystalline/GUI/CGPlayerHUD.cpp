@@ -146,8 +146,7 @@ void ACGPlayerHUD::DrawHUD()
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	if (Pawn)
 	{
-		DrawShield();
-		
+		DrawShield();		
 
 		ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
 		if (Weapon)
@@ -183,8 +182,6 @@ void ACGPlayerHUD::DrawHUD()
 					DrawPrompt();
 				}
 			}
-
-
 		}		
 	}
 
@@ -201,7 +198,8 @@ void ACGPlayerHUD::DrawHUD()
 
 	DrawGameInfo();
 
-	if (bScoreboardVisible)
+	// XXX a hack, shows the scoreboard when the player is detached.
+	if (bScoreboardVisible || Pawn == NULL)
 	{
 		DrawScoreboard();
 	}
