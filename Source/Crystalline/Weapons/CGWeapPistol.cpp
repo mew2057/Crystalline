@@ -67,8 +67,6 @@ bool ACGWeapPistol::CanReload() const
 
 void ACGWeapPistol::StartOverheat()
 {
-	UE_LOG(LogTemp, Log, TEXT("StartOverheat!"));
-
 	bIsOverheated = true;
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Overheat, this,

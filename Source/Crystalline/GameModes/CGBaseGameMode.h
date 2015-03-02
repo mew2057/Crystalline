@@ -29,11 +29,8 @@ public:
 	int32 GetScoreToWin() const { return ScoreToWin; }
 
 
-protected:
-
-	
+protected:	
 	virtual void HandleMatchIsWaitingToStart() override;
-
 
 	/**Invoked when the game enters the In Progress State.*/
 	virtual void HandleMatchHasStarted() override;
@@ -74,6 +71,9 @@ protected:
 	/** Score deducted per suicide.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 SuicidePenalty;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	int32 PostGameTime;
 
 	UPROPERTY(EditDefaultsOnly, Category = BotConfig)
 	TSubclassOf<class APawn> BotPawn;

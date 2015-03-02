@@ -5,15 +5,7 @@
 #include "GameFramework/GameState.h"
 #include "CGGameState.generated.h"
 
-//typedef TMap<int32, TWeakObjectPtr<ACGPlayerState> > PlayerRankMap;
-/** Predicate for player sorts. */
-struct FComparePlayers
-{
-	FORCEINLINE bool operator()(const APlayerState& A, const APlayerState& B) const
-	{
-		return A.Score > B.Score;
-	}
-};
+
 /**
  * 
  */
@@ -24,6 +16,10 @@ class CRYSTALLINE_API ACGGameState : public AGameState
 
 public:
 	ACGGameState(const FObjectInitializer& ObjectInitializer);
+
+	/**Notify the players that the match has ended.*/
+	virtual void HandleMatchHasEnded() override;
+
 
 
 	/** Sends kill (excluding self) to clients */
@@ -45,6 +41,4 @@ public:
 	/** Set at the start of the match by the game mode, then never touched again.*/
 	UPROPERTY(Transient, Replicated)
 	float GoalScore;
-private:
-	FComparePlayers PlayerPredicate;
 };

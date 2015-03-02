@@ -22,6 +22,7 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) : 
 	MinRespawnDelay = 2.0f;
 	ScoreToWin = 25;
 	RoundTime = 300;
+	PostGameTime = 10;
 	ScorePerKill = 1;
 	SuicidePenalty = 1; 
 	bSpawnBots = true;
@@ -56,7 +57,14 @@ void ACGBaseGameMode::HandleMatchHasStarted()
 	// Kicks off the bot players.
 	StartBots();
 
-	// XXX notify the players?
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		ACGPlayerController* PC = Cast<ACGPlayerController>(*It);
+		if (PC)
+		{
+			PC->ClientGameStarted();
+		}
+	}
 }
 
 
@@ -66,6 +74,7 @@ void ACGBaseGameMode::DefaultTimer()
 	if (CGGameState && CGGameState->RemainingTime > 0 && --CGGameState->RemainingTime <= 0)
 	{
 		// If there's no longer time in the match we need to end the match.
+		
 		if (GetMatchState() == MatchState::InProgress)
 		{
 			EndGame();
@@ -85,7 +94,7 @@ void ACGBaseGameMode::DefaultTimer()
 }
 
 UClass* ACGBaseGameMode::GetDefaultPawnClassForController(AController* InController)
-{
+{ 
 
 	// If we have a bot controller, tell the game mode we need a bot pawn.
 	if (Cast<ACGBotController>(InController))
@@ -100,6 +109,12 @@ UClass* ACGBaseGameMode::GetDefaultPawnClassForController(AController* InControl
 
 void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
 {
+	// Don't score kills if the match is over.
+	if (GetMatchState() != MatchState::InProgress)
+	{
+		return;
+	}
+
 	// If the killer was the killed player, it was a suicide.
 	if (Killer == KilledPlayer || (Killer == NULL))
 	{
@@ -135,17 +150,35 @@ void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)
 /**Determines which player won the round.*/
 void ACGBaseGameMode::EndGame(ACGPlayerState* Winner)
 {
-	// Stop all of the pawns in the Scene.
-/*  TODO do we want it to freeze?
+
 	for (FConstPawnIterator Iterator = GetWorld()->GetPawnIterator(); Iterator; ++Iterator)
 	{
-		APawn* Pawn = *Iterator;
-		if (Pawn)
+		ACGCharacter* Character = Cast<ACGCharacter>(*Iterator);
+		ACGPlayerController* Controller = Character ? Cast<ACGPlayerController>(Character->Controller) : NULL;
+		if (Controller)
 		{
-			Pawn->TurnOff();
+			// TODO handle ties.
+
+			if (Winner == Controller->PlayerState)
+			{
+				// Tell them they won.
+				Controller->GameHasEnded(Character, true);
+			}
+			else
+			{
+				// Tell them they lost.
+				Controller->GameHasEnded(Winner, false);
+			}			 
 		}
 	}
-*/
+
+	// Set up the Timer for restart.
+	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
+	if (CGGameState)
+	{
+		CGGameState->RemainingTime = PostGameTime;
+	}
+
 	EndMatch();
 }
 
