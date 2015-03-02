@@ -227,7 +227,7 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	// Detach the controller from the pawn, so respawn can work.
 	DetachFromControllerPendingDestroy();
 
-	// Clean up the HUD XXX this doesn't work for clients! because the controller is detached by the time the client gets a hold of it.
+	// Clean up the HUD XXX this doesn't work for clients!
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
 	if (HUD)
