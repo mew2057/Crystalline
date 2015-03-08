@@ -3,15 +3,17 @@
 #include "Crystalline.h"
 #include "CGPlayerController.h"
 
-void ACGPlayerController::SpawnDefaultHUD()
-{
-	Super::SpawnDefaultHUD();
-}
-
-
 void ACGPlayerController::UnFreeze()
 {
 	ServerRestartPlayer();
+	
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+		// Clear the scoreboard and prompt on respawn.
+		HUD->SetScoreboardVisibility(false);
+		HUD->SetPromptMessage(false); // XXX this is a bandaid! fix this!
+	}
 }
 
 

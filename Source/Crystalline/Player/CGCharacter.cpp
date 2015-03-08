@@ -212,7 +212,6 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 		// TODO force feedback.
 	}
 
-
 	// Disables collisions.
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -228,15 +227,16 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 	// Detach the controller from the pawn, so respawn can work.
 	DetachFromControllerPendingDestroy();
 
-	// Clean up the HUD.
+	// Clean up the HUD XXX this doesn't work for clients!
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
 	if (HUD)
 	{
+		HUD->SetScoreboardVisibility(true);
 		HUD->SetPromptMessage(false);
 	}
-	// Once the Pawn is destroyed the playercontroller will spawn a new pawn, see UnFreeze() 
 
+	// Once the Pawn is destroyed the playercontroller will spawn a new pawn, see UnFreeze()
 	StopAllAnim();
 
 	/// Ragdoll
