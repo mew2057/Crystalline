@@ -36,5 +36,5 @@ public:
 	/** notify player about started match */
 	UFUNCTION(reliable, client)
 	void ClientGameStarted();
-	//virtual void ClientGameStarted_Implementation();
+	virtual void ClientGameStarted_Implementation();
 };
