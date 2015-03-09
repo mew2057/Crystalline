@@ -65,7 +65,7 @@ void ACGAmmoPickup::ReceiveActorBeginOverlap(class AActor* Other)
 
 void ACGAmmoPickup::ProcessDestroy()
 {
-	GetWorldTimerManager().ClearTimer(this, &ACGAmmoPickup::ProcessDestroy);
+	GetWorldTimerManager().ClearTimer(TimerHandle_Destroy);
 	Destroy();
 }
 
@@ -93,7 +93,7 @@ void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType 
 		Ammo = BaseAmmo;
 		AmmoType = BaseAmmoType;
 		AmmoMesh->IgnoreActorWhenMoving(Owner, true);
-		GetWorldTimerManager().SetTimer(this, &ACGAmmoPickup::ProcessDestroy, LifeSpan, false);
+		GetWorldTimerManager().SetTimer(TimerHandle_Destroy, this, &ACGAmmoPickup::ProcessDestroy, LifeSpan, false);
 	
 		SetActorRotation((Hit.ImpactNormal * FVector::ForwardVector).Rotation());
 		SetActorLocation(Hit.ImpactPoint);

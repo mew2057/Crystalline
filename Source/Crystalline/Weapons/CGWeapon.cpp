@@ -60,7 +60,6 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
-	bReplicateInstigator = true;
 	bNetUseOwnerRelevancy = true;
 
 	BurstCount    = 0;
@@ -205,15 +204,6 @@ void ACGWeapon::StopReload()
 	}	
 }
 
-void ACGWeapon::ClientCheckQueuedInput_Implementation()
-{
-	// If the user wants to fire, try firing.
-	if (CGOwner->bWantsToFire )
-	{
-		StartFire();
-	}
-}
-
 bool ACGWeapon::ServerStartReload_Validate()
 {
 	return true;
@@ -223,6 +213,15 @@ void ACGWeapon::ServerStartReload_Implementation()
 {
 	// Make sure the server Ammo is updated properly.
 	OnStartReload();
+}
+
+void ACGWeapon::ClientCheckQueuedInput_Implementation()
+{
+	// If the user wants to fire, try firing.
+	if (CGOwner->bWantsToFire )
+	{
+		StartFire();
+	}
 }
 
 void ACGWeapon::StartOverheat(){ }
@@ -433,7 +432,7 @@ void ACGWeapon::FireProjectile()
 
 	if (Impact.bBlockingHit)
 	{
-		FVector MuzzleDir = (Impact.ImpactPoint - Origin).SafeNormal();
+		FVector MuzzleDir = (Impact.ImpactPoint - Origin).GetSafeNormal();
 
 		bool bIntersecting = false;
 		float GunDot = FVector::DotProduct(MuzzleDir, Direction);

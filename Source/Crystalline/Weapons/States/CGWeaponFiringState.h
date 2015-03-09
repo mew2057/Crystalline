@@ -29,5 +29,7 @@ public:
 	void FireShot();
 
 	
-	
+	/**Timer Handle for the Refire timer.*/
+	FTimerHandle TimerHandle_Refire;
+
 };

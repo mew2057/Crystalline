@@ -49,6 +49,9 @@ private:
 
 	uint8 DestinationKeyID;
 
+	/**Timer Handle for the bot's respawn.*/
+	FTimerHandle TimerHandle_Respawn;
+
 	
 	
 };

@@ -15,7 +15,8 @@ class  UCGWeaponUnequippingState : public UCGWeaponState
 
 protected:
 
-
+	/**Timer Handle for the Unequip timer.*/
+	FTimerHandle TimerHandle_Unequip;
 public:
 
 	UCGWeaponUnequippingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -24,7 +25,7 @@ public:
 
 	virtual void EnterState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime);
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime);
 	}
 	
 	void UnequipFinished()
@@ -37,7 +38,7 @@ public:
 
 	virtual void EndState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().ClearTimer(this, &UCGWeaponUnequippingState::UnequipFinished);
+		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Unequip);
 	}
 
 	virtual void StartFire() override {}

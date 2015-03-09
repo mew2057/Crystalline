@@ -59,6 +59,8 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	float WeaponHeat;
 
+	/**Timer Handle for the Overheat timer.*/
+	FTimerHandle TimerHandle_Overheat;
 
 
 };

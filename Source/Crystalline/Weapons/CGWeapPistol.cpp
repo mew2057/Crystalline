@@ -69,7 +69,7 @@ void ACGWeapPistol::StartOverheat()
 {
 	bIsOverheated = true;
 
-	GetWorldTimerManager().SetTimer(this,
+	GetWorldTimerManager().SetTimer(TimerHandle_Overheat, this,
 		&ACGWeapPistol::BeginCooldown,
 		OverheatConfig.OverheatTime, false);
 }
@@ -77,7 +77,7 @@ void ACGWeapPistol::StartOverheat()
 void ACGWeapPistol::BeginCooldown()
 {
 	bIsOverheated = false;
-	GetWorldTimerManager().ClearTimer(this, &ACGWeapPistol::BeginCooldown);
+	GetWorldTimerManager().ClearTimer(TimerHandle_Overheat);
 }
 
 #pragma endregion

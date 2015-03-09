@@ -16,7 +16,8 @@ class UCGWeaponReloadingState : public UCGWeaponState
 public:	
 	UCGWeaponReloadingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 	{}
-
+	/**Timer Handle for the Reload timer.*/
+	FTimerHandle TimerHandle_Reload;
 
 	virtual void EnterState() override
 	{
@@ -32,7 +33,7 @@ public:
 
 		if (ReloadTime > .0f)
 		{
-			GetCGOwner()->GetWorldTimerManager().SetTimer(this, 
+			GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Reload, this,
 				&UCGWeaponReloadingState::ReloadFinished, ReloadTime, false);
 		}
 		else
@@ -49,7 +50,7 @@ public:
 
 	virtual void EndState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().ClearTimer(this, &UCGWeaponReloadingState::ReloadFinished);
+		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Reload);
 	}
 
 	// You should not be able to cancel this with fire.

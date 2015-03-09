@@ -141,6 +141,8 @@ public:
 	
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerStartReload();
+	virtual bool ACGWeapon::ServerStartReload_Validate();
+	virtual void ACGWeapon::ServerStartReload_Implementation();
 	
 	void StopReload();
 
@@ -148,6 +150,8 @@ public:
 	/**Invoked by the server when a timer based call finishes execution.*/
 	UFUNCTION(client, reliable)
 	void ClientCheckQueuedInput();
+	virtual void ClientCheckQueuedInput_Implementation();
+
 
 	// This is managed by the weapon, not the state at the present.
 	// FIXME
@@ -177,12 +181,17 @@ public:
 
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerStartFire();
+	virtual bool ServerStartFire_Validate();
+	virtual void ServerStartFire_Implementation();
+
 
 	/** Ends the firing of the weapon, stop in StartFire for non automatic weapons. */
 	virtual void StopFire();
 
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerStopFire();
+	virtual bool ServerStopFire_Validate();
+	virtual void ServerStopFire_Implementation();
 	
 	virtual bool StartFiring();
 
@@ -200,6 +209,9 @@ public:
 
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerFireProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
+	virtual bool ServerFireProjectile_Validate(FVector Origin, FVector_NetQuantizeNormal ShootDir);
+	virtual void ServerFireProjectile_Implementation(FVector Origin, FVector_NetQuantizeNormal ShootDir);
+
 
 	virtual void SpawnProjectile(FVector Origin, FVector_NetQuantizeNormal ShootDir);
 
@@ -216,10 +228,14 @@ public:
 	/** server notified of hit from client to verify */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerNotifyHit(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
+	virtual bool ServerNotifyHit_Validate(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
+	virtual void ServerNotifyHit_Implementation(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
 
 	/** server notified of miss to show trail FX */
 	UFUNCTION(unreliable, server, WithValidation)
 	void ServerNotifyMiss(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
+	virtual bool ServerNotifyMiss_Validate(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
+	virtual void ServerNotifyMiss_Implementation(FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread);
 
 	UFUNCTION()
 	void OnRep_HitNotify();

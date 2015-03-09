@@ -58,7 +58,7 @@ public:
 	virtual void Destroyed() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Game|HUD")
-		void SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID);
+	void SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID);
 
 	virtual bool IsFirstPerson();
 
@@ -68,6 +68,9 @@ public:
 	FRotator GetAimOffsets() const;
 
 protected:
+	/**Timer Handle for the Shield Regeneration timer.*/
+	FTimerHandle TimerHandle_ShieldRegen;
+	
 	/** The name of the Socket/Bone on the skeleton that constitutes the player head.. */
 	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	FName HeadBone;
@@ -217,19 +220,26 @@ public:
 	// This will eventually telegraph the ADS animation montage to clients.
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetZoom(bool bZoom);
-
+	virtual bool ServerSetZoom_Validate(bool bZoom);
+	virtual void ServerSetZoom_Implementation(bool bZoom);
+	
 	/** Triggers the action button response.*/
 	void OnActionButton();
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerPickUpCrystal();
+	virtual bool ServerPickUpCrystal_Validate();
+	virtual void ServerPickUpCrystal_Implementation();
 
 	void PickupCrystal();
 
 	/** Pops the most powerful crystal in the gun. */
 	void OnPopCrystal();
+
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerPopCrystal();
+	virtual bool ServerPopCrystal_Validate();
+	virtual void ServerPopCrystal_Implementation();
 
 	void PopCrystal();
 
@@ -318,6 +328,8 @@ public:
 	*/
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(ACGWeapon* Weapon);
+	virtual bool ServerEquipWeapon_Validate(ACGWeapon* Weapon);
+	virtual void ServerEquipWeapon_Implementation(ACGWeapon* Weapon);
 
 	/** Invoked when the player begins to Overlap with a Crystal Pickup, triggers a prompt.*/
 	void OnStartCrystalOverlap(class ACGCrystal* Crystal);

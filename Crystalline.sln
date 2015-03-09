@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{C65A5CF1-29D1-460A-B2AD-0981B8EA4D94}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{7EEADCF1-F2B1-4901-A09D-C1F65EBCBCE8}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Crystalline", "Intermediate\ProjectFiles\Crystalline.vcxproj", "{6F72AD40-0104-4F0C-82CC-3A93E6F39306}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UE4", "Intermediate\ProjectFiles\UE4.vcxproj", "{B819438D-A3E8-426F-A884-0FED2B14D96D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,8 +30,17 @@ Global
 		{6F72AD40-0104-4F0C-82CC-3A93E6F39306}.Development|Windows.Build.0 = Development_Game|x64
 		{6F72AD40-0104-4F0C-82CC-3A93E6F39306}.Shipping|Windows.ActiveCfg = Shipping_Game|Win32
 		{6F72AD40-0104-4F0C-82CC-3A93E6F39306}.Shipping|Windows.Build.0 = Shipping_Game|Win32
+		{B819438D-A3E8-426F-A884-0FED2B14D96D}.DebugGame Editor|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{B819438D-A3E8-426F-A884-0FED2B14D96D}.DebugGame|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{B819438D-A3E8-426F-A884-0FED2B14D96D}.Development Editor|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{B819438D-A3E8-426F-A884-0FED2B14D96D}.Development|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{B819438D-A3E8-426F-A884-0FED2B14D96D}.Shipping|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F72AD40-0104-4F0C-82CC-3A93E6F39306} = {7EEADCF1-F2B1-4901-A09D-C1F65EBCBCE8}
+		{B819438D-A3E8-426F-A884-0FED2B14D96D} = {C65A5CF1-29D1-460A-B2AD-0981B8EA4D94}
 	EndGlobalSection
 EndGlobal

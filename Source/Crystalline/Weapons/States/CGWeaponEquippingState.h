@@ -12,6 +12,9 @@ UCLASS(CustomConstructor)
 class UCGWeaponEquippingState : public UCGWeaponState
 {
 	GENERATED_BODY()
+protected:
+	/**Timer Handle for the Shield Regeneration timer.*/
+	FTimerHandle TimerHandle_Equipping;
 
 public:
 	UCGWeaponEquippingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -19,7 +22,7 @@ public:
 
 	virtual void EnterState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().SetTimer(this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime, false);
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Equipping, this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime, false);
 	}
 
 	virtual void StartEquip() override
@@ -41,7 +44,7 @@ public:
 
 	virtual void EndState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().ClearTimer(this, &UCGWeaponEquippingState::EquipFinished);
+		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Equipping);
 	}
 
 };
