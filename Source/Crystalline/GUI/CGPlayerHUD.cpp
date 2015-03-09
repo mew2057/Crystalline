@@ -33,6 +33,7 @@ void ACGPlayerHUD::PostInitializeComponents()
 	bool GamepadConnected = false;
 
 	// Set Button Icons up.	
+	// FIXME This crashes the editor!
 	DetermineKeyCodeForAction("ActionButton", ACTION_BUTTON, GamepadConnected);
 	DetermineKeyCodeForAction("PopCrystalButton", POP_BUTTON, GamepadConnected);
 }
@@ -40,6 +41,12 @@ void ACGPlayerHUD::PostInitializeComponents()
 //XXX This is Janky code.
 void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID, bool GamepadConnected)
 {
+	//if (PlayerOwner == NULL)
+	//{
+	//	return;
+	//}
+
+	// Crashes PIE
 	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
 	int32 Num = Keys.Num();;
 	int32 Key = -1;
