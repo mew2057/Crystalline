@@ -50,6 +50,13 @@ void ACGPlayerState::ScoreSuicide(int32 Points)
 	ForceNetUpdate();
 }
 
+void ACGPlayerState::AddScore(int32 AddToScore)
+{
+	Score += AddToScore;
+	ForceNetUpdate();
+};
+
+
 
 
 void ACGPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

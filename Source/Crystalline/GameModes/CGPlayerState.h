@@ -32,7 +32,8 @@ public:
 	/**Only Suicides negatively impact player score.*/
 	virtual void ScoreSuicide(int32 Points);
 
-
+	UFUNCTION(BlueprintCallable, Category = "StateScore")
+	void AddScore(int32 AddToScore);
 
 	FORCEINLINE int32 GetNumKills() { return NumKills;  }
 
