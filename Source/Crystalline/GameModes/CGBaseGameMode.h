@@ -42,6 +42,7 @@ protected:
 	virtual UClass* GetDefaultPawnClassForController(AController* InController) override;
 
 	/**Checks the score after a scoring action for the player.*/
+	UFUNCTION(BlueprintCallable, Category = "GameMode")
 	virtual void CheckScore(ACGPlayerState* Player);
 
 	/**Determines which player won the round.*/
