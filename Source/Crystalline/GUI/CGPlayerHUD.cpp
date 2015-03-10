@@ -179,9 +179,11 @@ void ACGPlayerHUD::DrawHUD()
 				if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed)
 				{
 					//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
+
+					FCanvasIcon HitConfirmedIcon = Weapon->WeaponHUDConfig.HitConfirmedIcon;
 					Canvas->DrawIcon(HitConfirmedIcon,
-						(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
-						(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+						(Center.X - (HitConfirmedIcon.UL * ScaleUIY * 0.5f)),
+						(Center.Y - (HitConfirmedIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 				}
 
 				if (Prompt.bPrompt)

@@ -517,9 +517,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 		float TimeToDisplayHitTaken;
 
-	/**Icon for hit confirmation.*/
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCanvasIcon HitConfirmedIcon;
 
 	/**Time to display the hit confirmation.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
