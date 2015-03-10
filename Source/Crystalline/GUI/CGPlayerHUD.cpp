@@ -33,6 +33,7 @@ void ACGPlayerHUD::PostInitializeComponents()
 	bool GamepadConnected = false;
 
 	// Set Button Icons up.	
+	// FIXME This crashes the editor!
 	DetermineKeyCodeForAction("ActionButton", ACTION_BUTTON, GamepadConnected);
 	DetermineKeyCodeForAction("PopCrystalButton", POP_BUTTON, GamepadConnected);
 }
@@ -40,6 +41,12 @@ void ACGPlayerHUD::PostInitializeComponents()
 //XXX This is Janky code.
 void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID, bool GamepadConnected)
 {
+	//if (PlayerOwner == NULL)
+	//{
+	//	return;
+	//}
+
+	// Crashes PIE
 	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
 	int32 Num = Keys.Num();;
 	int32 Key = -1;
@@ -172,9 +179,11 @@ void ACGPlayerHUD::DrawHUD()
 				if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed)
 				{
 					//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
+
+					FCanvasIcon HitConfirmedIcon = Weapon->WeaponHUDConfig.HitConfirmedIcon;
 					Canvas->DrawIcon(HitConfirmedIcon,
-						(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
-						(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+						(Center.X - (HitConfirmedIcon.UL * ScaleUIY * 0.5f)),
+						(Center.Y - (HitConfirmedIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 				}
 
 				if (Prompt.bPrompt)

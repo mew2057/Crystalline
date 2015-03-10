@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{2C64058B-A4CA-4ABD-B982-1B49B828CAD2}"
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{85F25B84-91D5-494B-801A-88D2C4084300}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{58987550-1750-462C-9623-EF6FB263DC0C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{2E9209BC-5F87-4ADC-A249-3A700EE18CD7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Crystalline", "Intermediate\ProjectFiles\Crystalline.vcxproj", "{3D3BBB03-1370-4769-B6DC-98149C702D58}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UE4", "Intermediate\ProjectFiles\UE4.vcxproj", "{72A878C7-28B7-4B11-9762-F0A72D12B7CE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UE4", "Intermediate\ProjectFiles\UE4.vcxproj", "{CB4AFBEB-09AF-4AF6-8B1B-28E25E519B9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,12 +30,17 @@ Global
 		{3D3BBB03-1370-4769-B6DC-98149C702D58}.Development|Windows.Build.0 = Development_Game|x64
 		{3D3BBB03-1370-4769-B6DC-98149C702D58}.Shipping|Windows.ActiveCfg = Shipping_Game|Win32
 		{3D3BBB03-1370-4769-B6DC-98149C702D58}.Shipping|Windows.Build.0 = Shipping_Game|Win32
+		{CB4AFBEB-09AF-4AF6-8B1B-28E25E519B9A}.DebugGame Editor|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{CB4AFBEB-09AF-4AF6-8B1B-28E25E519B9A}.DebugGame|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{CB4AFBEB-09AF-4AF6-8B1B-28E25E519B9A}.Development Editor|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{CB4AFBEB-09AF-4AF6-8B1B-28E25E519B9A}.Development|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
+		{CB4AFBEB-09AF-4AF6-8B1B-28E25E519B9A}.Shipping|Windows.ActiveCfg = BuiltWithUnrealBuildTool|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{72A878C7-28B7-4B11-9762-F0A72D12B7CE} = {2C64058B-A4CA-4ABD-B982-1B49B828CAD2}
-		{3D3BBB03-1370-4769-B6DC-98149C702D58} = {58987550-1750-462C-9623-EF6FB263DC0C}
+		{3D3BBB03-1370-4769-B6DC-98149C702D58} = {2E9209BC-5F87-4ADC-A249-3A700EE18CD7}
+		{CB4AFBEB-09AF-4AF6-8B1B-28E25E519B9A} = {85F25B84-91D5-494B-801A-88D2C4084300}
 	EndGlobalSection
 EndGlobal

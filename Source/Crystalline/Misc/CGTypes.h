@@ -347,12 +347,12 @@ struct FCGWeaponFXData
 {
 	GENERATED_USTRUCT_BODY()
 
-		////////////////////////////
-		// VFX
+	////////////////////////////
+	// VFX
 
-		/** The socket on the gun model that corresponds to the muzzle of the gun. */
-		UPROPERTY(EditDefaultsOnly, Category = Effects)
-		FName MuzzleSocket;
+	/** The socket on the gun model that corresponds to the muzzle of the gun. */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	FName MuzzleSocket;
 
 	/** The Muzzle flash for the gun. */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
@@ -397,9 +397,13 @@ struct FCGWeaponHUDData
 {
 	GENERATED_USTRUCT_BODY()
 
-		/**The crosshair icon for the weapon. Base color should be white. */
-		UPROPERTY(EditDefaultsOnly, Category = HUD)
-		FCanvasIcon CrosshairIcon;
+	/**The crosshair icon for the weapon. Base color should be white. */
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon CrosshairIcon;
+
+	/**Icon for hit confirmation.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon HitConfirmedIcon;
 
 	/**The Ammo Guage Background for the weapon. Base color should be white. */
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
