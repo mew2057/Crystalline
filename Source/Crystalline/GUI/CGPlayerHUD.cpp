@@ -41,10 +41,10 @@ void ACGPlayerHUD::PostInitializeComponents()
 //XXX This is Janky code.
 void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID, bool GamepadConnected)
 {
-	//if (PlayerOwner == NULL)
-	//{
-	//	return;
-	//}
+	if (PlayerOwner == NULL)
+	{
+		return;
+	}
 
 	// Crashes PIE
 	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
