@@ -6,10 +6,10 @@
 
 ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	
+	// TODO replace with Sphere?	
 	OverlapVolume = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("CrystalOverlapVolume"));
-	OverlapVolume->SetCapsuleHalfHeight(88.f);
-	OverlapVolume->SetCapsuleRadius(80.f);
+	OverlapVolume->SetCapsuleHalfHeight(120.f);
+	OverlapVolume->SetCapsuleRadius(120.f);
 	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	OverlapVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 	OverlapVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);

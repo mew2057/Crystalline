@@ -41,10 +41,10 @@ void ACGPlayerHUD::PostInitializeComponents()
 //XXX This is Janky code.
 void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID, bool GamepadConnected)
 {
-	//if (PlayerOwner == NULL)
-	//{
-	//	return;
-	//}
+	if (PlayerOwner == NULL)
+	{
+		return;
+	}
 
 	// Crashes PIE
 	TArray<FInputActionKeyMapping> Keys = PlayerOwner->PlayerInput->GetKeysForAction(Action);
@@ -166,7 +166,8 @@ void ACGPlayerHUD::DrawHUD()
 			// Crosshair	
 			if (!bScoreboardVisible)
 			{
-				Canvas->SetDrawColor(Weapon->CheckCanHit() ? FColor::Red : FColor::White);
+				bool bIsHitting = GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed;
+				Canvas->SetDrawColor(bIsHitting || Weapon->CheckCanHit() ? FColor::Red : FColor::White);
 
 				FCanvasIcon CrosshairIcon = Weapon->WeaponHUDConfig.CrosshairIcon;
 				// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
@@ -176,7 +177,7 @@ void ACGPlayerHUD::DrawHUD()
 					(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 
 				// Play hit confirmation
-				if (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed)
+				if (bIsHitting)
 				{
 					//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
 
