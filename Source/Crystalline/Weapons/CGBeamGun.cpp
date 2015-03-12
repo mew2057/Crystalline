@@ -76,7 +76,9 @@ void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 {
 	if (WeaponFXConfig.WeaponTrail && TrailPSC == NULL)
 	{
-		TrailPSC = UGameplayStatics::SpawnEmitterAttached(WeaponFXConfig.WeaponTrail, Mesh1P, WeaponFXConfig.MuzzleSocket);
+		USkeletalMeshComponent* Mesh = GetWeaponMesh();
+
+		TrailPSC = UGameplayStatics::SpawnEmitterAttached(WeaponFXConfig.WeaponTrail, Mesh, WeaponFXConfig.MuzzleSocket);
 
 		if (TrailPSC)
 		{

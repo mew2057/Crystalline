@@ -146,6 +146,8 @@ public:
 	float FOVDefault;
 	///////////////////////////////////////////////////////////
 
+	FORCEINLINE USkeletalMeshComponent* GetPawnMesh() { return IsFirstPerson() ? Mesh1P : GetMesh(); }
+
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	FORCEINLINE float GeCurrentShield() const { return CurrentShield; }
 	FORCEINLINE float GetCurrentHealth() const{ return CurrentHealth; }

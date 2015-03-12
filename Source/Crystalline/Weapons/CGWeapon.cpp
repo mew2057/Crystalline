@@ -21,7 +21,7 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 	Mesh1P->bChartDistanceFactor = false;                        // prevents the mesh from being added to the gloabal chart
 	Mesh1P->bReceivesDecals = false;                             // Prevents decals from spawning on the gun.
 	Mesh1P->CastShadow = false;                                  // Hides the shadow.
-	Mesh1P->bOnlyOwnerSee = false;
+	Mesh1P->bOnlyOwnerSee = true;
 	Mesh1P->bOwnerNoSee = false;
 	Mesh1P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
 	Mesh1P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
@@ -30,18 +30,22 @@ ACGWeapon::ACGWeapon(const FObjectInitializer& ObjectInitializer) : Super(Object
 	RootComponent = Mesh1P;										 // Makes the first player mesh the root component.
 
 	// Initializes the weapon mesh.
-	/*Mesh3P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh1P"));
+	Mesh3P = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh3P"));
 	Mesh3P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 	Mesh3P->bChartDistanceFactor = false;                        // prevents the mesh from being added to the gloabal chart
 	Mesh3P->bReceivesDecals = false;                             // Prevents decals from spawning on the gun.
-	Mesh3P->CastShadow = false;                                  // Hides the shadow.
-	Mesh1P->bOnlyOwnerSee = false;
-	Mesh1P->bOwnerNoSee = true;
+	Mesh3P->CastShadow = true;                                  // Hides the shadow.
+	Mesh3P->bOnlyOwnerSee = false;
+	Mesh3P->bOwnerNoSee = true;
 	Mesh3P->SetCollisionObjectType(ECC_WorldDynamic);			 //Sets the Collision channel of the gun.
 	Mesh3P->SetCollisionEnabled(ECollisionEnabled::NoCollision); // Ignores collisions.
+	Mesh3P->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	Mesh3P->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	Mesh3P->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
 	Mesh3P->SetCollisionResponseToAllChannels(ECR_Ignore);       // No Collision response.
+	Mesh3P->SetHiddenInGame(true);
 	Mesh3P->AttachParent = Mesh1P;
-	*/
+	
 
 
 	ActiveState      = ObjectInitializer.CreateDefaultSubobject<UCGWeaponActiveState>(this, TEXT("StateActive"));
@@ -370,9 +374,10 @@ void ACGWeapon::StartWeaponFireSimulation()
 	// Muzzle Flash
 	if (WeaponFXConfig.MuzzleFlash)
 	{
-		const FVector FlashPoint = Mesh1P->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
+		USkeletalMeshComponent* Mesh = GetWeaponMesh();
+		const FVector FlashPoint = Mesh->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
 
-		MuzzleFlashComp = UGameplayStatics::SpawnEmitterAttached(WeaponFXConfig.MuzzleFlash, Mesh1P, WeaponFXConfig.MuzzleSocket);
+		MuzzleFlashComp = UGameplayStatics::SpawnEmitterAttached(WeaponFXConfig.MuzzleFlash, Mesh, WeaponFXConfig.MuzzleSocket);
 		// TODO CONFIGURE THIS!		
 		MuzzleFlashComp->bOwnerNoSee = false;
 		MuzzleFlashComp->bOnlyOwnerSee = false;
@@ -813,9 +818,22 @@ void ACGWeapon::AttachMeshToPawn()
 
 		const FName ConnectionPoint = CGOwner->GetWeaponAttachPoint();
 
-		USkeletalMeshComponent * PawnMesh1P = CGOwner->IsFirstPerson() ? CGOwner->GetMesh1P() : CGOwner->GetMesh();
-		Mesh1P->SetHiddenInGame(false);
-		Mesh1P->AttachTo(PawnMesh1P, ConnectionPoint, EAttachLocation::SnapToTarget);
+		// If the weapon owner is locally controlled, it needs both the 3rd person and 1st person mesh for kill cams.
+		if (CGOwner->IsLocallyControlled()) // FIXME Bots spawn both.
+		{
+			Mesh1P->SetHiddenInGame(false);
+			Mesh1P->AttachTo(CGOwner->GetMesh1P(), ConnectionPoint, EAttachLocation::SnapToTarget);
+
+			Mesh3P->SetHiddenInGame(false);
+			Mesh3P->AttachTo(CGOwner->GetMesh(), ConnectionPoint, EAttachLocation::SnapToTarget);
+		}
+		else
+		{
+			USkeletalMeshComponent* WeaponMesh = GetWeaponMesh();
+			USkeletalMeshComponent* PawnMesh = CGOwner->GetPawnMesh();
+			WeaponMesh->SetHiddenInGame(false);
+			WeaponMesh->AttachTo(PawnMesh, ConnectionPoint, EAttachLocation::SnapToTarget);
+		}
 	}
 }
 
@@ -823,6 +841,9 @@ void ACGWeapon::DetachMeshFromPawn()
 {
 	Mesh1P->DetachFromParent();
 	Mesh1P->SetHiddenInGame(true);
+
+	Mesh3P->DetachFromParent();
+	Mesh3P->SetHiddenInGame(true);
 }
 
 #pragma endregion
@@ -882,15 +903,12 @@ FVector ACGWeapon::GetCameraLocation() const
 
 FVector ACGWeapon::GetMuzzleLocation() const
 {
-	// TODO Mesh for not locally controlled.
-
-	return Mesh1P->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
+	return GetWeaponMesh()->GetSocketLocation(WeaponFXConfig.MuzzleSocket);
 }
 
 FVector ACGWeapon::GetMuzzleRotation() const
 {
-	// TODO Mesh for not locally controlled.
-	return Mesh1P->GetSocketRotation(WeaponFXConfig.MuzzleSocket).Vector();
+	return GetWeaponMesh()->GetSocketRotation(WeaponFXConfig.MuzzleSocket).Vector();
 }
 
 
