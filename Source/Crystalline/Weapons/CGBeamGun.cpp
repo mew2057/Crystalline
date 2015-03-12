@@ -74,6 +74,7 @@ void ACGBeamGun::StopWeaponFireSimulation()
 
 void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 {
+
 	if (WeaponFXConfig.WeaponTrail && TrailPSC == NULL)
 	{
 		USkeletalMeshComponent* Mesh = GetWeaponMesh();
@@ -88,6 +89,7 @@ void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 	}
 	else if (TrailPSC)
 	{
+
 		TrailPSC->SetVectorParameter(WeaponFXConfig.TrailTargetParam, EndPoint);
 	}
 }

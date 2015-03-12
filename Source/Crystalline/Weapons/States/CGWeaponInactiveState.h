@@ -22,10 +22,6 @@ public:
 	{
 		GetOuterACGWeapon()->GotoEquippingState();
 	}
-
-	// Firing is NOT Legal from the Inactive State
-	// No children of the Inactive state may change this behavior.
-	virtual void StartFire() final { }
 	virtual void StartReload() final { }
 
 };

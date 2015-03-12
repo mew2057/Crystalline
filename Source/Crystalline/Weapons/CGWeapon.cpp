@@ -278,14 +278,11 @@ void ACGWeapon::StartFire()
 		return;
 	}
 
-	// Tell the server to start firing.
-	if (Role < ROLE_Authority)
+	// Tell the server to start firing, Only if we can fire locally.
+	if (CurrentState->StartFire() && Role < ROLE_Authority)
 	{
 		ServerStartFire();
 	}
-
-	// Begin firing locally.
-	CurrentState->StartFire();
 }
 
 bool ACGWeapon::ServerStartFire_Validate()
@@ -330,8 +327,8 @@ bool ACGWeapon::StartFiring()
 		OnStartReload();
 		return false;
 	}
-
-	if (CGOwner && CGOwner->IsLocallyControlled())
+	
+	if (CGOwner != NULL && CGOwner->IsLocallyControlled())
 	{
 		if (WeaponConfig.bUsesProjectile)
 		{

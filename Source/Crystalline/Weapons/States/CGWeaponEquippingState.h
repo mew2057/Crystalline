@@ -34,11 +34,6 @@ public:
 	{
 		GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->ActiveState);
 	}
-
-	virtual void StartFire() override 
-	{ 
-		// TODO 
-	}
 	
 	virtual void StartReload() final { }
 
