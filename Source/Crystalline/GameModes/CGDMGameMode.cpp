@@ -15,10 +15,12 @@ void ACGDMGameMode::CheckScore(ACGPlayerState* Player)
 	else if (Player->Score == ScoreToWin-1){
 		//One kill to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is one kill away from winning.");
+		ForceNetUpdate();
 	}
 	else if (Player->Score == ScoreToWin - 5){
 		//5 kills to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is 5 kills away from winning.");
+		ForceNetUpdate();
 	}
 }
 
