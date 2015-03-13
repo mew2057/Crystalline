@@ -54,10 +54,12 @@ public:
 		GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->ReloadingState);
 	}
 
-	/** Override if firing is not legal from that state. */
-	virtual void StartFire()
+	/** Override if firing is not legal from that state.
+	@return True, if it is legal to fire in this state.
+	*/
+	virtual bool StartFire()
 	{
-		GetOuterACGWeapon()->GotoFiringState();
+		return false;
 	}
 
 	// ONLY firing states should hit this.

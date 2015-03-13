@@ -40,7 +40,4 @@ public:
 	{
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Unequip);
 	}
-
-	virtual void StartFire() override {}
-
 };

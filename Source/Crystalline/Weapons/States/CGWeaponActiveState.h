@@ -17,10 +17,11 @@ public:
 	UCGWeaponActiveState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 	{}
 	
-	virtual void StartFire() override
+	virtual bool StartFire() override
 	{
 		//TODO check to see if we can fire, e.g. have ammo/not overheating.
 		GetOuterACGWeapon()->GotoFiringState();
+		return true;
 	}
 
 	
