@@ -362,11 +362,7 @@ void ACGWeapon::StopFiring()
 
 void ACGWeapon::StartWeaponFireSimulation()
 {
-	// The sound effect.
-	if (WeaponFXConfig.FireSound)
-	{
-		FireAudioComponent = UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
-	}
+
 
 	// Muzzle Flash
 	if (WeaponFXConfig.MuzzleFlash)
@@ -383,6 +379,12 @@ void ACGWeapon::StartWeaponFireSimulation()
 
 	if (CGOwner)
 	{
+		// The sound effect.
+		if (WeaponFXConfig.FireSound)
+		{
+			FireAudioComponent = UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, CGOwner->GetRootComponent());
+		}
+
 		APlayerController* CGController = Cast<APlayerController>(CGOwner->GetController());
 
 		if (CGController != NULL && CGController->IsLocalController())
