@@ -39,7 +39,11 @@ protected:
 	/** weapon mesh: 1st person view */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Mesh1P;
-
+	
+	/** weapon mesh: 3rd person view */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* Mesh3P;
+	
 #pragma endregion 
 
 
@@ -110,9 +114,16 @@ public:
 	UPROPERTY(Transient)
 	UAudioComponent* FireAudioComponent;
 
+
+	/**Retrieves the appropriate mesh for the view.*/
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return (CGOwner != NULL && CGOwner->IsFirstPerson()) ? Mesh1P : Mesh3P; };
+
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; };
 	
+	/** Returns Mesh3P subobject **/
+	FORCEINLINE USkeletalMeshComponent* GetMesh3P() const { return Mesh3P; };
+
 	/** The ACGCharacter holding this weapon. Replication triggers the inventory update functions. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
 	ACGCharacter* CGOwner;

@@ -51,11 +51,5 @@ public:
 	virtual void EndState() override
 	{
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Reload);
-	}
-
-	// You should not be able to cancel this with fire.
-	virtual void StartFire() override {}
-
-	
-	
+	}	
 };
