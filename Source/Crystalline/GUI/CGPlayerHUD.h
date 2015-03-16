@@ -4,6 +4,7 @@
 
 
 #include "GameFramework/HUD.h"
+#include "GUI/Slate/ShieldWidget.h"
 #include "CGPlayerHUD.generated.h"
 
 #define TARGET_Y_RESOLUTION 1080.0f
@@ -482,7 +483,11 @@ private:
 
 	/**The configuration for the Shield HUD Element.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCGHUDElement Shield;
+	FCGHUDElement Shield;
+
+	/**The slate widget for the shield.*/
+	TSharedPtr<class SShieldWidget> ShieldWidget;
+
 
 	/**The configuration for the Round HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)

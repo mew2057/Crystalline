@@ -36,6 +36,27 @@ void ACGPlayerHUD::PostInitializeComponents()
 	// FIXME This crashes the editor!
 	DetermineKeyCodeForAction("ActionButton", ACTION_BUTTON, GamepadConnected);
 	DetermineKeyCodeForAction("PopCrystalButton", POP_BUTTON, GamepadConnected);
+
+
+	// SLATE TUTORIAL
+	SAssignNew(ShieldWidget, SShieldWidget).OwnerHUD(this);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////Pass our viewport a weak ptr to our widget
+	if (GEngine->IsValidLowLevel())
+	{
+		GEngine->GameViewport->
+			/*Viewport's weak ptr will not give Viewport ownership of Widget*/
+			AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(ShieldWidget.ToSharedRef()));
+	}
+
+	if (ShieldWidget.IsValid())
+	{
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////Set widget's properties as visible (sets child widget's properties recursively)
+		ShieldWidget->SetVisibility(EVisibility::Visible);
+	}
+
 }
 
 //XXX This is Janky code.
@@ -354,7 +375,8 @@ void ACGPlayerHUD::DrawShield()
 	
 	Canvas->SetDrawColor(FColor::White);	
 	const FCGHUDTransform Transform = Shield.Transform;
-
+	
+	
 	Canvas->DrawTile(
 		Shield.BGIcon.Texture,
 		PixelsPerCent.X * Transform.PercentX,
@@ -378,7 +400,7 @@ void ACGPlayerHUD::DrawShield()
 			PixelsPerCent.X * Transform.WidthPercent * Percent,
 			PixelsPerCent.Y * Transform.HeightPercent,
 			Shield.FGIcon.U, Shield.FGIcon.V,
-			Shield.FGIcon.UL * Percent, Shield.FGIcon.VL,
+			Shield.FGIcon.UL , Shield.FGIcon.VL,
 			EBlendMode::BLEND_Translucent);
 	}
 	
