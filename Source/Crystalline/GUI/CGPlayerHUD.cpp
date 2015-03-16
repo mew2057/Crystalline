@@ -14,8 +14,8 @@
 ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// TODO REPLACE THIS FONT!
-	static ConstructorHelpers::FObjectFinder<UFont> BigFontOb(TEXT("/Game/Textures/MenuFont"));
-	BigFont = BigFontOb.Object;
+	static ConstructorHelpers::FObjectFinder<UFont> FontOb(TEXT("/Game/Textures/MenuFont"));
+	Font = FontOb.Object;
 	HitTakenColor = FLinearColor::Red;
 	TimeSinceLastHitTaken = 0.f;
 	TimeSinceLastHitConfirmed = 0.f;
@@ -260,83 +260,93 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 
 	/** Get Primary weapon for the player. */
-	if (CurrentWeapon )
+	if (CurrentWeapon)
 	{
+		// Current weapon box.
+		const float EquippedX               = X + PixelsPerCent.X * WeaponElement.EquippedWeapon.Transform.PercentX;
+		const float EquippedY               = Y + PixelsPerCent.Y * WeaponElement.EquippedWeapon.Transform.PercentY;
+		const float EquippedPixelsPerWidth  = PixelsPerWidth  * WeaponElement.EquippedWeapon.Transform.WidthPercent  * .01f;
+		const float EquippedPixelsPerHeight = PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.HeightPercent * .01f;
+
+		// Draw Backgeound.
+		DrawRect(
+			WeaponElement.EquippedWeapon.ElementBackgroundColor,
+			EquippedX, EquippedY,
+			PixelsPerWidth  * WeaponElement.EquippedWeapon.Transform.WidthPercent, PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.HeightPercent
+		);
+
 		FCGWeaponHUDData WeaponHUDConfig = CurrentWeapon->WeaponHUDConfig;
-		// TODO team modifications.
-		Canvas->SetDrawColor(FColor::White);
-	
-		AmmoIcon = WeaponHUDConfig.AmmoGuageBGIcon;
-
-		Canvas->DrawTile(
-			AmmoIcon.Texture,
-			X + PixelsPerWidth * WeaponElement.GuageTransform.PercentX,
-			Y + PixelsPerHeight * WeaponElement.GuageTransform.PercentY,
-			PixelsPerWidth * WeaponElement.GuageTransform.WidthPercent,
-			PixelsPerHeight * WeaponElement.GuageTransform.HeightPercent,
-			AmmoIcon.U,  AmmoIcon.V,
-			AmmoIcon.UL, AmmoIcon.VL,
-			EBlendMode::BLEND_Translucent);
-
-
-		AmmoIcon = WeaponHUDConfig.AmmoGuageFGIcon;		
-	
+		
+		const float ElemX = EquippedX + EquippedPixelsPerWidth  * WeaponElement.EquippedWeapon.GuageTransform.PercentX;
+		const float ElemY = EquippedY + EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.GuageTransform.PercentY;
+		const float ElemW = EquippedPixelsPerWidth       * WeaponElement.EquippedWeapon.GuageTransform.WidthPercent;
+		const float ElemH = EquippedPixelsPerHeight      * WeaponElement.EquippedWeapon.GuageTransform.HeightPercent;
+		
 		const float Percent = CurrentWeapon->GetClipPercent();
-	
+
+		DrawRect(
+			WeaponElement.EquippedWeapon.GuageBackgroundColor,
+			ElemX, ElemY,
+			ElemW, ElemH 
+		);
+
 		// Determine the draw behavior.
 		if (CurrentWeapon->WeaponConfig.bOverHeatWeapon)
-		{
-			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent));
+		{			
+			DrawRect(
+				FMath::Lerp(WeaponHUDConfig.FullAmmoColor, WeaponHUDConfig.LowAmmoColor, Percent),
+				ElemX, ElemY,
+				ElemW * Percent, ElemH
+			);
 
-			Canvas->DrawTile(
-				AmmoIcon.Texture,
-				X + PixelsPerWidth * WeaponElement.GuageTransform.PercentX,
-				Y + PixelsPerHeight * WeaponElement.GuageTransform.PercentY,
-				PixelsPerWidth * WeaponElement.GuageTransform.WidthPercent * Percent,
-				PixelsPerHeight * WeaponElement.GuageTransform.HeightPercent,
-				AmmoIcon.U, AmmoIcon.V,
-				AmmoIcon.UL * Percent, AmmoIcon.VL,
-				EBlendMode::BLEND_Translucent);
+			const float ShotStart = ElemX + ElemW * Percent;
+			const float ShotWidth = FMath::Min(ElemW - ElemW * Percent, ElemW * CurrentWeapon->GetPercentPerShot());
+
+			// Draw ShotPercent
+			DrawRect(
+				WeaponElement.EquippedWeapon.GuageShotColor,
+				ShotStart, ElemY,
+				ShotWidth, ElemH
+			);
 		}
 		else
 		{
-			Canvas->SetDrawColor(FMath::Lerp(WeaponHUDConfig.LowAmmoColor, WeaponHUDConfig.FullAmmoColor, Percent));
-
-			Canvas->DrawTile(
-				AmmoIcon.Texture,
-				X + PixelsPerWidth * WeaponElement.GuageTransform.PercentX,
-				Y + PixelsPerHeight * WeaponElement.GuageTransform.PercentY,
-				PixelsPerWidth * WeaponElement.GuageTransform.WidthPercent * Percent,
-				PixelsPerHeight * WeaponElement.GuageTransform.HeightPercent,
-				AmmoIcon.U, AmmoIcon.V,
-				AmmoIcon.UL * Percent, AmmoIcon.VL,
-				EBlendMode::BLEND_Translucent);
-
-			// Ammo Text only here.
+			// Draw Main bar.
+			DrawRect(
+				WeaponElement.EquippedWeapon.GuageEnergyColor,
+				ElemX, ElemY,
+				ElemW * Percent, ElemH
+			);
+			
+			// Draw ShotPercent
+			DrawRect(
+				WeaponElement.EquippedWeapon.GuageShotColor,
+				ElemX + ElemW * Percent, ElemY,
+				-ElemW * CurrentWeapon->GetPercentPerShot() * (Percent > 0), ElemH
+			);
 
 			// Ammo in gun.
-			FString Text = FString::Printf(TEXT("%3d"), CurrentWeapon->GetAmmoInClip());
-			
+			FString Text = FString::Printf(TEXT("%4d"), CurrentWeapon->GetAmmoInClip());
 			DrawScaledText(
 				Text,
-				WeaponElement.AmmoTextColor,
-				X + PixelsPerWidth * WeaponElement.InClipAmmoTransform.PercentX,
-				Y + PixelsPerHeight * WeaponElement.InClipAmmoTransform.PercentY,
-				BigFont,
-				PixelsPerHeight * WeaponElement.InClipAmmoTransform.HeightPercent,
-				WeaponElement.InClipAnchor);
+				WeaponElement.EquippedWeapon.InClip.Color,
+				EquippedX + EquippedPixelsPerWidth * WeaponElement.EquippedWeapon.InClip.Transform.PercentX,
+				EquippedY + EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.InClip.Transform.PercentY,
+				Font,
+				EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.InClip.Transform.HeightPercent,
+				WeaponElement.EquippedWeapon.InClip.Anchor);
 
 			
 			// Ammo held.
 			Text = FString::Printf(TEXT("%4d"), CurrentWeapon->GetAmmo());
 			DrawScaledText(
 				Text,
-				WeaponElement.AmmoTextColor,
-				X + PixelsPerWidth * WeaponElement.HeldAmmoTransform.PercentX,
-				Y + PixelsPerHeight * WeaponElement.HeldAmmoTransform.PercentY,
-				BigFont,
-				PixelsPerHeight * WeaponElement.HeldAmmoTransform.HeightPercent,
-				WeaponElement.HeldAmmoAnchor);
+				WeaponElement.EquippedWeapon.HeldAmmo.Color,
+				EquippedX + EquippedPixelsPerWidth * WeaponElement.EquippedWeapon.HeldAmmo.Transform.PercentX,
+				EquippedY + EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.HeldAmmo.Transform.PercentY,
+				Font,
+				EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.HeldAmmo.Transform.HeightPercent,
+				WeaponElement.EquippedWeapon.HeldAmmo.Anchor);
 
 		}
 		
@@ -344,27 +354,13 @@ void ACGPlayerHUD::DrawWeaponHUD()
 
 		Canvas->DrawTile(
 			WeaponHUDConfig.WeaponIcon.Texture,
-			X + PixelsPerWidth * WeaponElement.MainIconTransform.PercentX,
-			Y + PixelsPerHeight * WeaponElement.MainIconTransform.PercentY,
-			PixelsPerWidth * WeaponElement.MainIconTransform.WidthPercent,
-			PixelsPerHeight * WeaponElement.MainIconTransform.HeightPercent,
+			EquippedX + EquippedPixelsPerWidth  * WeaponElement.EquippedWeapon.MainIconTransform.PercentX,
+			EquippedY + EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.MainIconTransform.PercentY,
+			EquippedPixelsPerWidth  * WeaponElement.EquippedWeapon.MainIconTransform.WidthPercent,
+			EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.MainIconTransform.HeightPercent,
 			WeaponHUDConfig.WeaponIcon.U,  WeaponHUDConfig.WeaponIcon.V,
 			WeaponHUDConfig.WeaponIcon.UL, WeaponHUDConfig.WeaponIcon.VL,
 			EBlendMode::BLEND_Translucent);
-
-		// TODO Crystal Display
-		// FIXME this crashes when both players are dead and respawning. Seems to happen on client, this ONLY occurs in release mode.
-		/*
-		if (Pawn && Pawn->Inventory)
-		{
-			/** Draw the crystals the player has*/
-		/*	TextItem.Text = FText::FromString(TEXT("T1: " + FString::FromInt((int8)Pawn->Inventory->TierOneCrystal)));
-			Canvas->DrawItem(TextItem, 5, 100);
-	
-			TextItem.Text = FText::FromString(TEXT("T2: " + FString::FromInt((int8)Pawn->Inventory->TierTwoCrystal)));
-			Canvas->DrawItem(TextItem, 5, 150);
-		}*/
-	
 	}
 }
 
@@ -446,14 +442,15 @@ void ACGPlayerHUD::DrawGameInfo()
 
 		FString Text = FString::Printf(TEXT("%2d : %02d"), Minutes, Seconds);
 
+		// TODO write a new scaled text.
 		DrawScaledText(
 			Text,
-			RoundDataElement.TimeColor,
-			X + PixelsPerWidth * RoundDataElement.TimeTransform.PercentX,
-			Y + PixelsPerHeight * RoundDataElement.TimeTransform.PercentY,
-			BigFont,
-			PixelsPerHeight * RoundDataElement.TimeTransform.HeightPercent,
-			RoundDataElement.TimeAnchor);
+			RoundDataElement.TimeText.Color,
+			X + PixelsPerWidth * RoundDataElement.TimeText.Transform.PercentX,
+			Y + PixelsPerHeight * RoundDataElement.TimeText.Transform.PercentY,
+			Font,
+			PixelsPerHeight * RoundDataElement.TimeText.Transform.HeightPercent,
+			RoundDataElement.TimeText.Anchor);
 
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Score Output.
@@ -483,13 +480,24 @@ void ACGPlayerHUD::DrawGameInfo()
 				TempPlayerState = PlayerState ;
 			}
 
-			Canvas->SetDrawColor(RoundDataElement.DataElementColor);
+			//Canvas->SetDrawColor(RoundDataElement.DataElementColor);
 
 			const float ElemX = X + PixelsPerWidth * TempElement.Transform.PercentX;
 			const float ElemY = Y + PixelsPerHeight * TempElement.Transform.PercentY;
 			const float ElemW = PixelsPerWidth * TempElement.Transform.WidthPercent;
 			const float ElemH = PixelsPerHeight * TempElement.Transform.HeightPercent;
 
+			DrawRect(
+				RoundDataElement.DataBackgroundColor, 
+				ElemX, ElemY,
+				ElemW, ElemH );
+
+			DrawRect(
+				RoundDataElement.DataForegroundColor,
+				ElemX, ElemY,
+				ElemW * TempPlayerState->Score / CGGameState->GoalScore, ElemH );
+
+			/*
 			Canvas->DrawTile(
 				RoundDataElement.BGIcon.Texture, 
 				ElemX, ElemY,
@@ -497,7 +505,9 @@ void ACGPlayerHUD::DrawGameInfo()
 				RoundDataElement.BGIcon.U, RoundDataElement.BGIcon.V,
 				RoundDataElement.BGIcon.UL,RoundDataElement.BGIcon.VL,
 				EBlendMode::BLEND_Translucent);
-
+				*/
+			
+			/*
 			Canvas->SetDrawColor(FColor::Blue);
 
 			// TODO verify Goal Score.
@@ -508,17 +518,18 @@ void ACGPlayerHUD::DrawGameInfo()
 				RoundDataElement.FGIcon.U, RoundDataElement.FGIcon.V,
 				RoundDataElement.FGIcon.UL * TempPlayerState->Score / CGGameState->GoalScore, RoundDataElement.FGIcon.VL,
 				EBlendMode::BLEND_Translucent);
+				*/
 			
 			// Score goes here.
 			// TODO this needs some kind of anchoring.
 			Text = FString::Printf(TEXT("%.0f"), TempPlayerState->Score);
 			DrawScaledText(
 				Text, 
-				RoundDataElement.ScoreColor, 
-				ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreTransform.PercentX, 
-				ElemY + PixelsPerHeight * RoundDataElement.ScoreTransform.PercentY, 
-				BigFont, PixelsPerHeight * RoundDataElement.ScoreTransform.HeightPercent,
-				RoundDataElement.ScoreAnchor);
+				RoundDataElement.ScoreText.Color, 
+				ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreText.Transform.PercentX,
+				ElemY + PixelsPerHeight * RoundDataElement.ScoreText.Transform.PercentY,
+				Font, PixelsPerHeight * RoundDataElement.ScoreText.Transform.HeightPercent,
+				RoundDataElement.ScoreText.Anchor);
 
 
 			if (TempPlayerState == PlayerState)
@@ -576,7 +587,7 @@ void ACGPlayerHUD::DrawPrompt()
 	{
 		// Compute the total size of the message for justification.
 		float SizeX, SizeY;
-		Canvas->StrLen(BigFont, Prompt.BasePrompt + Prompt.PromptMessage, SizeX, SizeY);
+		Canvas->StrLen(Font, Prompt.BasePrompt + Prompt.PromptMessage, SizeX, SizeY);
 		const float Scale = Height / SizeY;
 
 		SizeX = (SizeX * Scale) + PixelsPerCent.X * Prompt.PromptKeyOffset + bDisplayButton * (PixelsPerCent.X * Prompt.PromptKeyOffset + Height);
@@ -588,7 +599,7 @@ void ACGPlayerHUD::DrawPrompt()
 		Prompt.BasePrompt,
 		Prompt.PromptTextColor,
 		X, Y,
-		BigFont,
+		Font,
 		Height);
 
 	if (bDisplayButton)
@@ -616,7 +627,7 @@ void ACGPlayerHUD::DrawPrompt()
 		Prompt.PromptMessage,
 		Prompt.PromptTextColor,
 		CurrentX, Y,
-		BigFont,
+		Font,
 		Height);
 	
 }
@@ -680,7 +691,7 @@ void ACGPlayerHUD::DrawScoreboard()
 		DrawScaledText(
 			"Rank",
 			Scoreboard.TextColor,
-			CurrentX + RankWidth*Scoreboard.RankAlignment, Y, BigFont,
+			CurrentX + RankWidth*Scoreboard.RankAlignment, Y, Font,
 			RowHeight,
 			Scoreboard.RankAlignment);
 		CurrentX += RankWidth + ColOffset;
@@ -688,7 +699,7 @@ void ACGPlayerHUD::DrawScoreboard()
 		DrawScaledText(
 			"Name",
 			Scoreboard.TextColor,
-			CurrentX + NameWidth * Scoreboard.NameAlignment, Y, BigFont,
+			CurrentX + NameWidth * Scoreboard.NameAlignment, Y, Font,
 			RowHeight,
 			Scoreboard.NameAlignment);
 		CurrentX += NameWidth + ColOffset;
@@ -696,7 +707,7 @@ void ACGPlayerHUD::DrawScoreboard()
 		DrawScaledText(
 			"Score",
 			Scoreboard.TextColor,
-			CurrentX + ScoreWidth * Scoreboard.ScoreAlignment, Y, BigFont,
+			CurrentX + ScoreWidth * Scoreboard.ScoreAlignment, Y, Font,
 			RowHeight,
 			Scoreboard.ScoreAlignment);
 
@@ -729,7 +740,7 @@ void ACGPlayerHUD::DrawScoreboard()
 			DrawScaledText(
 				FString::Printf(TEXT("%d"), i + 1),
 				Scoreboard.TextColor,
-				CurrentX + RankWidth*Scoreboard.RankAlignment, CurrentY, BigFont,
+				CurrentX + RankWidth*Scoreboard.RankAlignment, CurrentY, Font,
 				RowHeight,
 				Scoreboard.RankAlignment);
 			CurrentX += RankWidth + ColOffset;
@@ -737,7 +748,7 @@ void ACGPlayerHUD::DrawScoreboard()
 			DrawScaledText(
 				TempPlayerState->PlayerName,
 				Scoreboard.TextColor,
-				CurrentX + NameWidth * Scoreboard.NameAlignment, CurrentY, BigFont,
+				CurrentX + NameWidth * Scoreboard.NameAlignment, CurrentY, Font,
 				RowHeight,
 				Scoreboard.NameAlignment);
 			CurrentX += NameWidth + ColOffset;
@@ -745,7 +756,7 @@ void ACGPlayerHUD::DrawScoreboard()
 			DrawScaledText(
 				FString::Printf(TEXT("%.0f"), TempPlayerState->Score),
 				Scoreboard.TextColor,
-				CurrentX + ScoreWidth * Scoreboard.ScoreAlignment, CurrentY, BigFont,
+				CurrentX + ScoreWidth * Scoreboard.ScoreAlignment, CurrentY, Font,
 				RowHeight,
 				Scoreboard.ScoreAlignment);
 

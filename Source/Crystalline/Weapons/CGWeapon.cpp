@@ -382,7 +382,7 @@ void ACGWeapon::StartWeaponFireSimulation()
 		// The sound effect.
 		if (WeaponFXConfig.FireSound)
 		{
-			FireAudioComponent = UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, CGOwner->GetRootComponent());
+			FireAudioComponent = UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
 		}
 
 		APlayerController* CGController = Cast<APlayerController>(CGOwner->GetController());
@@ -739,6 +739,12 @@ bool ACGWeapon::CanFire(bool InitFireCheck) const
 float ACGWeapon::GetClipPercent() const
 {
 	return 1.f;
+}
+
+
+float ACGWeapon::GetShotsPerClip() const
+{
+	return 0.f;
 }
 
 #pragma endregion

@@ -14,13 +14,6 @@
 #define NUM_BUTTON_OFFSET 25
 
 #pragma region Structs
-UENUM(BlueprintType)
-enum class ECGJustification : uint8
-{
-	LEFT   UMETA(DisplayName = "Left"),
-	CENTER UMETA(DisplayName = "Center"),
-	RIGHT  UMETA(DisplayName = "Right")
-};
 
 USTRUCT()
 struct FCGHUDTransform
@@ -88,6 +81,26 @@ struct FCGGameElement
 	
 	}
 };
+USTRUCT()
+struct FCGTextElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Text)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = Text)
+	float Anchor;
+
+	UPROPERTY(EditDefaultsOnly, Category = Text)
+	FLinearColor Color;
+
+	FCGTextElement()
+	{
+		Anchor = 0.f;
+		Color  = FLinearColor::White;
+	}
+};
 
 USTRUCT()
 struct FCGRoundElement
@@ -96,55 +109,107 @@ struct FCGRoundElement
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
+
+	/**Displays the time on the screen.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGTextElement TimeText;
+
+	/**The score text configuration, note every data element uses this.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGTextElement ScoreText;
 	
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor DataElementColor;
+	FLinearColor DataBackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform TimeTransform;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float TimeAnchor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor TimeColor;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform ScoreTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor ScoreColor;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float ScoreAnchor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon FGIcon;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon BGIcon;
+	FLinearColor DataForegroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCanvasIcon OwnerIcon;
 
+	/**The array of data elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor FullColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor EmptyColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	TArray<FCGGameElement> GameDataElements;
+	TArray<FCGGameElement> GameDataElements;	
 
 	FCGRoundElement()
 	{
-		DataElementColor = FLinearColor::White;
-		TimeColor = FLinearColor::White;
-		ScoreColor = FLinearColor::White;
-		FullColor = FLinearColor::Blue;
-		EmptyColor = FLinearColor::Blue;
-		TimeAnchor = 0.f;
-		ScoreAnchor = 0.f;
+		DataBackgroundColor = FLinearColor::White;
+		DataForegroundColor = FLinearColor::Blue;
+	}
+};
+
+USTRUCT()
+struct FCGEquippedWeaponElement
+{
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGTextElement InClip;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGTextElement HeldAmmo;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGHUDTransform GuageTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGHUDTransform MainIconTransform;
+
+	// Colors
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FLinearColor ElementBackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FLinearColor GuageBackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FLinearColor GuageEnergyColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FLinearColor GuageShotColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FLinearColor GuageUnusableColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FLinearColor GuageFlashColor;
+
+
+	FCGEquippedWeaponElement()
+	{
+		GuageBackgroundColor = FLinearColor::Black;
+		GuageEnergyColor = FLinearColor::Green;
+		GuageShotColor = FLinearColor::White;
+		GuageUnusableColor = FLinearColor::Gray;
+		GuageFlashColor = FLinearColor::Red;
+
+	}
+};
+
+USTRUCT()
+struct FCGSecondaryWeaponElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGTextElement Ammo;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform MainIconTransform;
+
+	// Colors
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor ElementBackgroundColor;
+
+	FCGSecondaryWeaponElement()
+	{
+		ElementBackgroundColor = FLinearColor::Gray;
 	}
 };
 
@@ -152,38 +217,17 @@ USTRUCT()
 struct FCGWeaponElement
 {
 	GENERATED_USTRUCT_BODY()
-	
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform InClipAmmoTransform;
+	FCGEquippedWeaponElement EquippedWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float InClipAnchor;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform HeldAmmoTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float HeldAmmoAnchor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor AmmoTextColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform GuageTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform MainIconTransform;
-
+	FCGSecondaryWeaponElement SecondaryWeapon;
 
 	FCGWeaponElement()
 	{
-		AmmoTextColor = FLinearColor::White;
-		InClipAnchor   = 0.f;
-		HeldAmmoAnchor = 0.f;
-
 	}
 };
 
@@ -443,7 +487,6 @@ public:
 	@return The Horizontal scale.*/
 	FORCEINLINE float DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight, float Anchor = 0.f);
 
-
 	/** Draws the prompt message.*/
 	void DrawPrompt();
 
@@ -529,7 +572,7 @@ private:
 
 	/**The Font for the HUD.*/
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-		UFont* BigFont;
+		UFont* Font;
 
 	/**Internal time since the player last took a hit.*/
 	UPROPERTY(Transient)

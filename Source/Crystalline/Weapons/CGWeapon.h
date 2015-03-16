@@ -275,7 +275,10 @@ public:
 
 	virtual float GetClipPercent() const;
 
-	float GetPercentPerShot() const { return ClipPercentPerShot; }
+	virtual float GetShotsPerClip() const;
+
+	FORCEINLINE float GetPercentPerShot() const { return ClipPercentPerShot; }
+
 
 	virtual int32 GetAmmo() const { return 0; }
 
