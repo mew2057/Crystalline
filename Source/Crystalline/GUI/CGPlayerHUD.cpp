@@ -376,7 +376,9 @@ void ACGPlayerHUD::DrawShield()
 	Canvas->SetDrawColor(FColor::White);	
 	const FCGHUDTransform Transform = Shield.Transform;
 	
-	
+	Canvas->SetDrawColor(Shield.EmptyColor);
+
+
 	Canvas->DrawTile(
 		Shield.BGIcon.Texture,
 		PixelsPerCent.X * Transform.PercentX,
@@ -385,7 +387,7 @@ void ACGPlayerHUD::DrawShield()
 		PixelsPerCent.Y * Transform.HeightPercent,
 		Shield.BGIcon.U, Shield.BGIcon.V,
 		Shield.BGIcon.UL, Shield.BGIcon.VL,
-		EBlendMode::BLEND_Translucent);
+		EBlendMode::BLEND_Additive);
 
 
 	if (Pawn)
@@ -401,7 +403,7 @@ void ACGPlayerHUD::DrawShield()
 			PixelsPerCent.Y * Transform.HeightPercent,
 			Shield.FGIcon.U, Shield.FGIcon.V,
 			Shield.FGIcon.UL , Shield.FGIcon.VL,
-			EBlendMode::BLEND_Translucent);
+			EBlendMode::BLEND_Opaque);
 	}
 	
 	// TODO Flashing when health low.
