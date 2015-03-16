@@ -14,18 +14,22 @@ void ACGKotHGameMode::CheckScore(ACGPlayerState* Player)
 	else if (Player->Score == ScoreToWin - 5){
 		//One kill to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is 5 seconds away from winning.");
+		ForceNetUpdate();
 	}
 	else if (Player->Score == ScoreToWin - 10){
 		//One kill to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is 10 seconds away from winning.");
+		ForceNetUpdate();
 	}
 	else if (Player->Score == ScoreToWin - 30){
 		//5 kills to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is 30 seconds away from winning.");
+		ForceNetUpdate();
 	}
 	else if (Player->Score == ScoreToWin - 60){
 		//5 kills to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is 1 minute away from winning.");
+		ForceNetUpdate();
 	}
 }
 
