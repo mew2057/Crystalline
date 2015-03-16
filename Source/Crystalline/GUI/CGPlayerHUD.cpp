@@ -39,14 +39,13 @@ void ACGPlayerHUD::PostInitializeComponents()
 
 
 	// SLATE TUTORIAL
-	SAssignNew(ShieldWidget, SShieldWidget).OwnerHUD(this);
+	/*SAssignNew(ShieldWidget, SShieldWidget).OwnerHUD(this);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////Pass our viewport a weak ptr to our widget
 	if (GEngine->IsValidLowLevel())
 	{
 		GEngine->GameViewport->
-			/*Viewport's weak ptr will not give Viewport ownership of Widget*/
 			AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(ShieldWidget.ToSharedRef()));
 	}
 
@@ -55,7 +54,7 @@ void ACGPlayerHUD::PostInitializeComponents()
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////Set widget's properties as visible (sets child widget's properties recursively)
 		ShieldWidget->SetVisibility(EVisibility::Visible);
-	}
+	}*/
 
 }
 
@@ -376,9 +375,18 @@ void ACGPlayerHUD::DrawShield()
 	Canvas->SetDrawColor(FColor::White);	
 	const FCGHUDTransform Transform = Shield.Transform;
 	
-	Canvas->SetDrawColor(Shield.EmptyColor);
+	//Canvas->SetDrawColor(Shield.EmptyColor);
 
+	
+	DrawRect(
+		Shield.EmptyColor, 
+		PixelsPerCent.X * Transform.PercentX,
+		PixelsPerCent.Y * Transform.PercentY,
+		PixelsPerCent.X * Transform.WidthPercent,
+		PixelsPerCent.Y * Transform.HeightPercent
+	);
 
+	/*
 	Canvas->DrawTile(
 		Shield.BGIcon.Texture,
 		PixelsPerCent.X * Transform.PercentX,
@@ -388,14 +396,23 @@ void ACGPlayerHUD::DrawShield()
 		Shield.BGIcon.U, Shield.BGIcon.V,
 		Shield.BGIcon.UL, Shield.BGIcon.VL,
 		EBlendMode::BLEND_Additive);
-
+		*/
 
 	if (Pawn)
 	{
 		float Percent = Pawn->GetShieldPercent();
-		Canvas->SetDrawColor(FMath::Lerp(Shield.EmptyColor, Shield.FullColor, Percent));
+	//	Canvas->SetDrawColor(FMath::Lerp(Shield.EmptyColor, Shield.FullColor, Percent));
 		
-		Canvas->DrawTile(
+
+		DrawRect(
+			FMath::Lerp(Shield.EmptyColor, Shield.FullColor, Percent),
+			PixelsPerCent.X * Transform.PercentX,
+			PixelsPerCent.Y * Transform.PercentY,
+			PixelsPerCent.X * Transform.WidthPercent * Percent,
+			PixelsPerCent.Y * Transform.HeightPercent
+			);
+
+		/*Canvas->DrawTile(
 			Shield.FGIcon.Texture,
 			PixelsPerCent.X * Transform.PercentX,
 			PixelsPerCent.Y * Transform.PercentY,
@@ -403,7 +420,7 @@ void ACGPlayerHUD::DrawShield()
 			PixelsPerCent.Y * Transform.HeightPercent,
 			Shield.FGIcon.U, Shield.FGIcon.V,
 			Shield.FGIcon.UL , Shield.FGIcon.VL,
-			EBlendMode::BLEND_Opaque);
+			EBlendMode::BLEND_Opaque);*/
 	}
 	
 	// TODO Flashing when health low.
