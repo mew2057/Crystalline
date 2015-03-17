@@ -247,6 +247,7 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	ACGWeapon* CurrentWeapon = Pawn ? Pawn->GetCurrentWeapon() : NULL;
+	ACGWeapon* OffHandWeapon = Pawn ? Pawn->GetOffHandWeapon() : NULL;
 	ACGInventory* CurrentInventory = Pawn ? Pawn->Inventory : NULL;
 
 	FCanvasIcon WeaponIcon;	
@@ -263,8 +264,8 @@ void ACGPlayerHUD::DrawWeaponHUD()
 	if (CurrentWeapon)
 	{
 		// Current weapon box.
-		const float EquippedX               = X + PixelsPerCent.X * WeaponElement.EquippedWeapon.Transform.PercentX;
-		const float EquippedY               = Y + PixelsPerCent.Y * WeaponElement.EquippedWeapon.Transform.PercentY;
+		const float EquippedX = X + PixelsPerWidth * WeaponElement.EquippedWeapon.Transform.PercentX;
+		const float EquippedY = Y + PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.PercentY;
 		const float EquippedPixelsPerWidth  = PixelsPerWidth  * WeaponElement.EquippedWeapon.Transform.WidthPercent  * .01f;
 		const float EquippedPixelsPerHeight = PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.HeightPercent * .01f;
 
@@ -272,11 +273,13 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		DrawRect(
 			WeaponElement.EquippedWeapon.ElementBackgroundColor,
 			EquippedX, EquippedY,
-			PixelsPerWidth  * WeaponElement.EquippedWeapon.Transform.WidthPercent, PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.HeightPercent
+			PixelsPerWidth  * WeaponElement.EquippedWeapon.Transform.WidthPercent, 
+			PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.HeightPercent
 		);
 
 		FCGWeaponHUDData WeaponHUDConfig = CurrentWeapon->WeaponHUDConfig;
 		
+		// Weapon Guage.
 		const float ElemX = EquippedX + EquippedPixelsPerWidth  * WeaponElement.EquippedWeapon.GuageTransform.PercentX;
 		const float ElemY = EquippedY + EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.GuageTransform.PercentY;
 		const float ElemW = EquippedPixelsPerWidth       * WeaponElement.EquippedWeapon.GuageTransform.WidthPercent;
@@ -362,6 +365,56 @@ void ACGPlayerHUD::DrawWeaponHUD()
 			WeaponHUDConfig.WeaponIcon.UL, WeaponHUDConfig.WeaponIcon.VL,
 			EBlendMode::BLEND_Translucent);
 	}
+
+	if (OffHandWeapon)
+	{
+		// Offhand weapon box.
+		const float OffHandX = X + PixelsPerWidth  * WeaponElement.OffHandWeapon.Transform.PercentX;
+		const float OffHandY = Y + PixelsPerHeight * WeaponElement.OffHandWeapon.Transform.PercentY;
+		const float OffHandPixelsPerWidth  = PixelsPerWidth  * WeaponElement.OffHandWeapon.Transform.WidthPercent  * .01f;
+		const float OffHandPixelsPerHeight = PixelsPerHeight * WeaponElement.OffHandWeapon.Transform.HeightPercent * .01f;
+
+		FCGWeaponHUDData WeaponHUDConfig = OffHandWeapon->WeaponHUDConfig;
+
+		// Draw Background.
+		DrawRect(
+			WeaponElement.OffHandWeapon.ElementBackgroundColor,
+			OffHandX, OffHandY,
+			PixelsPerWidth  * WeaponElement.OffHandWeapon.Transform.WidthPercent, 
+			PixelsPerHeight * WeaponElement.OffHandWeapon.Transform.HeightPercent
+		);
+
+		// TODO weapon color?
+		Canvas->SetDrawColor(FColor::White);
+
+		Canvas->DrawTile(
+			WeaponHUDConfig.WeaponIcon.Texture,
+			OffHandX + OffHandPixelsPerWidth  * WeaponElement.OffHandWeapon.IconTransform.PercentX,
+			OffHandY + OffHandPixelsPerHeight * WeaponElement.OffHandWeapon.IconTransform.PercentY,
+			OffHandPixelsPerWidth  * WeaponElement.OffHandWeapon.IconTransform.WidthPercent,
+			OffHandPixelsPerHeight * WeaponElement.OffHandWeapon.IconTransform.HeightPercent,
+			WeaponHUDConfig.WeaponIcon.U, WeaponHUDConfig.WeaponIcon.V,
+			WeaponHUDConfig.WeaponIcon.UL, WeaponHUDConfig.WeaponIcon.VL,
+			EBlendMode::BLEND_Translucent);
+
+		if (OffHandWeapon->WeaponConfig.bOverHeatWeapon)
+		{
+			// DO something else
+		}
+		else
+		{
+			// Ammo held.
+			FString Text = FString::Printf(TEXT("%4d"), OffHandWeapon->GetAmmoInClip() + OffHandWeapon->GetAmmo());
+			DrawScaledText(
+				Text,
+				WeaponElement.OffHandWeapon.Ammo.Color,
+				OffHandX + OffHandPixelsPerWidth  * WeaponElement.OffHandWeapon.Ammo.Transform.PercentX,
+				OffHandY + OffHandPixelsPerHeight * WeaponElement.OffHandWeapon.Ammo.Transform.PercentY,
+				Font,
+				OffHandPixelsPerHeight * WeaponElement.OffHandWeapon.Ammo.Transform.HeightPercent,
+				WeaponElement.OffHandWeapon.Ammo.Anchor);
+		}
+	}
 }
 
 void ACGPlayerHUD::DrawShield()
@@ -382,18 +435,6 @@ void ACGPlayerHUD::DrawShield()
 		PixelsPerCent.Y * Transform.HeightPercent
 	);
 
-	/*
-	Canvas->DrawTile(
-		Shield.BGIcon.Texture,
-		PixelsPerCent.X * Transform.PercentX,
-		PixelsPerCent.Y * Transform.PercentY,
-		PixelsPerCent.X * Transform.WidthPercent,
-		PixelsPerCent.Y * Transform.HeightPercent,
-		Shield.BGIcon.U, Shield.BGIcon.V,
-		Shield.BGIcon.UL, Shield.BGIcon.VL,
-		EBlendMode::BLEND_Additive);
-		*/
-
 	if (Pawn)
 	{
 		float Percent = Pawn->GetShieldPercent();
@@ -407,16 +448,6 @@ void ACGPlayerHUD::DrawShield()
 			PixelsPerCent.X * Transform.WidthPercent * Percent,
 			PixelsPerCent.Y * Transform.HeightPercent
 			);
-
-		/*Canvas->DrawTile(
-			Shield.FGIcon.Texture,
-			PixelsPerCent.X * Transform.PercentX,
-			PixelsPerCent.Y * Transform.PercentY,
-			PixelsPerCent.X * Transform.WidthPercent * Percent,
-			PixelsPerCent.Y * Transform.HeightPercent,
-			Shield.FGIcon.U, Shield.FGIcon.V,
-			Shield.FGIcon.UL , Shield.FGIcon.VL,
-			EBlendMode::BLEND_Opaque);*/
 	}
 	
 	// TODO Flashing when health low.

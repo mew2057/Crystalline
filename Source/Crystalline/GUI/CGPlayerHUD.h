@@ -190,7 +190,7 @@ struct FCGEquippedWeaponElement
 };
 
 USTRUCT()
-struct FCGSecondaryWeaponElement
+struct FCGOffHandWeaponElement
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -201,13 +201,13 @@ struct FCGSecondaryWeaponElement
 	FCGTextElement Ammo;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform MainIconTransform;
+	FCGHUDTransform IconTransform;
 
 	// Colors
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FLinearColor ElementBackgroundColor;
 
-	FCGSecondaryWeaponElement()
+	FCGOffHandWeaponElement()
 	{
 		ElementBackgroundColor = FLinearColor::Gray;
 	}
@@ -224,7 +224,7 @@ struct FCGWeaponElement
 	FCGEquippedWeaponElement EquippedWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGSecondaryWeaponElement SecondaryWeapon;
+	FCGOffHandWeaponElement OffHandWeapon;
 
 	FCGWeaponElement()
 	{

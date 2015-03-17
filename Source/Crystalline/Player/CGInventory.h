@@ -42,6 +42,7 @@ public:
 
 	FORCEINLINE int32 GetWeaponIndex(ACGWeapon* Weapon) const { return Weapons.Find(Weapon); }
 
+
 	void SetCGOwner(ACGCharacter* NewOwner);
 
 	UFUNCTION()

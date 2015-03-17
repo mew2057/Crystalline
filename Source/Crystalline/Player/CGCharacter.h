@@ -267,6 +267,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Transient, ReplicatedUsing = OnRep_CurrentWeapon)
 	class ACGWeapon* CurrentWeapon;
 
+	/** The offhand weapon for the player. */
+	UPROPERTY(BlueprintReadOnly, Transient)
+	class ACGWeapon* OffHandWeapon;
+
 	/** A pending weapon for equips. */
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
@@ -298,6 +302,9 @@ public:
 	void SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon = NULL);
 
 	FORCEINLINE ACGWeapon*  GetCurrentWeapon() const { return CurrentWeapon; };
+
+	/** Returns the next weapon in the array. */
+	FORCEINLINE ACGWeapon* GetOffHandWeapon() const { return OffHandWeapon; };
 	
 	/*
 	 * Invoked when the weapon has been changed, the character performs the actual equip call.
