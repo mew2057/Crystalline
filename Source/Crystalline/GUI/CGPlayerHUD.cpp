@@ -8,13 +8,12 @@
 #include "GameModes/CGGameState.h"
 #include "GameModes/CGPlayerState.h"
 #include "GameModes/CGBaseGameMode.h"
-
 #include "Weapons/States/CGWeaponState.h"
 
 ACGPlayerHUD::ACGPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	// TODO REPLACE THIS FONT!
-	static ConstructorHelpers::FObjectFinder<UFont> FontOb(TEXT("/Game/Textures/MenuFont"));
+	static ConstructorHelpers::FObjectFinder<UFont> FontOb(TEXT("/Game/Textures/InGameHUD/Source_Reg_20"));
 	Font = FontOb.Object;
 	HitTakenColor = FLinearColor::Red;
 	TimeSinceLastHitTaken = 0.f;
@@ -142,7 +141,6 @@ void ACGPlayerHUD::DetermineKeyCodeForAction(const FName& Action, int32 ButtonID
 	}	
 }
 
-
 // TODO add a dirty bit for player Scoring.
 void ACGPlayerHUD::PostRender()
 {
@@ -155,7 +153,6 @@ void ACGPlayerHUD::PostRender()
 
 	Super::PostRender();
 }
-
 
 void ACGPlayerHUD::DrawHUD()
 {
@@ -240,7 +237,6 @@ void ACGPlayerHUD::DrawHUD()
 	}
 }
 
-
 void ACGPlayerHUD::DrawWeaponHUD()
 {
 	// XXX Crystals should be present on the weapon sprites for the crystal gun.
@@ -311,6 +307,26 @@ void ACGPlayerHUD::DrawWeaponHUD()
 				ShotStart, ElemY,
 				ShotWidth, ElemH
 			);
+
+			FString Text = FString::Printf(TEXT("----"));
+			DrawScaledText(
+				Text,
+				WeaponElement.EquippedWeapon.InClip.Color,
+				EquippedX + EquippedPixelsPerWidth * WeaponElement.EquippedWeapon.InClip.Transform.PercentX,
+				EquippedY + EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.InClip.Transform.PercentY,
+				Font,
+				EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.InClip.Transform.HeightPercent,
+				WeaponElement.EquippedWeapon.InClip.Anchor);
+
+			Text = FString::Printf(TEXT("----"));
+			DrawScaledText(
+				Text,
+				WeaponElement.EquippedWeapon.HeldAmmo.Color,
+				EquippedX + EquippedPixelsPerWidth * WeaponElement.EquippedWeapon.HeldAmmo.Transform.PercentX,
+				EquippedY + EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.HeldAmmo.Transform.PercentY,
+				Font,
+				EquippedPixelsPerHeight * WeaponElement.EquippedWeapon.HeldAmmo.Transform.HeightPercent,
+				WeaponElement.EquippedWeapon.HeldAmmo.Anchor);
 		}
 		else
 		{
@@ -421,14 +437,13 @@ void ACGPlayerHUD::DrawShield()
 {
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	
-	Canvas->SetDrawColor(FColor::White);	
 	const FCGHUDTransform Transform = Shield.Transform;
 	
-	//Canvas->SetDrawColor(Shield.EmptyColor);
-
+	const float Percent = Pawn == NULL ? Pawn->GetShieldPercent() : 0.f;
 	
+	// TODO Flashing when health low.
 	DrawRect(
-		Shield.EmptyColor, 
+		Shield.BackgroundColor,
 		PixelsPerCent.X * Transform.PercentX,
 		PixelsPerCent.Y * Transform.PercentY,
 		PixelsPerCent.X * Transform.WidthPercent,
@@ -437,12 +452,8 @@ void ACGPlayerHUD::DrawShield()
 
 	if (Pawn)
 	{
-		float Percent = Pawn->GetShieldPercent();
-	//	Canvas->SetDrawColor(FMath::Lerp(Shield.EmptyColor, Shield.FullColor, Percent));
-		
-
 		DrawRect(
-			FMath::Lerp(Shield.EmptyColor, Shield.FullColor, Percent),
+			Shield.ShieldColor,
 			PixelsPerCent.X * Transform.PercentX,
 			PixelsPerCent.Y * Transform.PercentY,
 			PixelsPerCent.X * Transform.WidthPercent * Percent,
@@ -450,7 +461,6 @@ void ACGPlayerHUD::DrawShield()
 			);
 	}
 	
-	// TODO Flashing when health low.
 }
 
 void ACGPlayerHUD::DrawGameInfo()
@@ -671,7 +681,7 @@ void ACGPlayerHUD::SetPromptMessage(bool bSetPrompt, const FString& Message, int
 
 }
 
-void ACGPlayerHUD::NotifyHitTaken()
+void ACGPlayerHUD::NotifyHitTaken(const FVector& HitDirection )
 {
 	float TempTime = GetWorld()->GetTimeSeconds();
 	TimeSinceLastHitTaken = TempTime - TimeSinceLastHitTaken > TimeToDisplayHitTaken ? TempTime : TimeSinceLastHitTaken;

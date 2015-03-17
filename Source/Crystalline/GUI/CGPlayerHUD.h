@@ -42,29 +42,29 @@ struct FCGHUDTransform
 };
 
 USTRUCT()
-struct FCGHUDElement
+struct FCGShieldElement
 {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
 
+	// TODO Anim
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon FGIcon;
+	FLinearColor ShieldColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon BGIcon;
+	FLinearColor BackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor FullColor;
+	FLinearColor FlashColor;
 
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor EmptyColor;
-
-	FCGHUDElement()
+	FCGShieldElement()
 	{
-		FullColor = FLinearColor::Blue;
-		EmptyColor = FLinearColor::Red;
+		ShieldColor		= FLinearColor::White;
+		BackgroundColor = FLinearColor::Black;
+		FlashColor		= FLinearColor::Red;
+
 	}
 };
 
@@ -494,8 +494,9 @@ public:
 	void SetPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
 
 	/**Sets the TimeSinceLastHit for the hit notification.*/
-	void NotifyHitTaken();
+	void NotifyHitTaken(const FVector& HitDirection);
 
+	/**Lets the player know that they hit an opponent.*/
 	void NotifyHitConfirmed();
 
 
@@ -526,7 +527,7 @@ private:
 
 	/**The configuration for the Shield HUD Element.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDElement Shield;
+	FCGShieldElement Shield;
 
 	/**The slate widget for the shield.*/
 	TSharedPtr<class SShieldWidget> ShieldWidget;

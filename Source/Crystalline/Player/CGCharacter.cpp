@@ -54,8 +54,9 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 
 	MaxShield            = 100.0f;
 	CurrentShield        = MaxShield;
+	WarningShieldLevel   = 40.f;
 	ShieldRegenPerSecond = 50.f;
-	TimeToRegen			= 2.f;
+	TimeToRegen			 = 2.f;
 	bShieldRegenerating  = false;
 
 	bZooming	  = false;
@@ -289,7 +290,7 @@ void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageE
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
 	if (HUD)
 	{
-		HUD->NotifyHitTaken();
+		HUD->NotifyHitTaken((DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal2D());
 	}
 
 	if (PawnInstigator && PawnInstigator != this && PawnInstigator->IsLocallyControlled())

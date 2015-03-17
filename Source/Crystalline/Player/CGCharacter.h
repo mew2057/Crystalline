@@ -86,6 +86,10 @@ protected:
 	/** Max player shield amount. This is decayed before the health.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	float MaxShield;
+
+	/** The Shield level at which the user is alerted.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float WarningShieldLevel;
 	
 	/** The rate of regeneration for the shield. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
