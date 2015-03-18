@@ -33,6 +33,8 @@ public:
 
 	virtual float GetReloadTime() const override;
 
+	virtual bool ShouldDisplayAmmoWarning() const override { return AmmoInClip == 0.f; };
+
 	virtual bool CanReload() const override;
 
 	virtual void ApplyReload() override;

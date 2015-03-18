@@ -173,6 +173,9 @@ public:
 
 	virtual bool HasManualReload() const { return WeaponConfig.bHasManualReload; }
 
+	// True if the HUD should display a warning.
+	virtual bool ShouldDisplayAmmoWarning() const { return false; };
+
 	virtual bool CanReload() const;
 		
 	virtual void ApplyReload();

@@ -54,9 +54,9 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 
 	MaxShield            = 100.0f;
 	CurrentShield        = MaxShield;
-	WarningShieldLevel   = 40.f;
+	WarningShieldPercent = .42f;
 	ShieldRegenPerSecond = 50.f;
-	TimeToRegen			 = 2.f;
+	ShieldTimeToRegen    = 2.f;
 	bShieldRegenerating  = false;
 
 	bZooming	  = false;
@@ -86,7 +86,7 @@ void ACGCharacter::Tick(float DeltaSeconds)
 		CurrentShield = FMath::Min(MaxShield, CurrentShield + ShieldRegenPerSecond * DeltaSeconds);
 
 		// The Shield is regenerating while this is true.
-		bShieldRegenerating = CurrentShield < MaxShield;
+		bShieldRegenerating = CurrentShield < MaxShield;	
 	}
 
 	// XXX ZOOM ZOOM ZOOM
@@ -146,7 +146,7 @@ float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 		else
 		{
 			// Set a timer for to start the shield regeneration for the player, if one is set this should reset the time elapsed to zero.
-			GetWorldTimerManager().SetTimer(TimerHandle_ShieldRegen, this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
+			GetWorldTimerManager().SetTimer(TimerHandle_ShieldRegen, this, &ACGCharacter::StartShieldRegen, ShieldTimeToRegen, false); // TODO Clear me on death!
 			
 			// TODO Feedback from hit, e.g. force feedback and direction.
 			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
@@ -290,7 +290,8 @@ void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageE
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
 	if (HUD)
 	{
-		HUD->NotifyHitTaken((DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal2D());
+		//(DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal2D()
+		HUD->NotifyHitTaken(FVector::ZeroVector);
 	}
 
 	if (PawnInstigator && PawnInstigator != this && PawnInstigator->IsLocallyControlled())

@@ -84,23 +84,24 @@ protected:
 	float HeadOffset;
 
 	/** Max player shield amount. This is decayed before the health.*/
-	UPROPERTY(EditDefaultsOnly, Category = Config)
+	UPROPERTY(EditDefaultsOnly, Category = Shield)
 	float MaxShield;
 
 	/** The Shield level at which the user is alerted.*/
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	float WarningShieldLevel;
+	UPROPERTY(EditDefaultsOnly, Category = Shield)
+	float WarningShieldPercent;
 	
 	/** The rate of regeneration for the shield. */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
+	UPROPERTY(EditDefaultsOnly, Category = Shield)
 	float ShieldRegenPerSecond;
+
+	/** The time until the player's shields begin to regenerate after being hit. */
+	UPROPERTY(EditDefaultsOnly, Category = Shield)
+	float ShieldTimeToRegen;
 
 	/** The current shield amount, if zero the player is susceptible to death.*/
 	UPROPERTY(Transient, Replicated)
 	float CurrentShield;
-
-	/** The time until the player's shields begin to regenerate after being hit. */
-	float TimeToRegen;
 
 	/** Tracks when the shield is regenerating for the tick.*/
 	uint32 bShieldRegenerating : 1;
@@ -153,7 +154,12 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetPawnMesh() { return IsFirstPerson() ? Mesh1P : GetMesh(); }
 
 	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	FORCEINLINE float GeCurrentShield() const { return CurrentShield; }
+	FORCEINLINE float GetCurrentShield() const { return CurrentShield; }
+	FORCEINLINE float GetWarningShieldPercent() const { return WarningShieldPercent; }
+
+	FORCEINLINE bool IsShieldLow() const { return CurrentShield <= WarningShieldPercent * MaxShield; }
+
+
 	FORCEINLINE float GetCurrentHealth() const{ return CurrentHealth; }
 	FORCEINLINE float GetShieldPercent() const { return CurrentShield/MaxShield; }
 	

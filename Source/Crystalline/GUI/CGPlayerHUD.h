@@ -57,14 +57,24 @@ struct FCGShieldElement
 	FLinearColor BackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor FlashColor;
+		FLinearColor ForegroundFlashColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FLinearColor BackgroundFlashColor;
+
+	// TODO determine what number means to flashes per second.
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float FlashRate;
+	
+	float FlashTime;
 
 	FCGShieldElement()
 	{
-		ShieldColor		= FLinearColor::White;
-		BackgroundColor = FLinearColor::Black;
-		FlashColor		= FLinearColor::Red;
-
+		ShieldColor = FLinearColor(1.f, 1.f, 1.f, .9f);
+		BackgroundColor = FLinearColor(.1f, .1f, .1f, .4f);
+		ForegroundFlashColor = FLinearColor(1.f, 0.f, 0.f, .9f);
+		BackgroundFlashColor = FLinearColor(1.f, 0.f, 0.f, .4f);
+		FlashRate = 20.f;
 	}
 };
 
@@ -133,8 +143,8 @@ struct FCGRoundElement
 
 	FCGRoundElement()
 	{
-		DataBackgroundColor = FLinearColor::White;
-		DataForegroundColor = FLinearColor::Blue;
+		DataBackgroundColor = FLinearColor(.125f, .125f, .125f, .4f);
+		DataForegroundColor = FLinearColor(0.f, 0.f, .45f, .6f);
 	}
 };
 
@@ -160,32 +170,38 @@ struct FCGEquippedWeaponElement
 
 	// Colors
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FLinearColor ElementBackgroundColor;
+	FLinearColor ElementBackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FLinearColor GuageBackgroundColor;
+	FLinearColor GuageBackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FLinearColor GuageEnergyColor;
+	FLinearColor GuageEnergyColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FLinearColor GuageShotColor;
+	FLinearColor GuageShotColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FLinearColor GuageUnusableColor;
+	FLinearColor GuageUnusableColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FLinearColor GuageFlashColor;
+	FLinearColor FlashColor;
 
+	// TODO determine what number means to flashes per second.
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float FlashRate;
+
+	float FlashTime;
 
 	FCGEquippedWeaponElement()
 	{
-		GuageBackgroundColor = FLinearColor::Black;
-		GuageEnergyColor = FLinearColor::Green;
-		GuageShotColor = FLinearColor::White;
-		GuageUnusableColor = FLinearColor::Gray;
-		GuageFlashColor = FLinearColor::Red;
-
+		ElementBackgroundColor = FLinearColor(.1f, .1f, .1f, .15f);
+		GuageBackgroundColor = FLinearColor(.1f, .1f, .1f, .5f);
+		GuageEnergyColor = FLinearColor(0.f, .44f, 0.f, .75f);
+		GuageShotColor = FLinearColor(1.f, 1.f, 1.f, .75f);
+		GuageUnusableColor = FLinearColor(.5f, .5f, .5f ,1.f);
+		FlashColor = FLinearColor(1.f, 0.f, 0.f, .5f);
+		FlashRate = 10.f;
 	}
 };
 
@@ -209,7 +225,7 @@ struct FCGOffHandWeaponElement
 
 	FCGOffHandWeaponElement()
 	{
-		ElementBackgroundColor = FLinearColor::Gray;
+		ElementBackgroundColor = FLinearColor(.1f, .1f, .1f, .15f);
 	}
 };
 

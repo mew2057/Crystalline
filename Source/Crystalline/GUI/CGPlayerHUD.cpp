@@ -264,10 +264,21 @@ void ACGPlayerHUD::DrawWeaponHUD()
 		const float EquippedY = Y + PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.PercentY;
 		const float EquippedPixelsPerWidth  = PixelsPerWidth  * WeaponElement.EquippedWeapon.Transform.WidthPercent  * .01f;
 		const float EquippedPixelsPerHeight = PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.HeightPercent * .01f;
+		float FlashFactor = 0.f;
 
-		// Draw Backgeound.
+		// Determines whether or not our background should be flashing.
+		if (CurrentWeapon->ShouldDisplayAmmoWarning())
+		{
+			// At most flash at half speed.
+			WeaponElement.EquippedWeapon.FlashTime += GetWorld()->GetDeltaSeconds() * WeaponElement.EquippedWeapon.FlashRate;
+
+			// Use a Sine Wave for a smooth flash.
+			FlashFactor = ((FMath::Sin(WeaponElement.EquippedWeapon.FlashTime) + 1) * .5f);
+		}
+
+		// Draw Background.
 		DrawRect(
-			WeaponElement.EquippedWeapon.ElementBackgroundColor,
+			FMath::Lerp(WeaponElement.EquippedWeapon.ElementBackgroundColor, WeaponElement.EquippedWeapon.FlashColor, FlashFactor),
 			EquippedX, EquippedY,
 			PixelsPerWidth  * WeaponElement.EquippedWeapon.Transform.WidthPercent, 
 			PixelsPerHeight * WeaponElement.EquippedWeapon.Transform.HeightPercent
@@ -438,12 +449,28 @@ void ACGPlayerHUD::DrawShield()
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	
 	const FCGHUDTransform Transform = Shield.Transform;
-	
-	const float Percent = Pawn != NULL ? Pawn->GetShieldPercent() : 0.f;
-	
+	float Percent = 0.f;
+	float FlashFactor = 0.f;
+
+	if (Pawn)
+	{
+		Percent = Pawn->GetShieldPercent();
+
+		if (Percent <= Pawn->GetWarningShieldPercent())
+		{
+			const float FlashAdjustment = (1 - Percent / Pawn->GetWarningShieldPercent());
+
+			// At most flash at half speed.
+			Shield.FlashTime += GetWorld()->GetDeltaSeconds() * Shield.FlashRate * FMath::Max(.5f, FlashAdjustment);
+
+			// Use a Sine Wave for a smooth flash.
+			FlashFactor = ((FMath::Sin(Shield.FlashTime) + 1) * .5f) * FlashAdjustment;
+		}
+	}
+
 	// TODO Flashing when health low.
 	DrawRect(
-		Shield.BackgroundColor,
+		FMath::Lerp(Shield.BackgroundColor, Shield.BackgroundFlashColor, FlashFactor),
 		PixelsPerCent.X * Transform.PercentX,
 		PixelsPerCent.Y * Transform.PercentY,
 		PixelsPerCent.X * Transform.WidthPercent,
@@ -453,13 +480,15 @@ void ACGPlayerHUD::DrawShield()
 	if (Pawn)
 	{
 		DrawRect(
-			Shield.ShieldColor,
+			FMath::Lerp(Shield.ShieldColor, Shield.ForegroundFlashColor, FlashFactor),
 			PixelsPerCent.X * Transform.PercentX,
 			PixelsPerCent.Y * Transform.PercentY,
 			PixelsPerCent.X * Transform.WidthPercent * Percent,
-			PixelsPerCent.Y * Transform.HeightPercent
-			);
+			PixelsPerCent.Y * Transform.HeightPercent );
 	}
+
+
+	//
 	
 }
 
