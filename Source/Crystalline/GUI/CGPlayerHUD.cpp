@@ -439,7 +439,7 @@ void ACGPlayerHUD::DrawShield()
 	
 	const FCGHUDTransform Transform = Shield.Transform;
 	
-	const float Percent = Pawn == NULL ? Pawn->GetShieldPercent() : 0.f;
+	const float Percent = Pawn != NULL ? Pawn->GetShieldPercent() : 0.f;
 	
 	// TODO Flashing when health low.
 	DrawRect(
