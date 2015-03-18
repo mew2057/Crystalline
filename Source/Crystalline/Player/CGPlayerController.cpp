@@ -33,6 +33,8 @@ void ACGPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Scoreboard", IE_Pressed, this, &ACGPlayerController::OnShowScoreboard);
 	InputComponent->BindAction("Scoreboard", IE_Released, this, &ACGPlayerController::OnHideScoreboard);
+
+	
 }
 
 void ACGPlayerController::OnShowScoreboard()

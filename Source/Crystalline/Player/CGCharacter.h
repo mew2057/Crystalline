@@ -168,11 +168,11 @@ public:
 #pragma region Movement
 
 	/** Governs the horizontal camera turn rate for controllers. Other factors may influence this rate. */
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(EditAnywhere, Category = Camera)
 	float BaseTurnRate;
 
 	/** Governs the vertical camera turn rate for controllers. Other factors may influence this rate. */
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(EditAnywhere, Category = Camera)
 	float BaseLookUpRate;
 
 protected:

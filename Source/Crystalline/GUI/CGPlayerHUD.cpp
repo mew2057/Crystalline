@@ -582,6 +582,7 @@ void ACGPlayerHUD::DrawGameInfo()
 				ElemX, ElemY,
 				ElemW * TempPlayerState->Score / CGGameState->GoalScore, ElemH );
 			
+			// TODO clean this up
 			// Draw the score.
 			const float ScoreBoxX = ElemX + ElemW + RoundDataElement.ScoreBox.PercentX * PixelsPerWidth;
 			const float ScoreBoxWidth = RoundDataElement.ScoreBox.WidthPercent * PixelsPerWidth;
