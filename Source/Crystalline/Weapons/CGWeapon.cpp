@@ -245,11 +245,11 @@ void ACGWeapon::ApplyReload()
 
 }
 
-bool ACGWeapon::CheckCanHit()
+void ACGWeapon::CheckCanHit(bool & OutbCanHit, bool & OutbHeadShot)
 {
 	if (CurrentState != ActiveState && CurrentState != FiringState)
 	{
-		return false;
+		return;
 	}
 	// TODO make this 4 casts!
 	const FVector StartTrace = GetCameraLocation();
@@ -258,7 +258,8 @@ bool ACGWeapon::CheckCanHit()
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 	ACGCharacter* ImpactedPawn = Cast<ACGCharacter>(Impact.GetActor());
 
-	return ImpactedPawn != NULL && ImpactedPawn->IsAlive();
+	OutbCanHit = ImpactedPawn != NULL && ImpactedPawn->IsAlive();
+	OutbHeadShot = OutbCanHit && WeaponConfig.bHeadshotPossible && ImpactedPawn->IsHeadShot(Impact.Location, AimDir);
 }
 
 

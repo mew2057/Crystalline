@@ -160,6 +160,7 @@ struct FCGWeaponConfig
 {
 	GENERATED_USTRUCT_BODY()
 
+public:
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 		uint32 bAutomaticFire : 1;
 
@@ -171,6 +172,9 @@ struct FCGWeaponConfig
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 		uint32 bOverHeatWeapon : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	uint32 bHeadshotPossible : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
 		float TimeBetweenShots;
@@ -215,6 +219,7 @@ struct FCGWeaponConfig
 		WeaponRange = 10000.f;
 
 		bOverHeatWeapon = false;
+		bHeadshotPossible = false;
 
 		AmmoType = ECGAmmoType::NONE;
 

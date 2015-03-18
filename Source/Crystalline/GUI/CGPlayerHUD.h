@@ -487,6 +487,13 @@ public:
 
 	void DetermineKeyCodeForAction(const FName& Action, int32 ButtonID, bool GamepadConnected);
 
+
+	/**
+	 * Draws the crosshair for the currently equipped weapon. If the weapon is over a player in range the 
+	 * crosshair goes red, if the gun can make headshots, the headshot texture is displayed.
+	 */
+	void DrawCrosshair();
+
 	/**
 	* Draws the ammo, overheat gauge, and other relavant information.
 	* Note this assumes that the player only has two weapons, more weapons require modifications.
@@ -555,13 +562,13 @@ private:
 
 	/**The configuration for the Weapon HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCGWeaponElement WeaponElement;
+	FCGWeaponElement WeaponElement;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCGButtonIcons ButtonIcons;
+	FCGButtonIcons ButtonIcons;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCGPrompt Prompt;
+	FCGPrompt Prompt;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGScoreboardElement Scoreboard;
@@ -573,6 +580,10 @@ private:
 	/** Expanded to fit across the player's FOV. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 		UTexture2D* HitTakenOverlay;
+
+	/** Expanded to fit across the player's FOV. */
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCanvasIcon HeadShotIcon;
 
 	/**The color for the hit taken texture.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)

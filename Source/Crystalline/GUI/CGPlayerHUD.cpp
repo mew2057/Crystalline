@@ -163,8 +163,7 @@ void ACGPlayerHUD::DrawHUD()
 	ScaleUIY = Canvas->ClipY / TARGET_Y_RESOLUTION;
 	//ScaleUIX = Canvas->ClipX / TARGET_X_RESOLUTION; XXX This may be needed in the future, we'll see how using only the Y for scaling works. -John
 
-	// Find center of the Canvas. XXX Does this need to be a vector? -John
-	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
+	
 
 	PixelsPerCent = FVector2D(Canvas->ClipX * .01f, Canvas->ClipY * 0.01f);
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
@@ -183,26 +182,7 @@ void ACGPlayerHUD::DrawHUD()
 			// Crosshair	
 			if (!bScoreboardVisible)
 			{
-				bool bIsHitting = GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed;
-				Canvas->SetDrawColor(bIsHitting || Weapon->CheckCanHit() ? FColor::Red : FColor::White);
-
-				FCanvasIcon CrosshairIcon = Weapon->WeaponHUDConfig.CrosshairIcon;
-				// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
-				// The UL and VL values indicate the width and length of the texture respectively.
-				Canvas->DrawIcon(CrosshairIcon,
-					(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
-					(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
-
-				// Play hit confirmation
-				if (bIsHitting)
-				{
-					//Canvas->SetDrawColor(FLinearColor(1.f, 1.f, 1.f, 1 - (GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed) / TimeToDisplayHitConfirmed));
-
-					FCanvasIcon HitConfirmedIcon = Weapon->WeaponHUDConfig.HitConfirmedIcon;
-					Canvas->DrawIcon(HitConfirmedIcon,
-						(Center.X - (HitConfirmedIcon.UL * ScaleUIY * 0.5f)),
-						(Center.Y - (HitConfirmedIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
-				}
+				DrawCrosshair();
 
 				if (Prompt.bPrompt)
 				{
@@ -235,6 +215,50 @@ void ACGPlayerHUD::DrawHUD()
 	{
 		DrawEndGameMessage();
 	}
+}
+
+
+void ACGPlayerHUD::DrawCrosshair()
+{
+	// Find center of the Canvas. XXX Does this need to be a vector? -John
+	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
+
+	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
+	ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
+
+	bool bIsHitting = GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed;
+	
+	bool bCanHit = false;
+	bool bHeadShot = false;
+	Weapon->CheckCanHit(bCanHit, bHeadShot);
+	
+	Canvas->SetDrawColor(bIsHitting || bCanHit ? FColor::Red : FColor::White);
+
+	FCanvasIcon CrosshairIcon = Weapon->WeaponHUDConfig.CrosshairIcon;
+
+	// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
+	// The UL and VL values indicate the width and length of the texture respectively.
+	Canvas->DrawIcon(CrosshairIcon,
+		(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
+		(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+
+	// Play hit confirmation
+	if (bIsHitting)
+	{
+		FCanvasIcon HitConfirmedIcon = Weapon->WeaponHUDConfig.HitConfirmedIcon;
+		Canvas->DrawIcon(HitConfirmedIcon,
+			(Center.X - (HitConfirmedIcon.UL * ScaleUIY * 0.5f)),
+			(Center.Y - (HitConfirmedIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+	}
+
+	if (bHeadShot)
+	{
+		Canvas->DrawIcon(HeadShotIcon,
+			(Center.X - (HeadShotIcon.UL * ScaleUIY * 0.5f)),
+			(Center.Y - (HeadShotIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+	}
+
+
 }
 
 void ACGPlayerHUD::DrawWeaponHUD()
