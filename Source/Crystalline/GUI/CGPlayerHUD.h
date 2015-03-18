@@ -432,6 +432,26 @@ struct FCGScoreboardElement
 	}
 };
 
+
+USTRUCT()
+struct FCGCrosshairElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	/**Scale of the crosshair relative to the Y demension of the screen.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float YScale;
+
+	/** Expanded to fit across the player's FOV. */
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCanvasIcon HeadShotIcon;
+
+	FCGCrosshairElement()
+	{
+		YScale = 1.5f;
+	}
+};
+
 USTRUCT()
 struct FCGEndGameMessage
 {
@@ -548,17 +568,16 @@ private:
 	/**The number of pixels per percent.*/
 	FVector2D PixelsPerCent;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGCrosshairElement Crosshair;
+
 	/**The configuration for the Shield HUD Element.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGShieldElement Shield;
 
-	/**The slate widget for the shield.*/
-	TSharedPtr<class SShieldWidget> ShieldWidget;
-
-
 	/**The configuration for the Round HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCGRoundElement RoundDataElement;
+	FCGRoundElement RoundDataElement;
 
 	/**The configuration for the Weapon HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
@@ -579,36 +598,31 @@ private:
 
 	/** Expanded to fit across the player's FOV. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		UTexture2D* HitTakenOverlay;
-
-	/** Expanded to fit across the player's FOV. */
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCanvasIcon HeadShotIcon;
+	UTexture2D* HitTakenOverlay;
 
 	/**The color for the hit taken texture.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FLinearColor HitTakenColor;
+	FLinearColor HitTakenColor;
 
 	/**Time to display the hit taken texture.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		float TimeToDisplayHitTaken;
-
+	float TimeToDisplayHitTaken;
 
 	/**Time to display the hit confirmation.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		float TimeToDisplayHitConfirmed;
+	float TimeToDisplayHitConfirmed;
 
 	/**The Font for the HUD.*/
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-		UFont* Font;
+	UFont* Font;
 
 	/**Internal time since the player last took a hit.*/
 	UPROPERTY(Transient)
-		float TimeSinceLastHitTaken;
+	float TimeSinceLastHitTaken;
 
 	/**Time Since the last hit was confirmed.*/
 	UPROPERTY(Transient)
-		float TimeSinceLastHitConfirmed;
+	float TimeSinceLastHitConfirmed;
 
 	uint32 bScoreboardVisible : 1;
 

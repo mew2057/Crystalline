@@ -157,14 +157,7 @@ void ACGPlayerHUD::PostRender()
 void ACGPlayerHUD::DrawHUD()
 {
 	Super::DrawHUD();
-
-	// Calculate the scale factor of the ui based on the clip space of the screen.
-	// XXX We may be able to move this to an event response in the future (need to research if the clipspace change is bindable). -John
-	ScaleUIY = Canvas->ClipY / TARGET_Y_RESOLUTION;
-	//ScaleUIX = Canvas->ClipX / TARGET_X_RESOLUTION; XXX This may be needed in the future, we'll see how using only the Y for scaling works. -John
-
 	
-
 	PixelsPerCent = FVector2D(Canvas->ClipX * .01f, Canvas->ClipY * 0.01f);
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	if (Pawn)
@@ -225,37 +218,35 @@ void ACGPlayerHUD::DrawCrosshair()
 
 	ACGCharacter* Pawn = Cast<ACGCharacter>(GetOwningPawn());
 	ACGWeapon* Weapon = Pawn->GetCurrentWeapon();
-
-	bool bIsHitting = GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed;
 	
+	const float ScaleUIY = Canvas->ClipY / TARGET_Y_RESOLUTION * Crosshair.YScale;
+
+	bool bIsHitting = GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed;	
 	bool bCanHit = false;
 	bool bHeadShot = false;
 	Weapon->CheckCanHit(bCanHit, bHeadShot);
 	
 	Canvas->SetDrawColor(bIsHitting || bCanHit ? FColor::Red : FColor::White);
 
-	FCanvasIcon CrosshairIcon = Weapon->WeaponHUDConfig.CrosshairIcon;
-
 	// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
 	// The UL and VL values indicate the width and length of the texture respectively.
-	Canvas->DrawIcon(CrosshairIcon,
-		(Center.X - (CrosshairIcon.UL * ScaleUIY * 0.5f)),
-		(Center.Y - (CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+	Canvas->DrawIcon(Weapon->WeaponHUDConfig.CrosshairIcon,
+		(Center.X - (Weapon->WeaponHUDConfig.CrosshairIcon.UL * ScaleUIY * 0.5f)),
+		(Center.Y - (Weapon->WeaponHUDConfig.CrosshairIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 
 	// Play hit confirmation
 	if (bIsHitting)
 	{
-		FCanvasIcon HitConfirmedIcon = Weapon->WeaponHUDConfig.HitConfirmedIcon;
-		Canvas->DrawIcon(HitConfirmedIcon,
-			(Center.X - (HitConfirmedIcon.UL * ScaleUIY * 0.5f)),
-			(Center.Y - (HitConfirmedIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+		Canvas->DrawIcon(Weapon->WeaponHUDConfig.HitConfirmedIcon,
+			(Center.X - (Weapon->WeaponHUDConfig.HitConfirmedIcon.UL * ScaleUIY * 0.5f)),
+			(Center.Y - (Weapon->WeaponHUDConfig.HitConfirmedIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 	}
 
 	if (bHeadShot)
 	{
-		Canvas->DrawIcon(HeadShotIcon,
-			(Center.X - (HeadShotIcon.UL * ScaleUIY * 0.5f)),
-			(Center.Y - (HeadShotIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
+		Canvas->DrawIcon(Crosshair.HeadShotIcon,
+			(Center.X - (Crosshair.HeadShotIcon.UL * ScaleUIY * 0.5f)),
+			(Center.Y - (Crosshair.HeadShotIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 	}
 
 
@@ -772,14 +763,9 @@ void ACGPlayerHUD::DrawScoreboard()
 		float CurrentY = Y;
 
 		// Draw the background of the header.
-		Canvas->SetDrawColor(Scoreboard.HeaderBackgroundColor);
-		Canvas->DrawTile(
-			Scoreboard.RowBackground.Texture,
+		DrawRect( Scoreboard.HeaderBackgroundColor,
 			CurrentX, CurrentY,
-			Width, RowHeight,
-			Scoreboard.RowBackground.U, Scoreboard.RowBackground.V,
-			Scoreboard.RowBackground.UL, Scoreboard.RowBackground.VL,
-			EBlendMode::BLEND_Translucent);
+			Width, RowHeight);
 
 		CurrentX += ColOffset;
 		DrawScaledText(
@@ -818,15 +804,10 @@ void ACGPlayerHUD::DrawScoreboard()
 			TempPlayerState = CGGameState->PlayerArray[i];
 			CurrentX = X;
 
-			// Set Color on the basis of who owns it.
-			Canvas->SetDrawColor(TempPlayerState != PlayerState ? Scoreboard.RowBackgroundColor : Scoreboard.OwnerBackgroundColor);
-			Canvas->DrawTile(
-				Scoreboard.RowBackground.Texture,
+			DrawRect(
+				TempPlayerState != PlayerState ? Scoreboard.RowBackgroundColor : Scoreboard.OwnerBackgroundColor,
 				CurrentX, CurrentY,
-				Width, RowHeight,
-				Scoreboard.RowBackground.U, Scoreboard.RowBackground.V,
-				Scoreboard.RowBackground.UL, Scoreboard.RowBackground.VL,
-				EBlendMode::BLEND_Translucent);
+				Width, RowHeight);
 
 			// Fudge factor to make sure the column is not reight on the edge.
 			CurrentX += ColOffset;
