@@ -581,40 +581,27 @@ void ACGPlayerHUD::DrawGameInfo()
 				RoundDataElement.DataForegroundColor,
 				ElemX, ElemY,
 				ElemW * TempPlayerState->Score / CGGameState->GoalScore, ElemH );
-
-			/*
-			Canvas->DrawTile(
-				RoundDataElement.BGIcon.Texture, 
-				ElemX, ElemY,
-				ElemW, ElemH,
-				RoundDataElement.BGIcon.U, RoundDataElement.BGIcon.V,
-				RoundDataElement.BGIcon.UL,RoundDataElement.BGIcon.VL,
-				EBlendMode::BLEND_Translucent);
-				*/
 			
-			/*
-			Canvas->SetDrawColor(FColor::Blue);
+			// Draw the score.
+			const float ScoreBoxX = ElemX + ElemW + RoundDataElement.ScoreBox.PercentX * PixelsPerWidth;
+			const float ScoreBoxWidth = RoundDataElement.ScoreBox.WidthPercent * PixelsPerWidth;
+			const float ScoreBoxPixelsWidth = ScoreBoxWidth * .01f;
 
-			// TODO verify Goal Score.
-			Canvas->DrawTile(
-				RoundDataElement.FGIcon.Texture,
-				ElemX, ElemY,
-				ElemW * TempPlayerState->Score / CGGameState->GoalScore, ElemH,
-				RoundDataElement.FGIcon.U, RoundDataElement.FGIcon.V,
-				RoundDataElement.FGIcon.UL * TempPlayerState->Score / CGGameState->GoalScore, RoundDataElement.FGIcon.VL,
-				EBlendMode::BLEND_Translucent);
-				*/
-			
-			// Score goes here.
-			// TODO this needs some kind of anchoring.
+			DrawRect(
+				RoundDataElement.DataBackgroundColor,
+				ScoreBoxX, ElemY,
+				ScoreBoxWidth, ElemH);
+
 			Text = FString::Printf(TEXT("%.0f"), TempPlayerState->Score);
 			DrawScaledText(
 				Text, 
 				RoundDataElement.ScoreText.Color, 
-				ElemX + ElemW + PixelsPerWidth * RoundDataElement.ScoreText.Transform.PercentX,
+				ScoreBoxX + ScoreBoxPixelsWidth * RoundDataElement.ScoreText.Transform.PercentX,
 				ElemY + PixelsPerHeight * RoundDataElement.ScoreText.Transform.PercentY,
 				Font, PixelsPerHeight * RoundDataElement.ScoreText.Transform.HeightPercent,
 				RoundDataElement.ScoreText.Anchor);
+			
+	
 
 
 			if (TempPlayerState == PlayerState)
@@ -776,6 +763,7 @@ void ACGPlayerHUD::DrawScoreboard()
 			Scoreboard.RankAlignment);
 		CurrentX += RankWidth + ColOffset;
 
+		// TODO add elipses to name.
 		DrawScaledText(
 			"Name",
 			Scoreboard.TextColor,

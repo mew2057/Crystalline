@@ -120,6 +120,10 @@ struct FCGRoundElement
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
 
+	/**Offset between the score box and "progress" bar.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform ScoreBox;
+
 	/**Displays the time on the screen.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGTextElement TimeText;
@@ -405,7 +409,7 @@ struct FCGScoreboardElement
 
 	FCGScoreboardElement()
 	{
-		Transform.WidthPercent = 20.f;
+		Transform.WidthPercent = 35.f;
 		Transform.HeightPercent = 75.f;
 		Transform.PercentX = 50.f;
 		Transform.PercentY = 20.f;
@@ -419,7 +423,7 @@ struct FCGScoreboardElement
 		TextColor = FLinearColor::White;
 
 		RowHeightPercent = 4.f;
-		RowOffsetPercent = 1.f;
+		RowOffsetPercent = .5f;
 		ColumnOffsetPercent = 2.5f;
 
 		RankAlignment = .5f;
