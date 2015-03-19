@@ -13,7 +13,7 @@ ACGCrystalGun::ACGCrystalGun(const FObjectInitializer& ObjectInitializer) :Super
 void ACGCrystalGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	ClipPercentPerShot = 1 / AmmoConfig.ShotsPerClip;
+	ClipPercentPerShot = 1.f / (float)AmmoConfig.ShotsPerClip;
 }
 
 #pragma region Ammo
@@ -45,6 +45,12 @@ float ACGCrystalGun::GetClipPercent() const
 {
 	return (float)AmmoInClip / (AmmoConfig.ShotsPerClip * AmmoConfig.AmmoPerShot);
 }
+
+float ACGCrystalGun::GetShotsPerClip() const
+{
+	return AmmoConfig.ShotsPerClip;
+}
+
 
 float ACGCrystalGun::GetReloadTime() const
 {

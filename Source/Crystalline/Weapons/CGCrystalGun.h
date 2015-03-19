@@ -29,7 +29,11 @@ public:
 
 	virtual float GetClipPercent() const override;
 
+	virtual float GetShotsPerClip() const override;
+
 	virtual float GetReloadTime() const override;
+
+	virtual bool ShouldDisplayAmmoWarning() const override { return AmmoInClip == 0.f; };
 
 	virtual bool CanReload() const override;
 

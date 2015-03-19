@@ -54,8 +54,9 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 
 	MaxShield            = 100.0f;
 	CurrentShield        = MaxShield;
+	WarningShieldPercent = .42f;
 	ShieldRegenPerSecond = 50.f;
-	TimeToRegen			= 2.f;
+	ShieldTimeToRegen    = 2.f;
 	bShieldRegenerating  = false;
 
 	bZooming	  = false;
@@ -85,7 +86,7 @@ void ACGCharacter::Tick(float DeltaSeconds)
 		CurrentShield = FMath::Min(MaxShield, CurrentShield + ShieldRegenPerSecond * DeltaSeconds);
 
 		// The Shield is regenerating while this is true.
-		bShieldRegenerating = CurrentShield < MaxShield;
+		bShieldRegenerating = CurrentShield < MaxShield;	
 	}
 
 	// XXX ZOOM ZOOM ZOOM
@@ -145,7 +146,7 @@ float ACGCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEv
 		else
 		{
 			// Set a timer for to start the shield regeneration for the player, if one is set this should reset the time elapsed to zero.
-			GetWorldTimerManager().SetTimer(TimerHandle_ShieldRegen, this, &ACGCharacter::StartShieldRegen, TimeToRegen, false); // TODO Clear me on death!
+			GetWorldTimerManager().SetTimer(TimerHandle_ShieldRegen, this, &ACGCharacter::StartShieldRegen, ShieldTimeToRegen, false); // TODO Clear me on death!
 			
 			// TODO Feedback from hit, e.g. force feedback and direction.
 			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
@@ -289,7 +290,8 @@ void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageE
 	ACGPlayerHUD* HUD = PlayerController ? Cast<ACGPlayerHUD>(PlayerController->GetHUD()) : NULL;
 	if (HUD)
 	{
-		HUD->NotifyHitTaken();
+		//(DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal2D()
+		HUD->NotifyHitTaken(FVector::ZeroVector);
 	}
 
 	if (PawnInstigator && PawnInstigator != this && PawnInstigator->IsLocallyControlled())
@@ -575,6 +577,21 @@ void ACGCharacter::WeaponChanged()
 		CurrentWeapon->SetCGOwner(this);
 		CurrentWeapon->OnEquip();
 		CurrentZoom = CurrentWeapon->WeaponZoomConfig; // Change the zoom on weapon change.
+	}
+
+	// Set the offhand weapon for the character, IFF we have a weapon.
+	// TODO check to see if There is a better way of doing this for the HUD.
+	// FIXME!
+	if (Inventory != NULL && CurrentWeapon != NULL)
+	{
+		const int32 NumberOfWeapons = Inventory->GetWeaponCount();
+		int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
+
+		if (NumberOfWeapons > 1)
+		{
+			WeaponIndex = (WeaponIndex + 1) % NumberOfWeapons;
+			OffHandWeapon = Inventory->GetWeapon(WeaponIndex);
+		}
 	}
 }
 
