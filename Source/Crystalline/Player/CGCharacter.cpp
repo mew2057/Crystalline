@@ -69,6 +69,7 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 	HeadRadius = 16.f;
 	HeadOffset = 6.f;
 	HeadBone = FName("Skull");
+	StrafeFactor = .8f;
 	// TODO preload Inventory!
 }
 
@@ -505,7 +506,7 @@ void ACGCharacter::MoveRight(float Val)
 	if (Controller && Val != 0.0f)
 	{
 		// TODO falling.
-		AddMovementInput(GetActorRightVector(), Val);
+		AddMovementInput(GetActorRightVector(), Val * StrafeFactor);
 	}
 }
 

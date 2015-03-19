@@ -175,6 +175,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Camera)
 	float BaseLookUpRate;
 
+	/**The strafe factor for the character, SHOULD NOT EXCEED 1.f*/
+	UPROPERTY(EditAnywhere, Category = Movement)
+	float StrafeFactor;
 protected:
 	/**
 	 * Moves the player pawn forward at the speed set CGMovementComponent.
