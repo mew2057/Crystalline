@@ -20,20 +20,26 @@ void ACGCrystalGun::PostInitializeComponents()
 
 void ACGCrystalGun::GiveAmmo(int32 NewAmmo)
 {
-	Ammo = FMath::Min(AmmoConfig.AmmoCapacity, Ammo + NewAmmo);
-
-	// Give the player enough ammo to fill up.
-	int32 AmmoOverFlow = Ammo % AmmoConfig.AmmoPerShot;
-	if (AmmoOverFlow > 0)
+	if (Role == ROLE_Authority)
 	{
-		Ammo += AmmoConfig.AmmoPerShot - AmmoOverFlow;
+		Ammo = FMath::Min(AmmoConfig.AmmoCapacity, Ammo + NewAmmo);
+
+		// Give the player enough ammo to fill up.
+		int32 AmmoOverFlow = Ammo % AmmoConfig.AmmoPerShot;
+		if (AmmoOverFlow > 0)
+		{
+			Ammo += AmmoConfig.AmmoPerShot - AmmoOverFlow;
+		}
 	}
 }
 
 
 void ACGCrystalGun::UseAmmo()
 {
-	AmmoInClip = AmmoInClip - AmmoConfig.AmmoPerShot;
+	if (Role == ROLE_Authority)
+	{
+		AmmoInClip = AmmoInClip - AmmoConfig.AmmoPerShot;
+	}
 }
 
 bool ACGCrystalGun::CanFire(bool InitFireCheck) const

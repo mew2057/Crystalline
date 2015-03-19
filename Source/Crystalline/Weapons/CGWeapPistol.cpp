@@ -37,6 +37,7 @@ void ACGWeapPistol::Tick(float DeltaSeconds)
 
 void ACGWeapPistol::UseAmmo()
 {
+	// FIXME this is an issue.
 	WeaponHeat = FMath::Min(WeaponHeat + OverheatConfig.HeatPerShot, OverheatConfig.MaxHeat);
 }
 
