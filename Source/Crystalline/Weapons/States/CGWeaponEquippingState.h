@@ -39,7 +39,10 @@ public:
 
 	virtual void EndState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Equipping);
+		if (GetCGOwner())
+		{
+			GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Equipping);
+		}
 	}
 
 };

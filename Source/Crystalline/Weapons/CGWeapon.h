@@ -173,6 +173,9 @@ public:
 
 	virtual bool HasManualReload() const { return WeaponConfig.bHasManualReload; }
 
+	// True if the HUD should display a warning.
+	virtual bool ShouldDisplayAmmoWarning() const { return false; };
+
 	virtual bool CanReload() const;
 		
 	virtual void ApplyReload();
@@ -275,7 +278,10 @@ public:
 
 	virtual float GetClipPercent() const;
 
-	float GetPercentPerShot() const { return ClipPercentPerShot; }
+	virtual float GetShotsPerClip() const;
+
+	FORCEINLINE float GetPercentPerShot() const { return ClipPercentPerShot; }
+
 
 	virtual int32 GetAmmo() const { return 0; }
 

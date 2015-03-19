@@ -4,6 +4,7 @@
 
 
 #include "GameFramework/HUD.h"
+#include "GUI/Slate/ShieldWidget.h"
 #include "CGPlayerHUD.generated.h"
 
 #define TARGET_Y_RESOLUTION 1080.0f
@@ -13,13 +14,6 @@
 #define NUM_BUTTON_OFFSET 25
 
 #pragma region Structs
-UENUM(BlueprintType)
-enum class ECGJustification : uint8
-{
-	LEFT   UMETA(DisplayName = "Left"),
-	CENTER UMETA(DisplayName = "Center"),
-	RIGHT  UMETA(DisplayName = "Right")
-};
 
 USTRUCT()
 struct FCGHUDTransform
@@ -48,29 +42,39 @@ struct FCGHUDTransform
 };
 
 USTRUCT()
-struct FCGHUDElement
+struct FCGShieldElement
 {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
 
+	// TODO Anim
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon FGIcon;
+	FLinearColor ShieldColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon BGIcon;
+	FLinearColor BackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor FullColor;
+		FLinearColor ForegroundFlashColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor EmptyColor;
+		FLinearColor BackgroundFlashColor;
 
-	FCGHUDElement()
+	// TODO determine what number means to flashes per second.
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float FlashRate;
+	
+	float FlashTime;
+
+	FCGShieldElement()
 	{
-		FullColor = FLinearColor::Blue;
-		EmptyColor = FLinearColor::Red;
+		ShieldColor = FLinearColor(1.f, 1.f, 1.f, .9f);
+		BackgroundColor = FLinearColor(.1f, .1f, .1f, .4f);
+		ForegroundFlashColor = FLinearColor(1.f, 0.f, 0.f, .9f);
+		BackgroundFlashColor = FLinearColor(1.f, 0.f, 0.f, .4f);
+		FlashRate = 20.f;
 	}
 };
 
@@ -87,6 +91,26 @@ struct FCGGameElement
 	
 	}
 };
+USTRUCT()
+struct FCGTextElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Text)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = Text)
+	float Anchor;
+
+	UPROPERTY(EditDefaultsOnly, Category = Text)
+	FLinearColor Color;
+
+	FCGTextElement()
+	{
+		Anchor = 0.f;
+		Color  = FLinearColor::White;
+	}
+};
 
 USTRUCT()
 struct FCGRoundElement
@@ -95,55 +119,113 @@ struct FCGRoundElement
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
+
+	/**Displays the time on the screen.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGTextElement TimeText;
+
+	/**The score text configuration, note every data element uses this.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGTextElement ScoreText;
 	
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor DataElementColor;
+	FLinearColor DataBackgroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform TimeTransform;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float TimeAnchor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor TimeColor;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform ScoreTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor ScoreColor;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float ScoreAnchor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon FGIcon;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCanvasIcon BGIcon;
+	FLinearColor DataForegroundColor;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCanvasIcon OwnerIcon;
 
+	/**The array of data elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor FullColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor EmptyColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	TArray<FCGGameElement> GameDataElements;
+	TArray<FCGGameElement> GameDataElements;	
 
 	FCGRoundElement()
 	{
-		DataElementColor = FLinearColor::White;
-		TimeColor = FLinearColor::White;
-		ScoreColor = FLinearColor::White;
-		FullColor = FLinearColor::Blue;
-		EmptyColor = FLinearColor::Blue;
-		TimeAnchor = 0.f;
-		ScoreAnchor = 0.f;
+		DataBackgroundColor = FLinearColor(.125f, .125f, .125f, .4f);
+		DataForegroundColor = FLinearColor(0.f, 0.f, .45f, .6f);
+	}
+};
+
+USTRUCT()
+struct FCGEquippedWeaponElement
+{
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGTextElement InClip;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGTextElement HeldAmmo;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGHUDTransform GuageTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		FCGHUDTransform MainIconTransform;
+
+	// Colors
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor ElementBackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor GuageBackgroundColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor GuageEnergyColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor GuageShotColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor GuageUnusableColor;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor FlashColor;
+
+	// TODO determine what number means to flashes per second.
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	float FlashRate;
+
+	float FlashTime;
+
+	FCGEquippedWeaponElement()
+	{
+		ElementBackgroundColor = FLinearColor(.1f, .1f, .1f, .15f);
+		GuageBackgroundColor = FLinearColor(.1f, .1f, .1f, .5f);
+		GuageEnergyColor = FLinearColor(0.f, .44f, 0.f, .75f);
+		GuageShotColor = FLinearColor(1.f, 1.f, 1.f, .75f);
+		GuageUnusableColor = FLinearColor(.5f, .5f, .5f ,1.f);
+		FlashColor = FLinearColor(1.f, 0.f, 0.f, .5f);
+		FlashRate = 10.f;
+	}
+};
+
+USTRUCT()
+struct FCGOffHandWeaponElement
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform Transform;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGTextElement Ammo;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGHUDTransform IconTransform;
+
+	// Colors
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor ElementBackgroundColor;
+
+	FCGOffHandWeaponElement()
+	{
+		ElementBackgroundColor = FLinearColor(.1f, .1f, .1f, .15f);
 	}
 };
 
@@ -151,38 +233,17 @@ USTRUCT()
 struct FCGWeaponElement
 {
 	GENERATED_USTRUCT_BODY()
-	
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGHUDTransform Transform;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform InClipAmmoTransform;
+	FCGEquippedWeaponElement EquippedWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float InClipAnchor;
-	
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform HeldAmmoTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	float HeldAmmoAnchor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FLinearColor AmmoTextColor;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform GuageTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-	FCGHUDTransform MainIconTransform;
-
+	FCGOffHandWeaponElement OffHandWeapon;
 
 	FCGWeaponElement()
 	{
-		AmmoTextColor = FLinearColor::White;
-		InClipAnchor   = 0.f;
-		HeldAmmoAnchor = 0.f;
-
 	}
 };
 
@@ -442,7 +503,6 @@ public:
 	@return The Horizontal scale.*/
 	FORCEINLINE float DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight, float Anchor = 0.f);
 
-
 	/** Draws the prompt message.*/
 	void DrawPrompt();
 
@@ -450,8 +510,9 @@ public:
 	void SetPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
 
 	/**Sets the TimeSinceLastHit for the hit notification.*/
-	void NotifyHitTaken();
+	void NotifyHitTaken(const FVector& HitDirection);
 
+	/**Lets the player know that they hit an opponent.*/
 	void NotifyHitConfirmed();
 
 
@@ -482,7 +543,11 @@ private:
 
 	/**The configuration for the Shield HUD Element.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
-		FCGHUDElement Shield;
+	FCGShieldElement Shield;
+
+	/**The slate widget for the shield.*/
+	TSharedPtr<class SShieldWidget> ShieldWidget;
+
 
 	/**The configuration for the Round HUD Elements.*/
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
@@ -524,7 +589,7 @@ private:
 
 	/**The Font for the HUD.*/
 	UPROPERTY(EditDefaultsOnly, Category = FontSettings)
-		UFont* BigFont;
+		UFont* Font;
 
 	/**Internal time since the player last took a hit.*/
 	UPROPERTY(Transient)

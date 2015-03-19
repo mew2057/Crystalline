@@ -8,6 +8,7 @@ public class CrystallineTarget : TargetRules
 	public CrystallineTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
+		bUsesSteam = true;
 	}
 
 	//

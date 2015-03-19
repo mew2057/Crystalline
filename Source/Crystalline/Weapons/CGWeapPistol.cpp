@@ -42,6 +42,7 @@ void ACGWeapPistol::UseAmmo()
 
 bool ACGWeapPistol::CanFire(bool InitFireCheck) const
 {
+	// XXX Clean this code up.
 	// TODO is this a good check?
 	if (CurrentState == ReloadingState)
 	{

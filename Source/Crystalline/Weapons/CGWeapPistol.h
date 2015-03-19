@@ -29,6 +29,8 @@ public:
 
 	virtual float GetClipPercent() const override;
 
+	virtual bool ShouldDisplayAmmoWarning() const override { return bIsOverheated || CurrentState == ReloadingState; };
+
 	virtual bool CanReload() const override;
 
 	virtual void StartOverheat() override;
