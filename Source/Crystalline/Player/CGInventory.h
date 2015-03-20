@@ -20,7 +20,11 @@ public:
 
 	virtual void InitializeInventory(const FCGDefaultWeaponConfig& Config);
 
-	void AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
+	/**Adds a weapon to the active weapon inventory.*/
+	void AddToWeapons(ACGWeapon* Weapon);
+
+	/**Adds a weapon to the mapping of weapons in our inventory.*/
+	void AddToWeaponMap(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
 
 	virtual void DestroyInventory();
 
@@ -58,10 +62,6 @@ public:
 	UPROPERTY(Transient, Replicated)
 	ECGCrystalType TierOneCrystal;
 
-	/** The Tier 2 Crystal for the Player. (POWER UP) */
-	UPROPERTY(Transient, Replicated)
-	ECGCrystalType TierTwoCrystal;
-	
 	/**The Weapons the player has available to them.*/
 	UPROPERTY(Transient, Replicated)
 	TArray<class ACGWeapon*> Weapons;

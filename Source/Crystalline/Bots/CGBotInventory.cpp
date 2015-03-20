@@ -41,7 +41,6 @@ void ACGBotInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 {
 	Super::InitializeInventory(Config);
 
-	TierTwoAmmo = Config.TierTwoAmmoConfig.AmmoCarried;
 	TierOneAmmo = Config.TierOneAmmoConfig.AmmoCarried;
 	
 

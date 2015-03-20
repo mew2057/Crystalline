@@ -6,7 +6,6 @@
 ACGInventory::ACGInventory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	TierOneCrystal = ECGCrystalType::NONE;
-	TierTwoCrystal = ECGCrystalType::NONE;
 
 	bReplicates = true;
 	bOnlyRelevantToOwner = true;
@@ -18,7 +17,6 @@ void ACGInventory::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	
 	TierOneCrystal = ECGCrystalType::NONE;
-	TierTwoCrystal = ECGCrystalType::NONE;
 }
 
 
@@ -32,10 +30,12 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
+	StaticWeaponCount = 0;
 
 	if (Config.CoreWeapon)
 	{
-		AddWeapon(GetWorld()->SpawnActor<ACGWeapon>(Config.CoreWeapon, SpawnInfo));
+		AddToWeapons(GetWorld()->SpawnActor<ACGWeapon>(Config.CoreWeapon, SpawnInfo));
+		StaticWeaponCount++;
 	}
 
 	// Note all guns from this point on are assumed to be crystal guns.
@@ -44,12 +44,9 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 	{
 		TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CoreCrystalGun, SpawnInfo);
 		TempCrystalGun->InitializeAmmo(Config.TierZeroAmmoConfig);
-		AddWeapon(TempCrystalGun);
+		AddToWeaponMap(TempCrystalGun, ECGCrystalType::NONE); // Assumes the gun to have no typing.
 	}
-
-	// Get the number of weaopns that were properly defined.
-	StaticWeaponCount = Weapons.Num();
-	
+		
 	const int32 NumWeaponGroups = Config.CrystalGunGroups.Num();
 	for (int i = 0; i < NumWeaponGroups; ++i)
 	{
@@ -59,15 +56,7 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 			// Add the Tier OneGun
 			TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CrystalGunGroups[i].TierOneGun, SpawnInfo);
 			TempCrystalGun->InitializeAmmo(Config.TierOneAmmoConfig);
-			AddWeapon(TempCrystalGun, Config.CrystalGunGroups[i].TierOneCrystalType);
-		}
-
-		if (Config.CrystalGunGroups[i].TierTwoGun)
-		{
-			// Add the TierTwo Gun
-			TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CrystalGunGroups[i].TierTwoGun, SpawnInfo);
-			TempCrystalGun->InitializeAmmo(Config.TierTwoAmmoConfig);
-			AddWeapon(TempCrystalGun, Config.CrystalGunGroups[i].TierOneCrystalType);
+			AddToWeaponMap(TempCrystalGun, Config.CrystalGunGroups[i].TierOneCrystalType);
 		}
 	}
 
@@ -75,7 +64,7 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 	ReconstructInventory();
 }
 
-void ACGInventory::AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type)
+void ACGInventory::AddToWeapons(ACGWeapon* Weapon)
 {
 	// If the weapon wasn't set and we're not the server, don't bother.
 	if (Weapon == NULL || Role < ROLE_Authority)
@@ -83,26 +72,28 @@ void ACGInventory::AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type)
 		return;
 	}
 
-	// If no type is specified, assume that it's a default weapon.
-	if (Type == ECGCrystalType::NONE)
-	{
-		Weapons.AddUnique(Weapon);
-	}
-	else
-	{
-		if (!WeaponGroups.Contains(Type))
-		{
-			TArray<class ACGWeapon*> NewWeapons;
-			WeaponGroups.Add(Type);
-		}
+	Weapons.AddUnique(Weapon);
+}
 
-		WeaponGroups[Type].AddUnique(Weapon);
+void ACGInventory::AddToWeaponMap(ACGWeapon* Weapon, ECGCrystalType Type)
+{
+	// If the weapon wasn't set and we're not the server, don't bother.
+	if (Weapon == NULL || Role < ROLE_Authority)
+	{
+		return;
 	}
+
+	if (!WeaponGroups.Contains(Type))
+	{
+		TArray<class ACGWeapon*> NewWeapons;
+		WeaponGroups.Add(Type);
+	}
+
+	WeaponGroups[Type].AddUnique(Weapon);
 
 	// Set the owner of the weapon to the Character.
 	Weapon->OnEnterInventory(CGOwner);	
 }
-
 
 void ACGInventory::DestroyInventory()
 {
@@ -178,41 +169,14 @@ void ACGInventory::ReconstructInventory()
 		return;
 	}
 
-	// Flag that the weapon group actually exists.
+	// Ensure that the crystal was defined.
 	bool bTierOneDefined = WeaponGroups.Contains(TierOneCrystal);
+	
+	// XXX Implement the weapon swap.
 
-	// If the tier is defined copy what we can.
-	if (bTierOneDefined )
-	{
-		const int32 WeaponCount = Weapons.Num();
-		const int32 GroupCount = WeaponGroups[TierOneCrystal].Num();
-		ACGCrystalGun * ReceivingGun;
-		ACGCrystalGun * TempGun;
-		for (int32 i = StaticWeaponCount, j = 0; i < WeaponCount && j < GroupCount; ++i, ++j)
-		{
-			// XXX this may be overkill, but I'm a bit overly cautious.
-			ReceivingGun = Cast<ACGCrystalGun>(WeaponGroups[TierOneCrystal][j]);
-			TempGun = Cast<ACGCrystalGun>(Weapons[i]);
-			if (ReceivingGun && TempGun)
-			{
-				ReceivingGun->CopyAmmo(TempGun);
-			}
-		}
-	}
-
-	// Clear the elements that need to be cleared.
-	Weapons.RemoveAt(StaticWeaponCount, Weapons.Num() - StaticWeaponCount, true);
-
-	if (bTierOneDefined)
-	{
-		// Determine the number of weapons to be transfered over.
-		int32 CopyLength = FMath::Min(WeaponGroups[TierOneCrystal].Num(), TierTwoCrystal == ECGCrystalType::NONE ? 1 : 2);
-
-		for (int32 i = 0; i < CopyLength; ++i)
-		{
-			Weapons.AddUnique(WeaponGroups[TierOneCrystal][i]);
-		}
-	}
+	// 1. Swap ammo (if appropriate).
+	// 2. Move the New Crystal weapon (if present) into the player's inventory.
+	// 3. continue.
 
 	// Equip the best possible weapon for the player.
 	if (Weapons.Num() > 0)
@@ -224,30 +188,16 @@ void ACGInventory::ReconstructInventory()
 bool ACGInventory::CanLoadCrystal(ECGCrystalType Crystal)
 {
 	return Crystal != ECGCrystalType::NONE &&
-		((Crystal > ECGCrystalType::POWER_UP && TierOneCrystal != Crystal) ||
-		(Crystal <= ECGCrystalType::POWER_UP && TierTwoCrystal != Crystal));
+		(Crystal > ECGCrystalType::POWER_UP && TierOneCrystal != Crystal);
 }
 
 void ACGInventory::LoadCrystal(ECGCrystalType Crystal)
 {
-	bool bIsDirty = false;
-
 	// Tier1 crystal
 	if (Crystal > ECGCrystalType::POWER_UP && TierOneCrystal != Crystal)
 	{
 		TierOneCrystal = Crystal;
-		bIsDirty = true;
-	}
-	else if (Crystal > ECGCrystalType::NONE && TierTwoCrystal != Crystal)
-	{
-		TierTwoCrystal = Crystal;
-		bIsDirty = true;
-	}
-
-	if (bIsDirty)
-	{
 		ReconstructInventory();
-		// TODO trigger inventory rebuild.
 	}
 }
 
@@ -255,25 +205,18 @@ void ACGInventory::PopAllCrystals()
 {
 	// Clear the Crystals and rebuild inventory.
 	TierOneCrystal = ECGCrystalType::NONE;
-	TierTwoCrystal = ECGCrystalType::NONE;
 
 	ReconstructInventory();
 }
 
 void ACGInventory::PopBestCrystal()
 {
-	if (TierTwoCrystal != ECGCrystalType::NONE)
-	{
-		TierTwoCrystal = ECGCrystalType::NONE;
-	}
-	else if (TierOneCrystal != ECGCrystalType::NONE)
+	if (TierOneCrystal != ECGCrystalType::NONE)
 	{
 		TierOneCrystal = ECGCrystalType::NONE;
+		ReconstructInventory();
 	}
-
-	ReconstructInventory();
 }
-
 
 void ACGInventory::OnRep_CGOwner()
 {
@@ -302,7 +245,6 @@ void ACGInventory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ACGInventory, TierOneCrystal, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ACGInventory, TierTwoCrystal, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGInventory, Weapons, COND_OwnerOnly);
 	
 	DOREPLIFETIME(ACGInventory, CGOwner);
