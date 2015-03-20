@@ -30,21 +30,25 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
-	StaticWeaponCount = 0;
+	CrystalGunIndex = 0;
 
+	// Add the Core gun.
 	if (Config.CoreWeapon)
 	{
 		AddToWeapons(GetWorld()->SpawnActor<ACGWeapon>(Config.CoreWeapon, SpawnInfo));
-		StaticWeaponCount++;
+		CrystalGunIndex++;
 	}
 
-	// Note all guns from this point on are assumed to be crystal guns.
+	// Add a weapon slot for the crystal gun.
+	Weapons.AddZeroed();
+
+	// NOTE: All guns from this point on are assumed to be crystal guns.
 	ACGCrystalGun* TempCrystalGun;
 	if (Config.CoreCrystalGun)
 	{
 		TempCrystalGun = GetWorld()->SpawnActor<ACGCrystalGun>(Config.CoreCrystalGun, SpawnInfo);
 		TempCrystalGun->InitializeAmmo(Config.TierZeroAmmoConfig);
-		AddToWeaponMap(TempCrystalGun, ECGCrystalType::NONE); // Assumes the gun to have no typing.
+		AddToWeaponMap(TempCrystalGun); // Assumes the gun to have no typing.
 	}
 		
 	const int32 NumWeaponGroups = Config.CrystalGunGroups.Num();
@@ -170,13 +174,23 @@ void ACGInventory::ReconstructInventory()
 	}
 
 	// Ensure that the crystal was defined.
-	bool bTierOneDefined = WeaponGroups.Contains(TierOneCrystal);
-	
-	// XXX Implement the weapon swap.
+	ACGCrystalGun* CurrentWeapon = Cast<ACGCrystalGun>(Weapons[CrystalGunIndex]);
+	ACGCrystalGun* NewWeapon = WeaponGroups.Contains(TierOneCrystal) ? Cast<ACGCrystalGun>(WeaponGroups[TierOneCrystal][0]) : NULL;
 
-	// 1. Swap ammo (if appropriate).
-	// 2. Move the New Crystal weapon (if present) into the player's inventory.
-	// 3. continue.
+	// Only if the 
+	if (NewWeapon != NULL)
+	{
+		if ( CurrentWeapon != NULL && CurrentWeapon->WeaponConfig.AmmoType == NewWeapon->WeaponConfig.AmmoType )
+		{
+			NewWeapon->CopyAmmo(CurrentWeapon);
+		}
+
+		Weapons[CrystalGunIndex] = NewWeapon; 
+	}
+	else
+	{
+		// Fail!
+	}
 
 	// Equip the best possible weapon for the player.
 	if (Weapons.Num() > 0)

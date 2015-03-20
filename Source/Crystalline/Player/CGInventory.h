@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "CGInventory.generated.h"
 
+#define INVENTORY_NUM_WEAPONS 2
+
 /**
  * 
  */
@@ -66,9 +68,9 @@ public:
 	UPROPERTY(Transient, Replicated)
 	TArray<class ACGWeapon*> Weapons;
 
-	/**This is the count of weapons that don't change with crystals.*/
+	/**The index of the crystal gun.*/
 	UPROPERTY(Transient)
-	int32 StaticWeaponCount;
+	int32 CrystalGunIndex;
 
 	/** Contains the weapon groups that the gun inventory is selected by. Managed by the server, then replicated to the client through Weapons.*/
 	TMap<ECGCrystalType, TArray<class ACGWeapon*>> WeaponGroups;
