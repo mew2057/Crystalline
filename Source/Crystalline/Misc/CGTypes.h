@@ -103,16 +103,12 @@ struct FCGDDefaultCrystalTreeConfig
 {
 	GENERATED_USTRUCT_BODY()
 
-		/** The Tier One Gun, Available when the player has a tier one crystal.*/
-		UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TSubclassOf<class ACGCrystalGun> TierOneGun;
-
-	/** The Tier Two Gun, Available when the player has a tier one and two crystal.*/
+	/** The Tier One Gun, Available when the player has a tier one crystal.*/
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TSubclassOf<class ACGCrystalGun> TierTwoGun;
+	TSubclassOf<class ACGCrystalGun> TierOneGun;
 
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		ECGCrystalType TierOneCrystalType;
+	ECGCrystalType TierOneCrystalType;
 };
 
 USTRUCT()
@@ -120,29 +116,25 @@ struct FCGDefaultWeaponConfig
 {
 	GENERATED_USTRUCT_BODY()
 
-		/** An ammo free side arm.*/
+	/** An ammo free side arm.*/
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TSubclassOf<class ACGWeapon> CoreWeapon;
 
 	/** The baseline crystal gun, this is always present for the player.*/
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TSubclassOf<class ACGCrystalGun> CoreCrystalGun;
+	TSubclassOf<class ACGCrystalGun> CoreCrystalGun;
 
 	/** Defines the Tiers for the Crystal Guns.*/
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TArray<FCGDDefaultCrystalTreeConfig> CrystalGunGroups;
+	TArray<FCGDDefaultCrystalTreeConfig> CrystalGunGroups;
 
 	/**Defines the max ammo for the assault rife.*/
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		FCGCrystalAmmo TierZeroAmmoConfig;
+	FCGCrystalAmmo TierZeroAmmoConfig;
 
 	/**Defines the max ammo for the tier one weapons.*/
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		FCGCrystalAmmo TierOneAmmoConfig;
-
-	/**Defines the max ammo for the tier two weapons.*/
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		FCGCrystalAmmo TierTwoAmmoConfig;
+	FCGCrystalAmmo TierOneAmmoConfig;
 
 	FCGDefaultWeaponConfig()
 	{

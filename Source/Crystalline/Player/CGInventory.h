@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "CGInventory.generated.h"
 
+#define INVENTORY_NUM_WEAPONS 2
+
 /**
  * 
  */
@@ -20,7 +22,11 @@ public:
 
 	virtual void InitializeInventory(const FCGDefaultWeaponConfig& Config);
 
-	void AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
+	/**Adds a weapon to the active weapon inventory.*/
+	void AddToWeapons(ACGWeapon* Weapon);
+
+	/**Adds a weapon to the mapping of weapons in our inventory.*/
+	void AddToWeaponMap(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
 
 	virtual void DestroyInventory();
 
@@ -58,17 +64,13 @@ public:
 	UPROPERTY(Transient, Replicated)
 	ECGCrystalType TierOneCrystal;
 
-	/** The Tier 2 Crystal for the Player. (POWER UP) */
-	UPROPERTY(Transient, Replicated)
-	ECGCrystalType TierTwoCrystal;
-	
 	/**The Weapons the player has available to them.*/
 	UPROPERTY(Transient, Replicated)
 	TArray<class ACGWeapon*> Weapons;
 
-	/**This is the count of weapons that don't change with crystals.*/
+	/**The index of the crystal gun.*/
 	UPROPERTY(Transient)
-	int32 StaticWeaponCount;
+	int32 CrystalGunIndex;
 
 	/** Contains the weapon groups that the gun inventory is selected by. Managed by the server, then replicated to the client through Weapons.*/
 	TMap<ECGCrystalType, TArray<class ACGWeapon*>> WeaponGroups;
