@@ -25,10 +25,13 @@ public:
 	virtual void SetupInputComponent() override;
 
 	/**Shows the in game scoreboard.*/
-	void ACGPlayerController::OnShowScoreboard();
+	void OnShowScoreboard();
 
 	/**Hides the in game scoreboard.*/
-	void ACGPlayerController::OnHideScoreboard();
+	void OnHideScoreboard();
+
+	/**Displays the kill message on the player HUD.*/
+	void OnKillMessage(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
 
 	/**Notifies the player that the round is over.*/
 	virtual void ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner) override;

@@ -55,6 +55,16 @@ void ACGPlayerController::OnHideScoreboard()
 	}
 }
 
+void ACGPlayerController::OnKillMessage(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
+{
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+		HUD->SetScoreboardVisibility(true);
+	}
+}
+
+
 void ACGPlayerController::ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::ClientGameEnded_Implementation(EndGameFocus, bIsWinner);

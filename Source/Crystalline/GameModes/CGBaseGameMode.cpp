@@ -115,12 +115,15 @@ void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, con
 		return;
 	}
 
+
+	ACGPlayerState* const KilledPlayerState = KilledPlayer ? Cast<ACGPlayerState>(KilledPlayer->PlayerState) : NULL;
+
 	// If the killer was the killed player, it was a suicide.
 	if (Killer == KilledPlayer || (Killer == NULL))
 	{
 		if (KilledPlayer != NULL && Cast<ACGPlayerState>(KilledPlayer->PlayerState))
 		{
-			Cast<ACGPlayerState>(KilledPlayer->PlayerState)->ScoreSuicide(SuicidePenalty);
+			KilledPlayerState->ScoreSuicide(SuicidePenalty);
 		}
 	}
 	else
@@ -138,8 +141,11 @@ void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, con
 	// Increment the death counter.
 	if (KilledPlayer != NULL && Cast<ACGPlayerState>(KilledPlayer->PlayerState))
 	{
-		Cast<ACGPlayerState>(KilledPlayer->PlayerState)->ScoreDeath();
+		KilledPlayerState->ScoreDeath();
+		KilledPlayerState->BroadcastDeathMessage(Killer, KilledPlayer, DamageType);
+
 	}
+
 }
 
 void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)

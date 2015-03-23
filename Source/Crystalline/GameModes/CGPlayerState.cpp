@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Crystalline.h"
+#include "Player/CGPlayerController.h"
+
 #include "CGPlayerState.h"
 
 ACGPlayerState::ACGPlayerState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -50,14 +52,24 @@ void ACGPlayerState::ScoreSuicide(int32 Points)
 	ForceNetUpdate();
 }
 
+void ACGPlayerState::BroadcastDeathMessage_Implementation(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ACGPlayerController * TempController = Cast<ACGPlayerController>(*It);
+		if (TempController && TempController->IsLocalController())
+		{
+			// Invoke the dialog message thing.
+			TempController->OnKillMessage(Killer, KilledPlayer, DamageType);
+		}
+	}
+}
+
 void ACGPlayerState::AddScore(int32 AddToScore)
 {
 	Score += AddToScore;
 	ForceNetUpdate();
-};
-
-
-
+}
 
 void ACGPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {

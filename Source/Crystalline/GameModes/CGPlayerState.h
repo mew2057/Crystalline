@@ -32,6 +32,11 @@ public:
 	/**Only Suicides negatively impact player score.*/
 	virtual void ScoreSuicide(int32 Points);
 
+	// Broadcasted across server and client reliably.
+	UFUNCTION(Reliable, NetMulticast)
+	void BroadcastDeathMessage(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
+	void BroadcastDeathMessage_Implementation(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
+
 	UFUNCTION(BlueprintCallable, Category = "StateScore")
 	void AddScore(int32 AddToScore);
 
