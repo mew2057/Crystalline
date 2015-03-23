@@ -634,6 +634,7 @@ float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor,
 	Canvas->StrLen(Font, Text, SizeX, SizeY);
 
 	// Compute the scale for the final text.
+	// XXX Maybe make this a power of two?
 	const float Scale = TextHeight / SizeY;
 	TextItem.Scale.Set(Scale, Scale);
 

@@ -280,15 +280,24 @@
     <Filter Include="Source\Crystalline\GUI\Slate">
       <UniqueIdentifier>{8e0562a8-04f6-441e-92ba-044cb9010cd0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Crystalline\GUI\Widgets">
+      <UniqueIdentifier>{e920eb5d-aad1-479f-8191-4264f168f7a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Crystalline\GUI\Slate\ShieldWidget.h">
       <Filter>Source\Crystalline\GUI\Slate</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.h">
+      <Filter>Source\Crystalline\GUI\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Crystalline\GUI\Slate\ShieldWidget.cpp">
       <Filter>Source\Crystalline\GUI\Slate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.cpp">
+      <Filter>Source\Crystalline\GUI\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

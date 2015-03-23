@@ -4,6 +4,62 @@
 
 #pragma once
 
+
+USTRUCT(BlueprintType)
+struct FCGHUDRenderObject
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** The size of the element in pixels. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RenderObject")
+	FVector2D Size;
+
+	/** The position of the Element in pixels. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RenderObject")
+	FVector2D Position;
+	
+	/** The anchor point for the RenderObject. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RenderObject")
+	FVector2D Anchor;
+
+	/** The color of the render element.*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RenderObject")
+	FLinearColor Color;
+
+	FCGHUDRenderObject()
+	{
+		Color = FLinearColor::White;
+	}
+};
+
+// A Text Binding.
+DECLARE_DELEGATE_RetVal(FText, FCGGetTextDelegate)
+USTRUCT(BlueprintType)
+struct FCGHUDRenderText : public FCGHUDRenderObject
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** If this is bound The delegate is invoked. */
+	FCGGetTextDelegate GetTextDelegate;
+
+	/** The Text of the Element to be rendered.*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RenderObject")
+	FText Text;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RenderObject")
+	UFont * Font;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RenderObject")
+	float Scale;
+
+	FCGHUDRenderText()
+	{
+
+	}
+};
+
+
+
 #pragma region Enums
 
 UENUM(BlueprintType)
@@ -402,13 +458,8 @@ struct FCGWeaponHUDData
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCanvasIcon HitConfirmedIcon;
 
-	/**The Ammo Guage Background for the weapon. Base color should be white. */
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
-		FCanvasIcon AmmoGuageBGIcon;
-
-	/**The Ammo Guage Foreground for the weapon. Base color should be white. */
-	UPROPERTY(EditDefaultsOnly, Category = HUD)
-		FCanvasIcon AmmoGuageFGIcon;
+	FSlateBrush WeaponIconSlate;
 
 	/**The Weapon Icon for the weapon. Base color should be white. */
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
