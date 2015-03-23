@@ -316,8 +316,9 @@ public:
 
 	FORCEINLINE ACGWeapon*  GetCurrentWeapon() const { return CurrentWeapon; };
 
+	// XXX temporary work around.
 	/** Returns the next weapon in the array. */
-	FORCEINLINE ACGWeapon* GetOffHandWeapon() const { return OffHandWeapon; };
+	FORCEINLINE ACGWeapon* GetOffHandWeapon() const;
 	
 	/*
 	 * Invoked when the weapon has been changed, the character performs the actual equip call.

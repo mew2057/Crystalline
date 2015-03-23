@@ -558,6 +558,12 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 	}
 }
 
+ACGWeapon* ACGCharacter::GetOffHandWeapon() const
+{ 
+	return Inventory ? Inventory->GetNextWeapon(CurrentWeapon) : NULL; 
+};
+
+
 void ACGCharacter::WeaponChanged()
 {
 	// FIXME make this less jarring when you have time for polish -John.
@@ -583,7 +589,7 @@ void ACGCharacter::WeaponChanged()
 	// Set the offhand weapon for the character, IFF we have a weapon.
 	// TODO check to see if There is a better way of doing this for the HUD.
 	// FIXME!
-	if (Inventory != NULL && CurrentWeapon != NULL)
+	/*if (Inventory != NULL && CurrentWeapon != NULL)
 	{
 		const int32 NumberOfWeapons = Inventory->GetWeaponCount();
 		int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
@@ -593,7 +599,7 @@ void ACGCharacter::WeaponChanged()
 			WeaponIndex = (WeaponIndex + 1) % NumberOfWeapons;
 			OffHandWeapon = Inventory->GetWeapon(WeaponIndex);
 		}
-	}
+	}*/
 }
 
 void ACGCharacter::SpawnBaseInventory()
