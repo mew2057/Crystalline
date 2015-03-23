@@ -76,6 +76,9 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 void ACGCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	// Initializes the meshes
+	UpdatePawnMeshes();
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -120,6 +123,29 @@ void ACGCharacter::SetPlayerDefaults()
 		CurrentHealth = MaxHealth;
 		SpawnBaseInventory();
 	}
+}
+
+void ACGCharacter::PawnClientRestart()
+{
+	Super::PawnClientRestart();
+	
+	// Move to 1st Person.
+	UpdatePawnMeshes();
+
+	// Ensures that the current weapon is properly equipped.
+	CurrentWeapon->SetCGOwner(this);
+	CurrentWeapon->OnEquip();
+}
+
+void ACGCharacter::UpdatePawnMeshes()
+{
+	bool const bFirstPerson = IsFirstPerson();
+
+	Mesh1P->MeshComponentUpdateFlag = !bFirstPerson ? EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered : EMeshComponentUpdateFlag::AlwaysTickPoseAndRefreshBones;
+	Mesh1P->SetOwnerNoSee(!bFirstPerson);
+
+	GetMesh()->MeshComponentUpdateFlag = bFirstPerson ? EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered : EMeshComponentUpdateFlag::AlwaysTickPoseAndRefreshBones;
+	GetMesh()->SetOwnerNoSee(bFirstPerson);
 }
 
 
@@ -222,6 +248,9 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 
 	// Clears out any and all timers for the object.
 	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	// Set the meshes to the appropriate 3rd person view.
+	UpdatePawnMeshes();
 
 	// Clear the inventory, we don't want any guns.
 	DestroyInventory();
