@@ -132,9 +132,13 @@ void ACGCharacter::PawnClientRestart()
 	// Move to 1st Person.
 	UpdatePawnMeshes();
 
+	// XXX Replace me with a function call.
 	// Ensures that the current weapon is properly equipped.
-	CurrentWeapon->SetCGOwner(this);
-	CurrentWeapon->OnEquip();
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->SetCGOwner(this);
+		CurrentWeapon->OnEquip();
+	}
 }
 
 void ACGCharacter::UpdatePawnMeshes()
