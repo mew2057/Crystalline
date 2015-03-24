@@ -7,9 +7,18 @@
 #include "Bots/CGBotController.h"
 #include "GUI/CGPlayerHUD.h"
 
+#pragma region Public
 
 
-ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer),
+	ScoreToWin(25),
+	RoundTime(300),
+	PostGameTime(10),
+	ScorePerKill(1),
+	SuicidePenalty(1),
+	bSpawnBots(false),
+	BotsInRound(2)
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CGPlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
@@ -18,94 +27,8 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) : 
 	HUDClass              = ACGPlayerHUD::StaticClass();
 	PlayerStateClass      = ACGPlayerState::StaticClass();
 	GameStateClass        = ACGGameState::StaticClass();
-
-	MinRespawnDelay = 2.0f;
-	ScoreToWin = 25;
-	RoundTime = 300;
-	PostGameTime = 10;
-	ScorePerKill = 1;
-	SuicidePenalty = 1; 
-	bSpawnBots = true;
-	BotsInRound = 2;
-
+	MinRespawnDelay		  = 2.f;
 }
-
-void ACGBaseGameMode::HandleMatchIsWaitingToStart()
-{
-	Super::HandleMatchIsWaitingToStart();
-
-	if (bSpawnBots)
-	{
-		// Create Bots
-		CreateBots();
-	}
-
-}
-
-void ACGBaseGameMode::HandleMatchHasStarted()
-{
-	Super::HandleMatchHasStarted();
-
-	// Start the game, if pregame time exists set that, otherwise start the match.
-	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
-	if (CGGameState)
-	{
-		CGGameState->RemainingTime = RoundTime;
-		CGGameState->GoalScore = ScoreToWin;
-	}
-
-	// Kicks off the bot players.
-	StartBots();
-
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-	{
-		ACGPlayerController* PC = Cast<ACGPlayerController>(*It);
-		if (PC)
-		{
-			PC->ClientGameStarted();
-		}
-	}
-}
-
-
-void ACGBaseGameMode::DefaultTimer()
-{
-	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
-	if (CGGameState && CGGameState->RemainingTime > 0 && --CGGameState->RemainingTime <= 0)
-	{
-		// If there's no longer time in the match we need to end the match.
-		
-		if (GetMatchState() == MatchState::InProgress)
-		{
-			EndGame();
-
-		}
-		else if (GetMatchState() == MatchState::WaitingToStart)
-		{
-			// Built into AGameMode.
-			StartMatch();
-		}
-		else if (GetMatchState() == MatchState::WaitingPostMatch)
-		{
-			// Built into AGameMode.
-			RestartGame();
-		}
-	}
-}
-
-UClass* ACGBaseGameMode::GetDefaultPawnClassForController(AController* InController)
-{ 
-
-	// If we have a bot controller, tell the game mode we need a bot pawn.
-	if (Cast<ACGBotController>(InController))
-	{
-		return BotPawn;
-	}
-
-	return Super::GetDefaultPawnClassForController(InController);
-}
-
-
 
 void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
 {
@@ -126,8 +49,8 @@ void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, con
 			VictimPlayerState->ScoreSuicide(SuicidePenalty);
 		}
 	}
-	else if(KillerPlayerState)
-	{	
+	else if (KillerPlayerState) // Otherwise score a kill for the killer.
+	{
 		// Let the Killer Score
 		KillerPlayerState->ScoreKill(ScorePerKill);
 		// Check for a win.
@@ -143,6 +66,99 @@ void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, con
 
 }
 
+int32 ACGBaseGameMode::GetRoundTime() const
+{ 
+	return RoundTime; 
+}
+
+
+int32 ACGBaseGameMode::GetScoreToWin() const
+{
+	return ScoreToWin; 
+}
+
+#pragma endregion Public
+
+#pragma region Protected
+
+#pragma region Override
+
+void ACGBaseGameMode::HandleMatchIsWaitingToStart()
+{
+	Super::HandleMatchIsWaitingToStart();
+
+	if (bSpawnBots)
+	{
+		CreateBots();
+	}
+}
+
+void ACGBaseGameMode::HandleMatchHasStarted()
+{
+	Super::HandleMatchHasStarted();
+
+	// Set time
+	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
+	if (CGGameState)
+	{
+		CGGameState->RemainingTime = RoundTime;
+		CGGameState->GoalScore = ScoreToWin;
+	}
+
+	// Initializes the bot players.
+	StartBots();
+
+	// Inform all of the players that the game has started.
+	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+	{
+		ACGPlayerController* PC = Cast<ACGPlayerController>(*It);
+		if (PC)
+		{
+			PC->ClientGameStarted();
+		}
+	}
+}
+
+
+void ACGBaseGameMode::DefaultTimer()
+{
+	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
+	if (CGGameState && CGGameState->RemainingTime > 0 && --CGGameState->RemainingTime <= 0)
+	{
+		// If there's no longer time in the match we need to end the match.		
+		if (GetMatchState() == MatchState::InProgress)
+		{
+			EndGame();
+		}
+		// If the game was waiting to start start the match
+		else if (GetMatchState() == MatchState::WaitingToStart) 
+		{
+			// Built into AGameMode.
+			StartMatch();
+		}
+		// If the game was in the post match, restart it.
+		else if (GetMatchState() == MatchState::WaitingPostMatch)
+		{
+			// Built into AGameMode.
+			RestartGame();
+		}
+	}
+}
+
+UClass* ACGBaseGameMode::GetDefaultPawnClassForController(AController* InController)
+{ 
+	// If we have a bot controller, tell the game mode we need a bot pawn.
+	if (Cast<ACGBotController>(InController))
+	{
+		return BotPawn;
+	}
+
+	// If not a bot spawn the default bot.
+	return Super::GetDefaultPawnClassForController(InController);
+}
+
+#pragma endregion Override
+
 void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)
 {
 	// If the player meets the goal score, they win.
@@ -151,7 +167,7 @@ void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)
 /**Determines which player won the round.*/
 void ACGBaseGameMode::EndGame(ACGPlayerState* Winner)
 {
-
+	// Iterate over the pawns in the game world and let them know the game has ended.
 	for (FConstPawnIterator Iterator = GetWorld()->GetPawnIterator(); Iterator; ++Iterator)
 	{
 		ACGCharacter* Character = Cast<ACGCharacter>(*Iterator);
@@ -173,7 +189,7 @@ void ACGBaseGameMode::EndGame(ACGPlayerState* Winner)
 		}
 	}
 
-	// Set up the Timer for restart.
+	// Set up the timer for restart.
 	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
 	if (CGGameState)
 	{
@@ -192,10 +208,10 @@ bool ACGBaseGameMode::IsWinner(ACGPlayerState* Player)
 void ACGBaseGameMode::CreateBots()
 {
 	int32 BotsActive = 0;
+
 	// Iterate over the controllers.
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-	{
-		
+	{		
 		if (Cast<ACGBotController>(*It))
 		{
 			BotsActive++;
@@ -209,21 +225,21 @@ void ACGBaseGameMode::CreateBots()
 
 }
 
-void ACGBaseGameMode::SpawnBot(int32 BotId)
+void ACGBaseGameMode::SpawnBot(int32 BotID)
 {
-
+	// Set the spawn parameters for the bot
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 	SpawnInfo.Instigator = nullptr;
 	SpawnInfo.OverrideLevel = nullptr;
 
+	// Spawn the bot controller in the world.
 	ACGBotController* Bot = GetWorld()->SpawnActor<ACGBotController>(SpawnInfo);
 
 	if (Bot && Bot->PlayerState)
 	{
-		Bot->PlayerState->PlayerName = FString::Printf(TEXT("Bottisimo #%d"), BotId);
-	}
-	
+		Bot->PlayerState->PlayerName = FString::Printf(TEXT("Bottisimo #%d"), BotID);
+	}	
 }
 
 
@@ -239,3 +255,5 @@ void ACGBaseGameMode::StartBots()
 		}
 	}
 }
+
+#pragma endregion Protected
