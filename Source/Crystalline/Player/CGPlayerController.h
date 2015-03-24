@@ -31,7 +31,7 @@ public:
 	void OnHideScoreboard();
 
 	/**Displays the kill message on the player HUD.*/
-	void OnKillMessage(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
+	void OnKillMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
 
 	/**Notifies the player that the round is over.*/
 	virtual void ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner) override;

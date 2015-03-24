@@ -55,12 +55,12 @@ void ACGPlayerController::OnHideScoreboard()
 	}
 }
 
-void ACGPlayerController::OnKillMessage(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
+void ACGPlayerController::OnKillMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
 {
 	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
 	if (HUD)
 	{
-		HUD->SetScoreboardVisibility(true);
+		HUD->AddDialogKillMessage(Killer, KilledPlayer, DamageType);
 	}
 }
 

@@ -115,35 +115,30 @@ void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, con
 		return;
 	}
 
-
-	ACGPlayerState* const KilledPlayerState = KilledPlayer ? Cast<ACGPlayerState>(KilledPlayer->PlayerState) : NULL;
+	ACGPlayerState* const KillerPlayerState = Cast<ACGPlayerState>(Killer->PlayerState);
+	ACGPlayerState* const VictimPlayerState = KilledPlayer ? Cast<ACGPlayerState>(KilledPlayer->PlayerState) : NULL;
 
 	// If the killer was the killed player, it was a suicide.
 	if (Killer == KilledPlayer || (Killer == NULL))
 	{
 		if (KilledPlayer != NULL && Cast<ACGPlayerState>(KilledPlayer->PlayerState))
 		{
-			KilledPlayerState->ScoreSuicide(SuicidePenalty);
+			VictimPlayerState->ScoreSuicide(SuicidePenalty);
 		}
 	}
-	else
-	{
-		ACGPlayerState* const KillerState = Cast<ACGPlayerState>(Killer->PlayerState);
-		if (KillerState)
-		{
-			// Let the Killer Score
-			KillerState->ScoreKill(ScorePerKill);
-			// Check for a win.
-			CheckScore(KillerState);
-		}
+	else if(KillerPlayerState)
+	{	
+		// Let the Killer Score
+		KillerPlayerState->ScoreKill(ScorePerKill);
+		// Check for a win.
+		CheckScore(KillerPlayerState);
 	}
 
 	// Increment the death counter.
 	if (KilledPlayer != NULL && Cast<ACGPlayerState>(KilledPlayer->PlayerState))
 	{
-		KilledPlayerState->ScoreDeath();
-		KilledPlayerState->BroadcastDeathMessage(Killer, KilledPlayer, DamageType);
-
+		VictimPlayerState->ScoreDeath();
+		VictimPlayerState->BroadcastDeathMessage(KillerPlayerState, VictimPlayerState, DamageType);
 	}
 
 }

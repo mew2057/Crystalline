@@ -35,26 +35,6 @@ void ACGPlayerHUD::PostInitializeComponents()
 	// FIXME This crashes the editor!
 	DetermineKeyCodeForAction("ActionButton", ACTION_BUTTON, GamepadConnected);
 	DetermineKeyCodeForAction("PopCrystalButton", POP_BUTTON, GamepadConnected);
-
-
-	// SLATE TUTORIAL
-	/*SAssignNew(ShieldWidget, SShieldWidget).OwnerHUD(this);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////Pass our viewport a weak ptr to our widget
-	if (GEngine->IsValidLowLevel())
-	{
-		GEngine->GameViewport->
-			AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(ShieldWidget.ToSharedRef()));
-	}
-
-	if (ShieldWidget.IsValid())
-	{
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		/////Set widget's properties as visible (sets child widget's properties recursively)
-		ShieldWidget->SetVisibility(EVisibility::Visible);
-	}*/
-
 }
 
 //XXX This is Janky code.
@@ -706,11 +686,27 @@ void ACGPlayerHUD::DrawPrompt()
 	
 }
 
+void ACGPlayerHUD::DrawDialog()
+{
+
+}
+
 void ACGPlayerHUD::SetPromptMessage(bool bSetPrompt, const FString& Message, int32 ButtonID)
 {
 	Prompt.PromptMessage = Message;
 	Prompt.bPrompt = bSetPrompt;
 	Prompt.CurrentButton = ButtonID;
+}
+
+void ACGPlayerHUD::AddDialogKillMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
+{
+	FCGKillMessage NewKillMessage;
+	NewKillMessage.KillerName = Killer->GetShortenedName();
+	NewKillMessage.VictimName = KilledPlayer->GetShortenedName();
+
+	DialogQueue.Add(NewKillMessage);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s Killed %s"), *NewKillMessage.KillerName, *NewKillMessage.VictimName);
 
 }
 
@@ -782,7 +778,7 @@ void ACGPlayerHUD::DrawScoreboard()
 			Scoreboard.ScoreAlignment);
 
 		const int32 NumPlayers = CGGameState->PlayerArray.Num();
-		APlayerState* TempPlayerState;
+		ACGPlayerState* TempPlayerState;
 
 		AController* const Controller = GetOwningPlayerController();
 		APlayerState* const PlayerState = Controller ? Controller->PlayerState : NULL;
@@ -791,7 +787,7 @@ void ACGPlayerHUD::DrawScoreboard()
 
 		for (int32 i = 0; i < NumPlayers; ++i)
 		{
-			TempPlayerState = CGGameState->PlayerArray[i];
+			TempPlayerState = Cast<ACGPlayerState>(CGGameState->PlayerArray[i]);
 			CurrentX = X;
 
 			DrawRect(
@@ -811,7 +807,7 @@ void ACGPlayerHUD::DrawScoreboard()
 			CurrentX += RankWidth + ColOffset;
 
 			DrawScaledText(
-				TempPlayerState->PlayerName,
+				TempPlayerState->GetShortenedName(),
 				Scoreboard.TextColor,
 				CurrentX + NameWidth * Scoreboard.NameAlignment, CurrentY, Font,
 				RowHeight,

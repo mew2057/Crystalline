@@ -52,7 +52,17 @@ void ACGPlayerState::ScoreSuicide(int32 Points)
 	ForceNetUpdate();
 }
 
-void ACGPlayerState::BroadcastDeathMessage_Implementation(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
+FString ACGPlayerState::GetShortenedName()
+{
+	if (PlayerName.Len() > MAX_PLAYER_NAME_SIZE)
+	{
+		return PlayerName.Left(MAX_PLAYER_NAME_SIZE) + TRUNCATION;
+	}
+	return PlayerName;
+}
+
+
+void ACGPlayerState::BroadcastDeathMessage_Implementation(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
 {
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
