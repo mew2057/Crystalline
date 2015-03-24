@@ -278,6 +278,7 @@ void ACGWeapon::StartFire()
 		OnStartReload();
 		return;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("LOCAL %d %s"), GetAmmoInClip(), *CurrentState->GetName());
 
 	// Tell the server to start firing, Only if we can fire locally.
 	if (CurrentState->StartFire() && Role < ROLE_Authority)
@@ -293,6 +294,8 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("REMOTE %d %s"), GetAmmoInClip(), *CurrentState->GetName() );
+
 	CurrentState->StartFire();
 }
 
@@ -328,7 +331,7 @@ bool ACGWeapon::StartFiring()
 		OnStartReload();
 		return false;
 	}
-	
+
 	if (CGOwner != NULL && CGOwner->IsLocallyControlled())
 	{
 		if (WeaponConfig.bUsesProjectile)

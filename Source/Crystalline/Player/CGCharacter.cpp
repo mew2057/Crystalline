@@ -76,6 +76,9 @@ ACGCharacter::ACGCharacter(const FObjectInitializer& PCIP)
 void ACGCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	// Initializes the meshes
+	UpdatePawnMeshes();
 }
 
 void ACGCharacter::Tick(float DeltaSeconds)
@@ -120,6 +123,33 @@ void ACGCharacter::SetPlayerDefaults()
 		CurrentHealth = MaxHealth;
 		SpawnBaseInventory();
 	}
+}
+
+void ACGCharacter::PawnClientRestart()
+{
+	Super::PawnClientRestart();
+	
+	// Move to 1st Person.
+	UpdatePawnMeshes();
+
+	// XXX Replace me with a function call.
+	// Ensures that the current weapon is properly equipped.
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->SetCGOwner(this);
+		CurrentWeapon->OnEquip();
+	}
+}
+
+void ACGCharacter::UpdatePawnMeshes()
+{
+	bool const bFirstPerson = IsFirstPerson();
+
+	Mesh1P->MeshComponentUpdateFlag = !bFirstPerson ? EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered : EMeshComponentUpdateFlag::AlwaysTickPoseAndRefreshBones;
+	Mesh1P->SetOwnerNoSee(!bFirstPerson);
+
+	GetMesh()->MeshComponentUpdateFlag = bFirstPerson ? EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered : EMeshComponentUpdateFlag::AlwaysTickPoseAndRefreshBones;
+	GetMesh()->SetOwnerNoSee(bFirstPerson);
 }
 
 
@@ -222,6 +252,9 @@ void ACGCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Damag
 
 	// Clears out any and all timers for the object.
 	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	// Set the meshes to the appropriate 3rd person view.
+	UpdatePawnMeshes();
 
 	// Clear the inventory, we don't want any guns.
 	DestroyInventory();
@@ -558,6 +591,12 @@ void ACGCharacter::SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon)
 	}
 }
 
+ACGWeapon* ACGCharacter::GetOffHandWeapon() const
+{ 
+	return Inventory ? Inventory->GetNextWeapon(CurrentWeapon) : NULL; 
+};
+
+
 void ACGCharacter::WeaponChanged()
 {
 	// FIXME make this less jarring when you have time for polish -John.
@@ -583,7 +622,7 @@ void ACGCharacter::WeaponChanged()
 	// Set the offhand weapon for the character, IFF we have a weapon.
 	// TODO check to see if There is a better way of doing this for the HUD.
 	// FIXME!
-	if (Inventory != NULL && CurrentWeapon != NULL)
+	/*if (Inventory != NULL && CurrentWeapon != NULL)
 	{
 		const int32 NumberOfWeapons = Inventory->GetWeaponCount();
 		int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
@@ -593,7 +632,7 @@ void ACGCharacter::WeaponChanged()
 			WeaponIndex = (WeaponIndex + 1) % NumberOfWeapons;
 			OffHandWeapon = Inventory->GetWeapon(WeaponIndex);
 		}
-	}
+	}*/
 }
 
 void ACGCharacter::SpawnBaseInventory()

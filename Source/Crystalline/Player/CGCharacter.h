@@ -27,6 +27,12 @@ public:
 
 	virtual void SetPlayerDefaults() override;
 
+	/**Makes sure all the information is properly set when the control is handed over to a local player..*/
+	virtual void PawnClientRestart() override;
+
+	/**Updates the pawn meshes relative to the viewing mode employed by the player.*/
+	void UpdatePawnMeshes();
+
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 	
 	bool CantDie(float KillingDamage, FDamageEvent const& DamageEvent, AController* Killer, AActor* DamageCauser) const;
@@ -316,8 +322,9 @@ public:
 
 	FORCEINLINE ACGWeapon*  GetCurrentWeapon() const { return CurrentWeapon; };
 
+	// XXX temporary work around.
 	/** Returns the next weapon in the array. */
-	FORCEINLINE ACGWeapon* GetOffHandWeapon() const { return OffHandWeapon; };
+	FORCEINLINE ACGWeapon* GetOffHandWeapon() const;
 	
 	/*
 	 * Invoked when the weapon has been changed, the character performs the actual equip call.

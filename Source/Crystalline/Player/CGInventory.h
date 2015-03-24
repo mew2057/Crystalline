@@ -48,6 +48,9 @@ public:
 
 	FORCEINLINE int32 GetWeaponIndex(ACGWeapon* Weapon) const { return Weapons.Find(Weapon); }
 
+	// XXX There might be a better way to do this.
+	FORCEINLINE ACGWeapon* GetNextWeapon(ACGWeapon* Weapon) const { return Weapons[(Weapons.Find(Weapon) + 1) % Weapons.Num()]; }
+
 
 	void SetCGOwner(ACGCharacter* NewOwner);
 
