@@ -41,15 +41,19 @@ public:
 
 	// XXX Maybe make the ammo convert wholesale?
 	virtual int32 GetAmmo() const override { return Ammo / AmmoConfig.AmmoPerShot; }
+	FORCEINLINE int32 GetActualAmmo() const { return Ammo; }
+
 
 	virtual int32 GetDroppableAmmo() const override { return Ammo + AmmoInClip; }
 
 	// XXX Maybe make the ammo convert wholesale?
 	virtual int32 GetAmmoInClip() const override { return AmmoInClip / AmmoConfig.AmmoPerShot; }
+	FORCEINLINE int32 GetActualAmmoInClip() const { return AmmoInClip; }
+
 
 	void InitializeAmmo(const FCGCrystalAmmo& AmmoStruct);
 
-	void CopyAmmo(const ACGCrystalGun* Other);
+	void CopyAmmo(int32 Ammo, int32 AmmoInClip);
 #pragma endregion
 
 protected:

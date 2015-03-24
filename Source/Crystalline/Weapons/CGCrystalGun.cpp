@@ -86,9 +86,9 @@ void ACGCrystalGun::InitializeAmmo(const FCGCrystalAmmo& AmmoStruct)
 	ApplyReload();
 };
 
-void ACGCrystalGun::CopyAmmo(const ACGCrystalGun* Other)
+void ACGCrystalGun::CopyAmmo(int32 NewAmmo, int32 NewAmmoInClip)
 {
-	AmmoInClip = Other->AmmoInClip;
+	AmmoInClip = NewAmmoInClip;
 
 	// TODO Fix Shotgun bug.
 	// Make sure the player always has "round numbers" for ammo.
@@ -98,7 +98,7 @@ void ACGCrystalGun::CopyAmmo(const ACGCrystalGun* Other)
 		AmmoInClip += AmmoConfig.AmmoPerShot - AmmoOverFlow;
 	}
 
-	Ammo = Other->Ammo;
+	Ammo = NewAmmo;
 
 	// Make sure the player always has "round numbers" for ammo.
 	AmmoOverFlow = Ammo % AmmoConfig.AmmoPerShot;

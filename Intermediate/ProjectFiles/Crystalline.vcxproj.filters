@@ -275,6 +275,7 @@
     <ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponUnequippingState.h">
       <Filter>Source\Crystalline\Weapons\States</Filter>
     </ClInclude>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source\Crystalline\GUI\Widgets">

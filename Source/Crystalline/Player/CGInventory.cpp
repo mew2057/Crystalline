@@ -93,6 +93,11 @@ void ACGInventory::AddToWeaponMap(ACGWeapon* Weapon, ECGCrystalType Type)
 		WeaponGroups.Add(Type);
 	}
 
+	if (AmmoCache.Num() <= (uint8)Weapon->WeaponConfig.AmmoType)
+	{
+		AmmoCache.AddUninitialized((uint8)Weapon->WeaponConfig.AmmoType - AmmoCache.Num() + 1);
+	}
+
 	WeaponGroups[Type].AddUnique(Weapon);
 
 	// Set the owner of the weapon to the Character.
@@ -175,14 +180,25 @@ void ACGInventory::ReconstructInventory()
 
 	// Ensure that the crystal was defined.
 	ACGCrystalGun* CurrentWeapon = Cast<ACGCrystalGun>(Weapons[CrystalGunIndex]);
+
+	// Workaround fix.
+	uint8 CurrentWeaponAmmoIndex = CurrentWeapon ? (uint8)CurrentWeapon->WeaponConfig.AmmoType : AmmoCache.Num();
+	if (CurrentWeaponAmmoIndex < AmmoCache.Num())
+	{
+		AmmoCache[CurrentWeaponAmmoIndex].Ammo = CurrentWeapon->GetActualAmmo();
+		AmmoCache[CurrentWeaponAmmoIndex].AmmoInClip = CurrentWeapon->GetActualAmmoInClip();
+	}
+
 	ACGCrystalGun* NewWeapon = WeaponGroups.Contains(TierOneCrystal) ? Cast<ACGCrystalGun>(WeaponGroups[TierOneCrystal][0]) : NULL;
 
 	// Only if the 
 	if (NewWeapon != NULL)
 	{
-		if ( CurrentWeapon != NULL && CurrentWeapon->WeaponConfig.AmmoType == NewWeapon->WeaponConfig.AmmoType )
+		uint8 NewWeaponAmmoIndex = (uint8)NewWeapon->WeaponConfig.AmmoType;
+		// FIXME this is broken!
+		if (NewWeaponAmmoIndex < AmmoCache.Num() && AmmoCache[NewWeaponAmmoIndex].Ammo >= 0)
 		{
-			NewWeapon->CopyAmmo(CurrentWeapon);
+			NewWeapon->CopyAmmo(AmmoCache[NewWeaponAmmoIndex].Ammo, AmmoCache[NewWeaponAmmoIndex].AmmoInClip);
 		}
 
 		Weapons[CrystalGunIndex] = NewWeapon; 

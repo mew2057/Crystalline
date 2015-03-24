@@ -7,6 +7,21 @@
 
 #define INVENTORY_NUM_WEAPONS 2
 
+
+USTRUCT()
+struct FCGAmmo
+{
+	GENERATED_USTRUCT_BODY()
+
+	int32 AmmoInClip;
+	int32 Ammo;
+
+	FCGAmmo() :
+		Ammo(-1)
+	{
+
+	}
+};
 /**
  * 
  */
@@ -70,6 +85,10 @@ public:
 	/**The Weapons the player has available to them.*/
 	UPROPERTY(Transient, Replicated)
 	TArray<class ACGWeapon*> Weapons;
+
+
+	TArray <FCGAmmo> AmmoCache;
+
 
 	/**The index of the crystal gun.*/
 	UPROPERTY(Transient)
