@@ -6,7 +6,7 @@
 #include "CGKotHGameMode.generated.h"
 
 /**
- * 
+ * Defines the King of the Hill game mode. Now with 90% less bobby.
  */
 UCLASS()
 class CRYSTALLINE_API ACGKotHGameMode : public ACGBaseGameMode

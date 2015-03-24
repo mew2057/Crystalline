@@ -275,7 +275,6 @@
     <ClInclude Include="..\..\Source\Crystalline\Weapons\States\CGWeaponUnequippingState.h">
       <Filter>Source\Crystalline\Weapons\States</Filter>
     </ClInclude>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source\Crystalline\GUI\Widgets">
@@ -283,25 +282,32 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.h">
-      <Filter>Source\Crystalline\GUI\Widgets</Filter>
+    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\AmmoWidget.h" />
+    <ClInclude Include="..\..\Source\Crystalline\Misc\CGGameSettings.h" />
+    <ClInclude Include="..\..\Source\Crystalline\Misc\CGSaveGame.h" />
+    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGKotHGameMode.h">
+      <Filter>Source\Crystalline\GameModes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogMessage.h">
-      <Filter>Source\Crystalline\GUI\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogKillMessage.h">
-      <Filter>Source\Crystalline\GUI\Widgets</Filter>
+    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGPlayerStart.h">
+      <Filter>Source\Crystalline\GameModes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.cpp">
-      <Filter>Source\Crystalline\GUI\Widgets</Filter>
+    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\AmmoWidget.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Misc\CGGameSettings.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Misc\CGSaveGame.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponActiveState.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponEquippingState.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponInactiveState.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponReloadingState.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponReloadOverheatState.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponState.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\Weapons\States\CGWeaponUnequippingState.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGKotHGameMode.cpp">
+      <Filter>Source\Crystalline\GameModes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogMessage.cpp">
-      <Filter>Source\Crystalline\GUI\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogKillMessage.cpp">
-      <Filter>Source\Crystalline\GUI\Widgets</Filter>
+    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGPlayerStart.cpp">
+      <Filter>Source\Crystalline\GameModes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

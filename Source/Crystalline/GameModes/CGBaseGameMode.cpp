@@ -157,6 +157,21 @@ UClass* ACGBaseGameMode::GetDefaultPawnClassForController(AController* InControl
 	return Super::GetDefaultPawnClassForController(InController);
 }
 
+AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
+{
+	// If the player is a bot, spawn them at a botspawn.
+	if (Cast<ACGBotController>(Player))
+	{
+
+	}
+	else
+	{
+
+	}
+
+	return Super::ChoosePlayerStart(Player);
+}
+
 #pragma endregion Override
 
 void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)

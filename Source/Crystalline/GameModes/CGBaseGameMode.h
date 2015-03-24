@@ -9,9 +9,8 @@
 #include "CGBaseGameMode.generated.h"
 
 
-
 /**
- * 
+ * The Base Game Mode for Crystalline. Defines Bot Spawn logic, timer, and match states.
  */
 UCLASS()
 class CRYSTALLINE_API ACGBaseGameMode : public AGameMode
@@ -19,7 +18,7 @@ class CRYSTALLINE_API ACGBaseGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	/** Constructs the Game Mode. Initializes game attributes (mainly for the Editor's benefit) and defines the default classes that manage what the player sees.*/
+	/** Constructs the Game Mode. Initializes game attributes (mainly for the Editor's benefit) and defines the default classes that manage what the player sees. */
 	ACGBaseGameMode(const FObjectInitializer& ObjectInitializer);
 
 	/**
@@ -63,6 +62,9 @@ protected:
 	/** Gets the Pawn for the controller, used to spawn bots.*/
 	virtual UClass* GetDefaultPawnClassForController(AController* InController) override;
 
+	/** Prevents players from spawning on top of each other. */
+	virtual AActor* ChoosePlayerStart(AController* Player) override;
+
 	/**
 	 * Checks the score after a scoring action for the player, implemented in the subclasses
 	 * @param Player The player who's state is being checked to see if it has won the game.
@@ -77,6 +79,7 @@ protected:
 	virtual void EndGame(ACGPlayerState* Winner = NULL);
 
 	/** 
+	 *	XXX This function is not currently used by Crystalline.
 	 * Determines whether or not the player is the winner of the round.
 	 * @param Player The player being checked for winner status.
 	 * @return True if the player is the winner.
