@@ -208,6 +208,11 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 	return BestStart != NULL ? BestStart : Super::ChoosePlayerStart(Player);
 }
 
+bool ACGBaseGameMode::ShouldSpawnAtStartSpot(AController* Player)
+{
+	return false;
+}
+
 #pragma endregion Override
 
 float ACGBaseGameMode::RatePlayerStart( ACGPlayerStart* Start, ACGPlayerController* PlayerController, bool bBot) const

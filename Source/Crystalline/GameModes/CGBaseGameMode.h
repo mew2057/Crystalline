@@ -69,6 +69,9 @@ protected:
 	/** Prevents players from spawning on top of each other. */
 	virtual AActor* ChoosePlayerStart(AController* Player) override;
 
+	/**Always returns true to prevent the player from spawning in the same location. XXX May want to modify in the future for special cases.*/
+	virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
+
 	/**
 	 * Borrowed, but heavily modified, from Unreal Tournament's Spawning system. Rates a spawn based upon cromulent factors for a game mode.
 	 * e.g. Time since someone last spawned at a location, whether bots are allowed, etc.
