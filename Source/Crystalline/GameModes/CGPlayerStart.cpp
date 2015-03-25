@@ -15,3 +15,13 @@ uint8 ACGPlayerStart::GetTeamNumber()
 { 
 	return TeamNumber; 
 }
+
+float ACGPlayerStart::GetLastSpawnTime()
+{
+	return LastSpawnTime;
+}
+
+void ACGPlayerStart::SetLastSpawnTime(float Time)
+{
+	LastSpawnTime = Time;
+}

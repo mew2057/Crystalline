@@ -5,10 +5,10 @@
 #include "Player/CGCharacter.h"
 #include "Player/CGPlayerController.h"
 #include "Bots/CGBotController.h"
+#include "CGPlayerStart.h"
 #include "GUI/CGPlayerHUD.h"
 
 #pragma region Public
-
 
 ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer),
@@ -18,7 +18,8 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	ScorePerKill(1),
 	SuicidePenalty(1),
 	bSpawnBots(false),
-	BotsInRound(2)
+	BotsInRound(2),
+	PlayerStartCooldownTime(10.f)
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CGPlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
@@ -157,22 +158,96 @@ UClass* ACGBaseGameMode::GetDefaultPawnClassForController(AController* InControl
 	return Super::GetDefaultPawnClassForController(InController);
 }
 
+AActor* ACGBaseGameMode::FindPlayerStart(AController* Player, const FString& IncomingName)
+{
+	AActor* PlayerStart = Super::FindPlayerStart(Player, IncomingName);
+
+	// This is approximately correct.
+	ACGPlayerStart* CGPlayerStart = Cast<ACGPlayerStart>(PlayerStart);
+	if (CGPlayerStart)
+	{
+		CGPlayerStart->SetLastSpawnTime(GetWorld()->GetTimeSeconds());
+	}	
+
+	return PlayerStart;
+}
+
+
 AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 {
-	// If the player is a bot, spawn them at a botspawn.
-	if (Cast<ACGBotController>(Player))
+	// Determine if the player is a bot and get the crystalline controller.
+	bool bIsBot = Cast<ACGBotController>(Player) != NULL;
+	ACGPlayerController* PlayerController = Cast<ACGPlayerController>(Player);
+
+	const int32 RandomStart = FMath::RandHelper(PlayerStarts.Num());
+	const int32 StartCount = PlayerStarts.Num();
+
+	float BestScore = 0.f;
+	float CurrentScore = 0.f;
+
+	ACGPlayerStart* BestStart    = NULL;
+	ACGPlayerStart* CurrentStart = NULL;
+
+	for (int32 i = 0; i < StartCount; ++i)
 	{
-
+		CurrentStart = Cast<ACGPlayerStart>(PlayerStarts[(i + RandomStart) % StartCount]);
+		CurrentScore = RatePlayerStart(CurrentStart, PlayerController, bIsBot);
+		
+		// If the rating is perfect return the current state.
+		if (CurrentScore == 100.f)
+		{
+			return CurrentStart;
+		}
+		else if (CurrentScore > BestScore)
+		{
+			BestScore = CurrentScore;
+			BestStart = CurrentStart;
+		}
 	}
-	else
-	{
 
-	}
-
-	return Super::ChoosePlayerStart(Player);
+	return BestStart != NULL ? BestStart : Super::ChoosePlayerStart(Player);
 }
 
 #pragma endregion Override
+
+float ACGBaseGameMode::RatePlayerStart( ACGPlayerStart* Start, ACGPlayerController* PlayerController, bool bBot) const
+{
+	float StartRating = 100.f;
+
+	// If the PlayerStart is not yet allowed to spawn penalize the spawn.
+	if (Start->GetLastSpawnTime() > 0 && 
+		PlayerStartCooldownTime > (GetWorld()->GetTimeSeconds() - Start->GetLastSpawnTime()))
+	{
+		StartRating -= 50.f;
+	}
+
+	// EARLY RETURN
+	// If the player is a bot and the spawn doesn't support bots, or 
+	// the spawn is for bots and the player is not then this spawn is not suitable.
+	if (XOR(Start->IsBotSpawn(), bBot))
+	{
+		return 0.f;
+	}
+
+
+	// Make Sure the player controller exists.
+	if (PlayerController != NULL)
+	{
+		// XXX probably shouldn't do this cast every time?
+		// Initial spawns should only be used once, if the player has died don't spawn them there again.
+		ACGPlayerState* PlayerState = Cast<ACGPlayerState>(PlayerController->PlayerState);
+
+		if (PlayerState->GetNumDeaths() > 0 && Start->IsInitialSpawn())
+		{
+			return -100.f;
+		}
+
+		// TODO Spatial locality.
+	}	
+
+	return StartRating;
+}
+
 
 void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)
 {

@@ -62,8 +62,25 @@ protected:
 	/** Gets the Pawn for the controller, used to spawn bots.*/
 	virtual UClass* GetDefaultPawnClassForController(AController* InController) override;
 
+
+	/** Sets the Spawn time on the PlayerStart before the player is spawned.*/
+	virtual AActor* FindPlayerStart(AController* Player, const FString& IncomingName) override;
+
 	/** Prevents players from spawning on top of each other. */
 	virtual AActor* ChoosePlayerStart(AController* Player) override;
+
+	/**
+	 * Borrowed, but heavily modified, from Unreal Tournament's Spawning system. Rates a spawn based upon cromulent factors for a game mode.
+	 * e.g. Time since someone last spawned at a location, whether bots are allowed, etc.
+	 * Right now we chiefly rely upon the principle of temporal locality to determine if a spawn is appropriate.
+	 *
+	 * @param Start The start location that is being assessed.
+	 * @param PlayerController The controller that will be spawned in the location.
+	 * @param bBot True if the controller is a bot.
+	 * @return A float rating for the spawn location.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "GameMode|State")
+	virtual float RatePlayerStart(class ACGPlayerStart* Start, class ACGPlayerController* PlayerController, bool bBot = false) const;
 
 	/**
 	 * Checks the score after a scoring action for the player, implemented in the subclasses
@@ -122,6 +139,10 @@ protected:
 	/** Time for the post game state. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 PostGameTime;
+
+	/** The time between uses of a particular spawn.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float PlayerStartCooldownTime;
 
 	/** Default pawn for the bot. */
 	UPROPERTY(EditDefaultsOnly, Category = BotConfig)

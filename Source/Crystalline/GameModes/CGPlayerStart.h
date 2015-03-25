@@ -23,6 +23,7 @@ public:
 
 	/**
 	 * Indicates whether or not a bot may spawn at this player start.
+	 *
 	 * @return True if a bot may spawn at this location.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Player Start")
@@ -30,10 +31,27 @@ public:
 
 	/**
 	 * Retrieves the current team number for a spawn.
+	 *
 	 * @return The team numeric identifier.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Player Start")
 	uint8 GetTeamNumber();
+
+	/**
+	* Retrieves the last time that the the spawn was used.
+	*
+	* @return The time that this start was last used.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Player Start")
+	float GetLastSpawnTime();
+
+	/**
+	 * Sets the time that this Start was used at for the sake of determining start rating.
+	 *
+	 * @param Time The time this Start was last used.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Player Start")
+	void SetLastSpawnTime(float Time);
 	
 protected:
 	/** The team number of this spawn. Note this is only used in team game types.*/
@@ -47,4 +65,8 @@ protected:
 	/** Flag that dictates whether or not a bot may spawn at this location. */
 	UPROPERTY(EditAnywhere)
 	uint32 bBotsMaySpawn : 1;
+
+	/** The last time that this start spawned a player. */
+	UPROPERTY(Transient)
+	float LastSpawnTime;
 };
