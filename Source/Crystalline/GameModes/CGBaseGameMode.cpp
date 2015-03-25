@@ -188,14 +188,18 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 	ACGPlayerStart* BestStart    = NULL;
 	ACGPlayerStart* CurrentStart = NULL;
 
+	UE_LOG(LogTemp, Warning, TEXT("Spawning Player %s."), *Player->GetName());	
+
 	for (int32 i = 0; i < StartCount; ++i)
 	{
 		CurrentStart = Cast<ACGPlayerStart>(PlayerStarts[(i + RandomStart) % StartCount]);
 		CurrentScore = CurrentStart ? RatePlayerStart(CurrentStart, PlayerController, bIsBot) : -100.f;
-		
+		UE_LOG(LogTemp, Warning, TEXT("Start %d Score %f"), i, CurrentScore);
 		// If the rating is perfect return the current state.
 		if (CurrentScore == 100.f)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Spawn At %s (Perfect rating)."), *CurrentStart->GetName());
+
 			return CurrentStart;
 		}
 		else if (CurrentScore > BestScore)
@@ -205,12 +209,25 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 		}
 	}
 
+	if (BestStart)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn At %s %f"), *BestStart->GetName(), BestScore);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn At fallback!"));
+	}
+
+
 	return BestStart != NULL ? BestStart : Super::ChoosePlayerStart(Player);
 }
 
 bool ACGBaseGameMode::ShouldSpawnAtStartSpot(AController* Player)
 {
-	return false;
+
+	// This fails to find a player spawn?
+	return Player != NULL && Player->StartSpot.IsValid() && // If the player start spot is valid.
+		GetMatchState() != MatchState::InProgress;	// And the round is not in progress use the start spot.
 }
 
 #pragma endregion Override
@@ -240,17 +257,29 @@ float ACGBaseGameMode::RatePlayerStart( ACGPlayerStart* Start, ACGPlayerControll
 	// Make Sure the player controller exists.
 	if (PlayerController != NULL)
 	{
-		// XXX probably shouldn't do this cast every time?
-		// Initial spawns should only be used once, if the player has died don't spawn them there again.
-		ACGPlayerState* PlayerState = Cast<ACGPlayerState>(PlayerController->PlayerState);
-
-		if (PlayerState->GetNumDeaths() > 0 && Start->IsInitialSpawn())
+		// If the player controller has a start spawn specified then it is not qualified for an initial spawn location.		
+		if ( Start->IsInitialSpawn())
 		{
-			return -100.f;
+			// If the player has spawned already this is not suitable.
+			// If the player hasn't spawned already give a slight pecedence.
+			if (PlayerController->StartSpot.IsValid())
+			{
+				return -100.f;
+			}
+			else
+			{
+				StartRating += 10.f;
+			}
+		}
+		else if (!PlayerController->StartSpot.IsValid())
+		{
+			// The first spawn should prefer Initial spawn locations.
+			StartRating -= 10.f;
 		}
 
 		// TODO Spatial locality.
 	}	
+
 
 	return StartRating;
 }
