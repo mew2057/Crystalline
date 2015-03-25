@@ -191,7 +191,7 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 	for (int32 i = 0; i < StartCount; ++i)
 	{
 		CurrentStart = Cast<ACGPlayerStart>(PlayerStarts[(i + RandomStart) % StartCount]);
-		CurrentScore = RatePlayerStart(CurrentStart, PlayerController, bIsBot);
+		CurrentScore = CurrentStart ? RatePlayerStart(CurrentStart, PlayerController, bIsBot) : -100.f;
 		
 		// If the rating is perfect return the current state.
 		if (CurrentScore == 100.f)
@@ -217,6 +217,8 @@ bool ACGBaseGameMode::ShouldSpawnAtStartSpot(AController* Player)
 
 float ACGBaseGameMode::RatePlayerStart( ACGPlayerStart* Start, ACGPlayerController* PlayerController, bool bBot) const
 {
+	// XXX should this have a null check for the Start?
+
 	float StartRating = 100.f;
 
 	// If the PlayerStart is not yet allowed to spawn penalize the spawn.
