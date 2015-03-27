@@ -56,13 +56,16 @@ protected:
 	 */
 	virtual void HandleMatchHasStarted() override;
 
+	/**Tells the player how to react after logging in.*/
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+
 	/** Updates the gameplay timer, if the timer zeroes out react according to the state that the gmae was in.*/
 	virtual void DefaultTimer() override;
 
 	/** Gets the Pawn for the controller, used to spawn bots.*/
 	virtual UClass* GetDefaultPawnClassForController(AController* InController) override;
-
-
+	
 	/** Sets the Spawn time on the PlayerStart before the player is spawned.*/
 	virtual AActor* FindPlayerStart(AController* Player, const FString& IncomingName) override;
 
@@ -138,6 +141,10 @@ protected:
 	/** Score deducted per suicide.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 SuicidePenalty;
+
+	/** Time for the WaitingToStart state. */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	int32 WarmupGameTime;
 
 	/** Time for the post game state. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
