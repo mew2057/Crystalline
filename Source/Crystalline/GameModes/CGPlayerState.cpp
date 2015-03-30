@@ -76,11 +76,25 @@ void ACGPlayerState::BroadcastDeathMessage_Implementation(ACGPlayerState* Killer
 		ACGPlayerController * TempController = Cast<ACGPlayerController>(*It);
 		if (TempController && TempController->IsLocalController())
 		{
-			// Invoke the dialog message thing.
+			// Invoke the dialog message.
 			TempController->OnKillMessage(Killer, KilledPlayer, DamageType);
 		}
 	}
 }
+
+void ACGPlayerState::BroadcastGameModeMessage_Implementation(const FString & Message)
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ACGPlayerController * TempController = Cast<ACGPlayerController>(*It);
+		if (TempController && TempController->IsLocalController())
+		{
+			// Invoke the dialog message for GameMode Messages.
+			TempController->OnGameModeMessage(Message);
+		}
+	}
+}
+
 
 void ACGPlayerState::AddScore(int32 AddToScore)
 {

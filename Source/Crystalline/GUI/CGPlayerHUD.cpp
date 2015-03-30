@@ -710,6 +710,12 @@ void ACGPlayerHUD::AddDialogKillMessage(ACGPlayerState* Killer, ACGPlayerState* 
 
 }
 
+void ACGPlayerHUD::AddDialogGameModeMessage(const FString & Message)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Message);
+}
+
+
 void ACGPlayerHUD::NotifyHitTaken(const FVector& HitDirection )
 {
 	float TempTime = GetWorld()->GetTimeSeconds();

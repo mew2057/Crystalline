@@ -627,6 +627,11 @@ public:
 	/**Append a kill message to the queue of death messages.*/
 	void AddDialogKillMessage(class ACGPlayerState* Killer, class ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
 
+
+	// TODO Make dialog work.
+	/**Append a GameMode Message to the queue of dialog messages.*/
+	void AddDialogGameModeMessage(const FString & Message);
+
 	/**Sets the TimeSinceLastHit for the hit notification.*/
 	void NotifyHitTaken(const FVector& HitDirection);
 

@@ -51,6 +51,13 @@ public:
 	void BroadcastDeathMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
 	void BroadcastDeathMessage_Implementation(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
 
+
+	// Broadcasted across server and client reliably.
+	UFUNCTION(Reliable, NetMulticast)
+	void BroadcastGameModeMessage(const FString & Message);
+	void BroadcastGameModeMessage_Implementation(const FString & Message);
+
+
 	UFUNCTION(BlueprintCallable, Category = "StateScore")
 	void AddScore(int32 AddToScore);
 

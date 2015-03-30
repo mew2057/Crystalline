@@ -343,6 +343,29 @@ float ACGBaseGameMode::RatePlayerStart( ACGPlayerStart* Start, ACGPlayerControll
 void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)
 {
 	// If the player meets the goal score, they win.
+	if (Player->Score >= ScoreToWin)
+	{
+		// Win the Game.
+		EndGame(Player);
+		return;
+	}
+
+	// Determine helper values.
+	const int32 MessageCount =  ScoreMessages.Num();
+	const int32 PointsToWin = ScoreToWin - Player->Score;
+
+	// Otherwise check to see if we have a score that a message should be played at.
+	for (int32 i = 0; i < MessageCount; ++i)
+	{
+		// If the points match, we're done.
+		if (ScoreMessages[i].PointsToWin == PointsToWin)
+		{
+			Player->BroadcastGameModeMessage(ScoreMessages[i].MessageText);
+
+			break;
+		}
+	}
+
 }
 
 /**Determines which player won the round.*/

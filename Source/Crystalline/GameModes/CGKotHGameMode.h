@@ -17,8 +17,6 @@ protected:
 	UPROPERTY(transient)
 	class ACGPlayerState* GameWinner;
 
-	virtual void CheckScore(ACGPlayerState* Player) final;
-
 	virtual bool IsWinner(ACGPlayerState* Player) override;
 
 	virtual void EndGame(ACGPlayerState* Winner) override;	

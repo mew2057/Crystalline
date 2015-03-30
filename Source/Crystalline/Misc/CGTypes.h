@@ -59,7 +59,6 @@ struct FCGHUDRenderText : public FCGHUDRenderObject
 };
 
 
-
 #pragma region Enums
 
 UENUM(BlueprintType)
@@ -88,6 +87,32 @@ inline uint8 GetTypeHash(const ECGCrystalType A)
 
 #pragma endregion
 
+#pragma region Game Mode Structs
+
+/**
+ * Used by the Game Mode to pass game state messages to the clients.
+ */
+USTRUCT(BlueprintType)
+struct FCGScoreMessage
+{
+	GENERATED_USTRUCT_BODY()
+
+	/**How far from the winning score should this message be played.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	int32 PointsToWin;
+
+	/**The message that is displayed to the player.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FString MessageText;
+	
+	// TODO Message voice.
+	FCGScoreMessage()
+	{
+
+	}
+};
+
+#pragma endregion
 
 #pragma region Character Structs
 
@@ -95,9 +120,10 @@ USTRUCT()
 struct FCGZoom
 {
 	GENERATED_USTRUCT_BODY()
-		/** The factor that this zoom.*/
-		UPROPERTY(EditDefaultsOnly)
-		float ZoomFactor;
+	
+	/** The factor that this zoom.*/
+	UPROPERTY(EditDefaultsOnly)
+	float ZoomFactor;
 
 	/**Speed of the interpolation from zoomed to zoomed out and vice versa. TODO make this seconds!*/
 	UPROPERTY(EditDefaultsOnly)

@@ -73,6 +73,16 @@ void ACGPlayerController::OnKillMessage(ACGPlayerState* Killer, ACGPlayerState* 
 }
 
 
+void ACGPlayerController::OnGameModeMessage(const FString & Message)
+{
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+		HUD->AddDialogGameModeMessage(Message);
+	}
+}
+
+
 void ACGPlayerController::ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::ClientGameEnded_Implementation(EndGameFocus, bIsWinner);

@@ -18,9 +18,6 @@ protected:
 	UPROPERTY(transient)
 	class ACGPlayerState* GameWinner;
 
-	/** Checks the score and sends a message to the players when a player is found to be close to winning. */
-	virtual void CheckScore(ACGPlayerState* Player) override;
-
 	/** If the player matches the game winner, the player is considered a winner.*/
 	virtual bool IsWinner(ACGPlayerState* Player) override;
   
