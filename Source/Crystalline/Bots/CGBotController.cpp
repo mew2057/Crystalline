@@ -13,9 +13,7 @@
 ACGBotController::ACGBotController(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
 {
 	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackBoardComp"));
-
 	BehaviorComp = ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BehaviorComp"));
-
 
 	bWantsPlayerState = true;
 }
