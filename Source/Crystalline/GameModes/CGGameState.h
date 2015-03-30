@@ -20,25 +20,29 @@ public:
 	/**Notify the players that the match has ended.*/
 	virtual void HandleMatchHasEnded() override;
 
-
-
-	/** Sends kill (excluding self) to clients */
-	//UFUNCTION(Reliable, Client)
-	//void InformAboutKill(class AShooterPlayerState* KillerPlayerState, const UDamageType* KillerDamageType, class AShooterPlayerState* KilledPlayerState);
-	//
-	///** broadcast death to local clients */
-	//UFUNCTION(Reliable, NetMulticast)
-	//void BroadcastDeath(class AShooterPlayerState* KillerPlayerState, const UDamageType* KillerDamageType, class AShooterPlayerState* KilledPlayerState);
-
-
+	/**
+	 * Performs an implementation of Bubble Sort on the players for rankings. 
+	 * Bubble sort is used over Merge Sort due to the adaptive nature of the Sorting algorithm. 
+	 * Typically this should only take about 2N time as there will generally only be one swap.
+	 */
 	void SortPlayers();
 
 	/** Time left in the round, post game, pre game, etc.*/
 	UPROPERTY(Transient, Replicated)
 	int32 RemainingTime;
 
-	// TODO is there a better way?
 	/** Set at the start of the match by the game mode, then never touched again.*/
 	UPROPERTY(Transient, Replicated)
 	float GoalScore;
+
+
+
+protected:
+	/** The index for the game mode in the message structure for the GameState. */
+	UPROPERTY(Transient, Replicated)
+	int32 CurrentGameMode;
+
+	/** A Collection of constant messages used to provide the player with appropriate game specific messages.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FCGCrystallineMessageAssortment CrystallineMessages;
 };

@@ -16,13 +16,7 @@ void ACGGameState::HandleMatchHasEnded()
 	//UE_Log(LogTemp, Log,TEXT("Match has ended!"));
 }
 
-void ACGGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ACGGameState, RemainingTime);
-	DOREPLIFETIME(ACGGameState, GoalScore);	
-}
 
 void ACGGameState::SortPlayers()
 {
@@ -53,4 +47,13 @@ void ACGGameState::SortPlayers()
 		// Only iterate until the farthest swap on the next pass as the array is guaranteed to be sorted past that point.
 		PlayerCount = FarthestSwapped;
 	} while (FarthestSwapped > 0);
+}
+
+void ACGGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACGGameState, RemainingTime);
+	DOREPLIFETIME(ACGGameState, GoalScore);
+	DOREPLIFETIME(ACGGameState, CurrentGameMode);
 }

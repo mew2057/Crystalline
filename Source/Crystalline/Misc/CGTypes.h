@@ -88,12 +88,36 @@ inline uint8 GetTypeHash(const ECGCrystalType A)
 #pragma endregion
 
 #pragma region Game Mode Structs
+// XXX Find better names for these!
 
 /**
- * Used by the Game Mode to pass game state messages to the clients.
- */
+* Base Class for predefined messages.
+*/
 USTRUCT(BlueprintType)
-struct FCGScoreMessage
+struct FCGMessage
+{
+	GENERATED_USTRUCT_BODY()
+
+	/**The message that is displayed to the player.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FString MessageText;
+
+	/** The Sound effect associated with the message.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	USoundCue * MessageSound;
+
+	FCGMessage()
+	{
+		
+	}
+};
+
+
+/**
+* Adds a Score to FCGMessage as a condition for displaying the message.
+*/
+USTRUCT(BlueprintType)
+struct FCGScoreMessage : public FCGMessage
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -101,17 +125,50 @@ struct FCGScoreMessage
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 PointsToWin;
 
-	/**The message that is displayed to the player.*/
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	FString MessageText;
-	
-	// TODO Message voice.
 	FCGScoreMessage()
 	{
 
 	}
 };
 
+
+/**
+* Contains a collection of messages used to display relevant information to the player, based on the game mode.
+*/
+USTRUCT(BlueprintType)
+struct FCGGameModeMessageAssortment
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** The Game Mode that the messages are specified for.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	TSubclassOf<class ACGBaseGameMode> GameModeClass;
+
+	/**A Collection of score messages that give the player feedback on game state. Used by check score.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	TArray<FCGScoreMessage> ScoreMessages;
+
+	FCGGameModeMessageAssortment()
+	{
+
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FCGCrystallineMessageAssortment
+{
+	GENERATED_USTRUCT_BODY()
+	// TODO generic messages.
+
+	/** Colleciton of Messages that are game mode specific. */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	TArray<FCGGameModeMessageAssortment> GameModeMessages;
+
+	FCGCrystallineMessageAssortment()
+	{
+
+	}
+};
 #pragma endregion
 
 #pragma region Character Structs
