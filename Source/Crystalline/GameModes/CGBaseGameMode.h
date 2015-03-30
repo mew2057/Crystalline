@@ -30,7 +30,15 @@ public:
 	 *	@param DamageType The type of damage that killed the player, e.g. Shotgun, Pistol, etc.
 	 */
 	virtual void Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType);
-	
+
+	/**
+	 * Invoked when the player achieves an objective goal on the server, e.g. holding a hill, capturing a flag, etc.
+	 *
+	 * @param PlayerController The player who has scored the objective.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "GameMode|Score")
+	virtual void ObjectiveScored(AController * PlayerController);
+
 	/**
 	 * Gets the maximum round time. Note: This is NOT the current round time.
 	 */
@@ -58,7 +66,6 @@ protected:
 
 	/**Tells the player how to react after logging in.*/
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-
 
 	/** Updates the gameplay timer, if the timer zeroes out react according to the state that the gmae was in.*/
 	virtual void DefaultTimer() override;
@@ -141,6 +148,10 @@ protected:
 	/** Score deducted per suicide.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 SuicidePenalty;
+
+	/** The score awarded upon completion of the objective.*/
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	int32 ObjectiveScore;
 
 	/** Time for the WaitingToStart state. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)

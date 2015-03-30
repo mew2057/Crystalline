@@ -52,6 +52,13 @@ void ACGPlayerState::ScoreSuicide(int32 Points)
 	ForceNetUpdate();
 }
 
+void ACGPlayerState::ScoreObjective(int32 Points)
+{
+	Score += Points;
+	ForceNetUpdate();
+}
+
+
 FString ACGPlayerState::GetShortenedName()
 {
 	if (PlayerName.Len() > MAX_PLAYER_NAME_SIZE)

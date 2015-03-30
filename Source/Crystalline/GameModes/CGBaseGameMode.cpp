@@ -17,6 +17,7 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	PostGameTime(10),
 	ScorePerKill(1),
 	SuicidePenalty(1),
+	ObjectiveScore(1),
 	bSpawnBots(false),
 	BotsInRound(2),
 	PlayerStartCooldownTime(10.f),
@@ -66,8 +67,26 @@ void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, con
 		VictimPlayerState->ScoreDeath();
 		VictimPlayerState->BroadcastDeathMessage(KillerPlayerState, VictimPlayerState, DamageType);
 	}
-
 }
+
+void ACGBaseGameMode::ObjectiveScored(AController * PlayerController)
+{
+	// Objectives scored when the game is not in progress mean nothing.
+	if (GetMatchState() != MatchState::InProgress )
+	{
+		return;
+	}
+
+	ACGPlayerState* const PlayerState = PlayerController ? Cast<ACGPlayerState>(PlayerController->PlayerState) : NULL;
+
+	// If there's a player state available to score, let them score.
+	if (PlayerState)
+	{
+		PlayerState->ScoreObjective(ObjectiveScore);
+		CheckScore(PlayerState);
+	}
+}
+
 
 int32 ACGBaseGameMode::GetRoundTime() const
 { 

@@ -27,13 +27,22 @@ public:
 	virtual void UnregisterPlayerWithSession() override;
 
 	/**Increment the number of kills and the score.*/
-	virtual void ScoreKill( int32 Points);
+	void ScoreKill( int32 Points);
 
 	/**Doesn't affect player socre, just changes deaths.*/
-	virtual void ScoreDeath();
+	void ScoreDeath();
 
 	/**Only Suicides negatively impact player score.*/
-	virtual void ScoreSuicide(int32 Points);
+	void ScoreSuicide(int32 Points);
+
+	/** 
+ 	 * Scores an objective for the player state.
+	 * Currently doesn't impact anything but player score.
+	 *
+	 * @param Points The number of points to reward the player score.
+	 */
+	void ScoreObjective(int32 Points);
+
 
 	FString GetShortenedName();
 

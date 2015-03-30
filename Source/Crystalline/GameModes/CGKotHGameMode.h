@@ -21,6 +21,5 @@ protected:
 
 	virtual bool IsWinner(ACGPlayerState* Player) override;
 
-	virtual void EndGame(ACGPlayerState* Winner) override;
-	
+	virtual void EndGame(ACGPlayerState* Winner) override;	
 };
