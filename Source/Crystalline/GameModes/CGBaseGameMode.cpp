@@ -19,7 +19,8 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	SuicidePenalty(1),
 	bSpawnBots(false),
 	BotsInRound(2),
-	PlayerStartCooldownTime(10.f)
+	PlayerStartCooldownTime(10.f),
+	WarmupGameTime(10.f)
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CGPlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
@@ -29,6 +30,7 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	PlayerStateClass      = ACGPlayerState::StaticClass();
 	GameStateClass        = ACGGameState::StaticClass();
 	MinRespawnDelay		  = 2.f;
+	bDelayedStart		  = true;
 }
 
 void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
@@ -92,6 +94,14 @@ void ACGBaseGameMode::HandleMatchIsWaitingToStart()
 	{
 		CreateBots();
 	}
+
+	// TODO spectator pawn.
+	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
+	if (CGGameState)
+	{
+		CGGameState->RemainingTime = WarmupGameTime;
+		CGGameState->GoalScore = 10000.f; // FIXME
+	}
 }
 
 void ACGBaseGameMode::HandleMatchHasStarted()
@@ -117,6 +127,28 @@ void ACGBaseGameMode::HandleMatchHasStarted()
 		{
 			PC->ClientGameStarted();
 		}
+	}
+}
+
+
+void ACGBaseGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	UE_LOG(LogTemp, Warning, TEXT("Post Login %s."), *NewPlayer->GetName());
+
+	// Ensure that the client has the proper spectaor camera location.
+	ACGPlayerController* NCGPC = Cast<ACGPlayerController>(NewPlayer);
+	if (NCGPC && NCGPC->GetPawn() == NULL)
+	{
+		NCGPC->ClientSetSpectatorCamera(NCGPC->GetSpawnLocation(), NCGPC->GetControlRotation());
+	}
+
+	// Notifies a new player if the match is already being played.
+	// This mainly does cleanup operations.
+	if (NCGPC && IsMatchInProgress())
+	{
+		NCGPC->ClientGameStarted();
 	}
 }
 
@@ -162,9 +194,10 @@ AActor* ACGBaseGameMode::FindPlayerStart(AController* Player, const FString& Inc
 {
 	AActor* PlayerStart = Super::FindPlayerStart(Player, IncomingName);
 
-	// This is approximately correct.
+	// Only Set the last spawn time for a spawn if we're in the match.
+	// This is an approximation.
 	ACGPlayerStart* CGPlayerStart = Cast<ACGPlayerStart>(PlayerStart);
-	if (CGPlayerStart)
+	if (CGPlayerStart && GetMatchState() == MatchState::InProgress)
 	{
 		CGPlayerStart->SetLastSpawnTime(GetWorld()->GetTimeSeconds());
 	}	
@@ -188,14 +221,18 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 	ACGPlayerStart* BestStart    = NULL;
 	ACGPlayerStart* CurrentStart = NULL;
 
+	UE_LOG(LogTemp, Warning, TEXT("Spawning Player %s."), *Player->GetName());	
+
 	for (int32 i = 0; i < StartCount; ++i)
 	{
 		CurrentStart = Cast<ACGPlayerStart>(PlayerStarts[(i + RandomStart) % StartCount]);
 		CurrentScore = CurrentStart ? RatePlayerStart(CurrentStart, PlayerController, bIsBot) : -100.f;
-		
+		UE_LOG(LogTemp, Warning, TEXT("Start %d Score %f"), i, CurrentScore);
 		// If the rating is perfect return the current state.
-		if (CurrentScore == 100.f)
+		if (CurrentScore >= 100.f)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Spawn At %s (Perfect rating)."), *CurrentStart->GetName());
+
 			return CurrentStart;
 		}
 		else if (CurrentScore > BestScore)
@@ -205,12 +242,25 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 		}
 	}
 
+	if (BestStart)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn At %s %f"), *BestStart->GetName(), BestScore);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn At fallback!"));
+	}
+
+
 	return BestStart != NULL ? BestStart : Super::ChoosePlayerStart(Player);
 }
 
 bool ACGBaseGameMode::ShouldSpawnAtStartSpot(AController* Player)
 {
-	return false;
+
+	// This fails to find a player spawn?
+	return Player != NULL && Player->StartSpot.IsValid() && // If the player start spot is valid.
+		GetMatchState() != MatchState::InProgress;	// And the round is not in progress use the start spot.
 }
 
 #pragma endregion Override
@@ -240,17 +290,32 @@ float ACGBaseGameMode::RatePlayerStart( ACGPlayerStart* Start, ACGPlayerControll
 	// Make Sure the player controller exists.
 	if (PlayerController != NULL)
 	{
-		// XXX probably shouldn't do this cast every time?
-		// Initial spawns should only be used once, if the player has died don't spawn them there again.
 		ACGPlayerState* PlayerState = Cast<ACGPlayerState>(PlayerController->PlayerState);
-
-		if (PlayerState->GetNumDeaths() > 0 && Start->IsInitialSpawn())
+	
+		// I use player deaths as a sort of flag for if a player has been alive.
+		// If the player controller has a start spawn specified then it is not qualified for an initial spawn location.		
+		if ( Start->IsInitialSpawn())
 		{
-			return -100.f;
+			// If the player has spawned already this is not suitable.
+			// If the player hasn't spawned already give a slight pecedence.
+			if (PlayerState->GetNumDeaths() > 0)
+			{
+				return -100.f;
+			}
+			else
+			{
+				StartRating += 10.f;
+			}
+		}
+		else if (PlayerState->GetNumDeaths() == 0)
+		{
+			// The first spawn should prefer Initial spawn locations.
+			StartRating -= 10.f;
 		}
 
 		// TODO Spatial locality.
 	}	
+
 
 	return StartRating;
 }

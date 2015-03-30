@@ -26,6 +26,14 @@ void ACGPlayerController::FailedToSpawnPawn()
 	Super::FailedToSpawnPawn();
 }
 
+void ACGPlayerController::PawnPendingDestroy(APawn * inPawn)
+{
+	Super::PawnPendingDestroy(inPawn);
+
+	// TODO more spectator stuff here.
+	ClientSetSpectatorCamera(inPawn->GetActorLocation(), inPawn->GetActorRotation());
+}
+
 
 void ACGPlayerController::SetupInputComponent()
 {
@@ -98,3 +106,10 @@ void ACGPlayerController::ClientGameStarted_Implementation()
 		HUD->SetEndGameMessage(false);
 	}
 }
+
+void ACGPlayerController::ClientSetSpectatorCamera_Implementation(const FVector & Location, const FRotator & Rotation)
+{
+	SetInitialLocationAndRotation(Location, Rotation);
+	SetViewTarget(this);
+}
+
