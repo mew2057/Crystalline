@@ -21,7 +21,7 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	bSpawnBots(false),
 	BotsInRound(2),
 	PlayerStartCooldownTime(10.f),
-	WarmupGameTime(10.f)
+	PreGameTime(10.f)
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CGPlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
@@ -118,7 +118,7 @@ void ACGBaseGameMode::HandleMatchIsWaitingToStart()
 	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
 	if (CGGameState)
 	{
-		CGGameState->RemainingTime = WarmupGameTime;
+		CGGameState->RemainingTime = PreGameTime;
 		CGGameState->GoalScore = 10000.f; // FIXME
 	}
 }

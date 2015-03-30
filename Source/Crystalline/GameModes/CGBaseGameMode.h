@@ -155,7 +155,7 @@ protected:
 
 	/** Time for the WaitingToStart state. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	int32 WarmupGameTime;
+	int32 PreGameTime;
 
 	/** Time for the post game state. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
