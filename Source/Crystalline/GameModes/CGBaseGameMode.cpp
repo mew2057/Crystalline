@@ -137,6 +137,19 @@ void ACGBaseGameMode::PostLogin(APlayerController* NewPlayer)
 
 	UE_LOG(LogTemp, Warning, TEXT("Post Login %s."), *NewPlayer->GetName());
 
+	// Ensure that the client has the proper spectaor camera location.
+	ACGPlayerController* NCGPC = Cast<ACGPlayerController>(NewPlayer);
+	if (NCGPC && NCGPC->GetPawn() == NULL)
+	{
+		NCGPC->ClientSetSpectatorCamera(NCGPC->GetSpawnLocation(), NCGPC->GetControlRotation());
+	}
+
+	// Notifies a new player if the match is already being played.
+	// This mainly does cleanup operations.
+	if (NCGPC && IsMatchInProgress())
+	{
+		NCGPC->ClientGameStarted();
+	}
 }
 
 
@@ -181,9 +194,10 @@ AActor* ACGBaseGameMode::FindPlayerStart(AController* Player, const FString& Inc
 {
 	AActor* PlayerStart = Super::FindPlayerStart(Player, IncomingName);
 
-	// This is approximately correct.
+	// Only Set the last spawn time for a spawn if we're in the match.
+	// This is an approximation.
 	ACGPlayerStart* CGPlayerStart = Cast<ACGPlayerStart>(PlayerStart);
-	if (CGPlayerStart)
+	if (CGPlayerStart && GetMatchState() == MatchState::InProgress)
 	{
 		CGPlayerStart->SetLastSpawnTime(GetWorld()->GetTimeSeconds());
 	}	

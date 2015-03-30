@@ -21,6 +21,9 @@ public:
 	/** If the pawn can't spawn, try the spawn again.*/
 	virtual void FailedToSpawnPawn() override;
 
+	/** Kick out to spectator mode when the player is killed.*/
+	virtual void PawnPendingDestroy(APawn * inPawn ) override;
+
 	/** Sets up UI related components.*/
 	virtual void SetupInputComponent() override;
 
@@ -40,4 +43,14 @@ public:
 	UFUNCTION(reliable, client)
 	void ClientGameStarted();
 	virtual void ClientGameStarted_Implementation();
+
+	/**
+	 * Invoked by the server to set the spectator camera location and rotation. This is most important in the initial spawn.
+	 *
+	 * @param Location The location that the spectator is located.
+	 * @param Rotation The rotation of the spectator.
+	 */
+	UFUNCTION(reliable, client)
+	void ClientSetSpectatorCamera(const FVector & Location, const FRotator & Rotation);
+	virtual void ClientSetSpectatorCamera_Implementation(const FVector & Location, const FRotator & Rotation);
 };
