@@ -12,7 +12,7 @@
 /**
  * The Base Game Mode for Crystalline. Defines Bot Spawn logic, timer, and match states.
  */
-UCLASS(Abstract, Config = GameMode)
+UCLASS()
 class CRYSTALLINE_API ACGBaseGameMode : public AGameMode
 {
 	GENERATED_BODY()
@@ -38,6 +38,14 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GameMode|Score")
 	virtual void ObjectiveScored(AController * PlayerController);
+
+	/**
+	*	XXX This function is not currently used by Crystalline.
+	* Determines whether or not the player is the winner of the round.
+	* @param Player The player being checked for winner status.
+	* @return True if the player is the winner.
+	*/
+	virtual bool IsWinner(ACGPlayerState* Player);
 
 	/**
 	 * Gets the maximum round time. Note: This is NOT the current round time.
@@ -102,19 +110,13 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "GameMode|State")
 	virtual void CheckScore(ACGPlayerState* Player);
 
-	/**
+	/** TODO Tiebreakers and Timeouts.
 	 * Determines which player won the round.
 	 * @param Winner The Winning state for easy checking in the function.
 	 */
 	virtual void EndGame(ACGPlayerState* Winner = NULL);
 
-	/** 
-	 *	XXX This function is not currently used by Crystalline.
-	 * Determines whether or not the player is the winner of the round.
-	 * @param Player The player being checked for winner status.
-	 * @return True if the player is the winner.
-	 */
-	virtual bool IsWinner(ACGPlayerState* Player);
+
 
 	/**
 	 * Iterates over the controllers that exists in the game world and determines how many more 

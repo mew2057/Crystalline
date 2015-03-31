@@ -9,7 +9,7 @@
 /**
  * Client side persistent representation of the game. Manages goal score, messages and more.
  */
-UCLASS(Abstract, Config = GameState)
+UCLASS()
 class CRYSTALLINE_API ACGGameState : public AGameState
 {
 	GENERATED_BODY()

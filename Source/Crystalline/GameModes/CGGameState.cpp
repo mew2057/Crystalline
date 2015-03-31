@@ -20,8 +20,8 @@ void ACGGameState::ReceivedGameModeClass()
 {
 	Super::ReceivedGameModeClass();
 	
+	// Assign the appropriate message properties.
 	CrystallineMessages.SetCurrentGameMode(GameModeClass);
-
 	CrystallineMessages.AssignMessageProperties(GameModeMessages);
 }
 

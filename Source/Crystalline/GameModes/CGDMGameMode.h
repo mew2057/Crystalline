@@ -12,15 +12,17 @@ UCLASS(Abstract, Config = GameMode)
 class CRYSTALLINE_API ACGDMGameMode : public ACGBaseGameMode
 {
 	GENERATED_BODY()
+public:
+
+	/** If the player matches the game winner, the player is considered a winner.*/
+	virtual bool IsWinner(ACGPlayerState* Player) override;
 	
 protected:	
 	/** The winner of the game mode. */
 	UPROPERTY(transient)
 	class ACGPlayerState* GameWinner;
 
-	/** If the player matches the game winner, the player is considered a winner.*/
-	virtual bool IsWinner(ACGPlayerState* Player) override;
-  
+
 	/** Determine who's the winner and supplies it to the super class if Winner was not specified.  */
 	virtual void EndGame(ACGPlayerState* Winner) override;
 };
