@@ -72,8 +72,5 @@ protected:
 
 	/***/
 	UPROPERTY(Transient, Replicated)
-	int32 NumDeaths;
-
-	
-	
+	int32 NumDeaths;	
 };

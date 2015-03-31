@@ -6,7 +6,7 @@
 #include "CGPlayerStart.generated.h"
 
 /**
- * 
+ * Defines a more robust player start for Crystalline game modes.
  */
 UCLASS()
 class CRYSTALLINE_API ACGPlayerStart : public APlayerStart

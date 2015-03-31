@@ -201,12 +201,13 @@ public:
 		CurrentGameModeIndex = -1;
 
 		int32 Count = GameModeMessageProperties.Num();
-		for (int32 i = 0; i < Count && CurrentGameModeIndex == -1; ++i)
+		for (int32 i = 0; i < Count; ++i)
 		{
 			// If the GameMode matches set the index for future use.
 			if (GameModeClass == GameModeMessageProperties[i].GameModeClass)
 			{
 				CurrentGameModeIndex = i;
+				break;
 			}
 		}
 	}
