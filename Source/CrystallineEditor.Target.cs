@@ -8,6 +8,7 @@ public class CrystallineEditorTarget : TargetRules
 	public CrystallineEditorTarget(TargetInfo Target)
 	{
 		Type = TargetType.Editor;
+		bUsesSteam = true;
 	}
 
 	//
