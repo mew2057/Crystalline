@@ -46,6 +46,13 @@ public:
 
 	FString GetShortenedName();
 
+	/** XXX is there a way to expose the actual function for this?
+	 * Invokes APlayerState's SetPlayerName.
+	 * @param NewName The new name for the player.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "State Name")
+	virtual void SetName(const FString& NewName);
+
 	// Broadcasted across server and client reliably.
 	UFUNCTION(Reliable, NetMulticast)
 	void BroadcastDeathMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
@@ -58,7 +65,7 @@ public:
 	void BroadcastGameScoreMessage_Implementation(int32 MessageIndex);
 
 
-	UFUNCTION(BlueprintCallable, Category = "StateScore")
+	UFUNCTION(BlueprintCallable, Category = "State Score")
 	void AddScore(int32 AddToScore);
 
 	FORCEINLINE int32 GetNumKills() { return NumKills;  }

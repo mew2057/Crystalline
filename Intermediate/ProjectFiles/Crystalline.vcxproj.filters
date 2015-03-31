@@ -316,10 +316,14 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\AmmoWidget.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogKillMessage.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogMessage.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\AmmoWidget.h" />
+    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogKillMessage.h" />
+    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogMessage.h" />
+    <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source\Crystalline\Misc">

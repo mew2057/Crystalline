@@ -68,6 +68,10 @@ FString ACGPlayerState::GetShortenedName()
 	return PlayerName;
 }
 
+void ACGPlayerState::SetName(const FString& NewName)
+{
+	Super::SetPlayerName(NewName);
+}
 
 void ACGPlayerState::BroadcastDeathMessage_Implementation(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
 {
