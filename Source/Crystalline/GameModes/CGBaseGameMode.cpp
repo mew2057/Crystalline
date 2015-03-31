@@ -26,10 +26,12 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CGPlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
+	static ConstructorHelpers::FClassFinder<AGameState> GameStateClassFinder(TEXT("/Game/Blueprints/States/CrystallineGameState"));
+	GameStateClass = GameStateClassFinder.Class;
+
 	PlayerControllerClass = ACGPlayerController::StaticClass();	
 	HUDClass              = ACGPlayerHUD::StaticClass();
 	PlayerStateClass      = ACGPlayerState::StaticClass();
-	GameStateClass        = ACGGameState::StaticClass();
 	MinRespawnDelay		  = 2.f;
 	bDelayedStart		  = true;
 }
@@ -42,7 +44,7 @@ void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, con
 		return;
 	}
 
-	ACGPlayerState* const KillerPlayerState = Cast<ACGPlayerState>(Killer->PlayerState);
+	ACGPlayerState* const KillerPlayerState = Killer ? Cast<ACGPlayerState>(Killer->PlayerState) : NULL;
 	ACGPlayerState* const VictimPlayerState = KilledPlayer ? Cast<ACGPlayerState>(KilledPlayer->PlayerState) : NULL;
 
 	// If the killer was the killed player, it was a suicide.
@@ -350,22 +352,12 @@ void ACGBaseGameMode::CheckScore(ACGPlayerState* Player)
 		return;
 	}
 
-	// Determine helper values.
-	const int32 MessageCount =  ScoreMessages.Num();
-	const int32 PointsToWin = ScoreToWin - Player->Score;
-
-	// Otherwise check to see if we have a score that a message should be played at.
-	for (int32 i = 0; i < MessageCount; ++i)
+	// Determine if the score message should be played and then broadcast it to the clients.
+	ACGGameState* const CGGameState = Cast<ACGGameState>(GameState);
+	if (CGGameState)
 	{
-		// If the points match, we're done.
-		if (ScoreMessages[i].PointsToWin == PointsToWin)
-		{
-			Player->BroadcastGameModeMessage(ScoreMessages[i].MessageText);
-
-			break;
-		}
+		CGGameState->FindAndPlayScoreMessage(Player, ScoreToWin - Player->Score);
 	}
-
 }
 
 /**Determines which player won the round.*/

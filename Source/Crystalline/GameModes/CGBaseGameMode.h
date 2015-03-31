@@ -12,7 +12,7 @@
 /**
  * The Base Game Mode for Crystalline. Defines Bot Spawn logic, timer, and match states.
  */
-UCLASS()
+UCLASS(Abstract, Config = GameMode)
 class CRYSTALLINE_API ACGBaseGameMode : public AGameMode
 {
 	GENERATED_BODY()
@@ -176,8 +176,4 @@ protected:
 	/** The number of bots the game should spawn. */
 	UPROPERTY(EditDefaultsOnly, Category = BotConfig)
 	int32 BotsInRound;
-
-	/**A Collection of score messages that give the player feedback on game state. Used by check score.*/
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	TArray<FCGScoreMessage> ScoreMessages;
 };

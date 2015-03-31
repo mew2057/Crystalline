@@ -54,8 +54,8 @@ public:
 
 	// Broadcasted across server and client reliably.
 	UFUNCTION(Reliable, NetMulticast)
-	void BroadcastGameModeMessage(const FString & Message);
-	void BroadcastGameModeMessage_Implementation(const FString & Message);
+	void BroadcastGameScoreMessage(int32 MessageIndex);
+	void BroadcastGameScoreMessage_Implementation(int32 MessageIndex);
 
 
 	UFUNCTION(BlueprintCallable, Category = "StateScore")

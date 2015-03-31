@@ -710,9 +710,15 @@ void ACGPlayerHUD::AddDialogKillMessage(ACGPlayerState* Killer, ACGPlayerState* 
 
 }
 
-void ACGPlayerHUD::AddDialogGameModeMessage(const FString & Message)
+void ACGPlayerHUD::AddDialogGameScoreMessage(int32 MessageIndex)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Message);
+	ACGGameState* const CGGameState = GetWorld()->GetGameState<ACGGameState>();
+
+	if (CGGameState)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, 
+			CGGameState->GetScoreMessageText(MessageIndex));
+	}
 }
 
 

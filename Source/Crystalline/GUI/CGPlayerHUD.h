@@ -630,7 +630,7 @@ public:
 
 	// TODO Make dialog work.
 	/**Append a GameMode Message to the queue of dialog messages.*/
-	void AddDialogGameModeMessage(const FString & Message);
+	void AddDialogGameScoreMessage(int32 MessageIndex);
 
 	/**Sets the TimeSinceLastHit for the hit notification.*/
 	void NotifyHitTaken(const FVector& HitDirection);

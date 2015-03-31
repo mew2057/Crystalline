@@ -82,7 +82,7 @@ void ACGPlayerState::BroadcastDeathMessage_Implementation(ACGPlayerState* Killer
 	}
 }
 
-void ACGPlayerState::BroadcastGameModeMessage_Implementation(const FString & Message)
+void ACGPlayerState::BroadcastGameScoreMessage_Implementation(int32 MessageIndex)
 {
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
@@ -90,7 +90,7 @@ void ACGPlayerState::BroadcastGameModeMessage_Implementation(const FString & Mes
 		if (TempController && TempController->IsLocalController())
 		{
 			// Invoke the dialog message for GameMode Messages.
-			TempController->OnGameModeMessage(Message);
+			TempController->OnGameScoreMessage(MessageIndex);
 		}
 	}
 }

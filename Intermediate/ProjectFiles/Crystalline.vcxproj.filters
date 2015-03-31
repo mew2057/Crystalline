@@ -113,9 +113,6 @@
     <Filter Include="Source\Crystalline\GUI\Widgets">
       <UniqueIdentifier>{0B41AB83-19B4-4ACC-B3A1-A9B0FEF398E5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Crystalline\Misc">
-      <UniqueIdentifier>{3363D840-03CC-46D0-99F6-04E4F0EB9122}</UniqueIdentifier>
-    </Filter>
     <ClCompile Include="..\..\Source\Crystalline\Misc\CGGameSettings.cpp">
       <Filter>Source\Crystalline\Misc</Filter>
     </ClCompile>
@@ -323,5 +320,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\AmmoWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source\Crystalline\Misc">
+      <UniqueIdentifier>{3363D840-03CC-46D0-99F6-04E4F0EB9122}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

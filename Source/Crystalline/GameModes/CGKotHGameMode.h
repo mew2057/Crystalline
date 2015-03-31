@@ -8,7 +8,7 @@
 /**
  * Defines the King of the Hill game mode. Now with 90% less bobby.
  */
-UCLASS()
+UCLASS(Abstract, Config = GameMode)
 class CRYSTALLINE_API ACGKotHGameMode : public ACGBaseGameMode
 {
 	GENERATED_BODY()

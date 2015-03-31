@@ -41,7 +41,7 @@ public:
 	 * Displays GameMode Messages to the player.
 	 * @param Message The message the player is to see, e.g. kills to win.
 	 */
-	void OnGameModeMessage(const FString & Message);
+	void OnGameScoreMessage(int32 MessageIndex);
 
 	/**Notifies the player that the round is over.*/
 	virtual void ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner) override;

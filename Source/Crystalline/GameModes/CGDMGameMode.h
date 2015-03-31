@@ -8,7 +8,7 @@
 /**
  * The Death Match Game Mode defines behaviors for score checking and game states.
  */
-UCLASS()
+UCLASS(Abstract, Config = GameMode)
 class CRYSTALLINE_API ACGDMGameMode : public ACGBaseGameMode
 {
 	GENERATED_BODY()

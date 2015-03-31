@@ -73,12 +73,12 @@ void ACGPlayerController::OnKillMessage(ACGPlayerState* Killer, ACGPlayerState* 
 }
 
 
-void ACGPlayerController::OnGameModeMessage(const FString & Message)
+void ACGPlayerController::OnGameScoreMessage(int32 MessageIndex)
 {
 	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
 	if (HUD)
 	{
-		HUD->AddDialogGameModeMessage(Message);
+		HUD->AddDialogGameScoreMessage(MessageIndex);
 	}
 }
 

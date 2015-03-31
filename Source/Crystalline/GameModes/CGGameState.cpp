@@ -16,6 +16,15 @@ void ACGGameState::HandleMatchHasEnded()
 	//UE_Log(LogTemp, Log,TEXT("Match has ended!"));
 }
 
+void ACGGameState::ReceivedGameModeClass()
+{
+	Super::ReceivedGameModeClass();
+	
+	CrystallineMessages.SetCurrentGameMode(GameModeClass);
+
+	CrystallineMessages.AssignMessageProperties(GameModeMessages);
+}
+
 
 
 void ACGGameState::SortPlayers()
@@ -49,11 +58,36 @@ void ACGGameState::SortPlayers()
 	} while (FarthestSwapped > 0);
 }
 
+void ACGGameState::FindAndPlayScoreMessage(ACGPlayerState* Player, int32 PointsToWin) const
+{
+	// EARLY RETURN if player was null
+	if (Player == NULL)
+	{
+		return;
+	}
+
+	// Find the matching message.
+	const int32 MessageCount = GameModeMessages.ScoreMessages.Num();
+	for (int32 i = 0; i < MessageCount; ++i)
+	{
+		if (GameModeMessages.ScoreMessages[i].PointsToWin == PointsToWin)
+		{
+			Player->BroadcastGameScoreMessage(i);
+		}
+	}
+}
+
+FString ACGGameState::GetScoreMessageText(int32 Index) const
+{
+	return Index > -1 && Index < GameModeMessages.ScoreMessages.Num() ? GameModeMessages.ScoreMessages[Index].MessageText : TEXT("");
+}
+
+
+
 void ACGGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACGGameState, RemainingTime);
 	DOREPLIFETIME(ACGGameState, GoalScore);
-	DOREPLIFETIME(ACGGameState, CurrentGameMode);
 }

@@ -87,9 +87,8 @@ inline uint8 GetTypeHash(const ECGCrystalType A)
 
 #pragma endregion
 
+//TODO Move to its own class.
 #pragma region Game Mode Structs
-// XXX Find better names for these!
-
 /**
 * Base Class for predefined messages.
 */
@@ -136,37 +135,80 @@ struct FCGScoreMessage : public FCGMessage
 * Contains a collection of messages used to display relevant information to the player, based on the game mode.
 */
 USTRUCT(BlueprintType)
-struct FCGGameModeMessageAssortment
+struct FCGGameModeMessageProperties
 {
 	GENERATED_USTRUCT_BODY()
 
 	/** The Game Mode that the messages are specified for.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	TSubclassOf<class ACGBaseGameMode> GameModeClass;
+	TSubclassOf<AGameMode> GameModeClass;
 
+	// XXX Should this be a Hash Map?
 	/**A Collection of score messages that give the player feedback on game state. Used by check score.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	TArray<FCGScoreMessage> ScoreMessages;
 
-	FCGGameModeMessageAssortment()
+	FCGGameModeMessageProperties()
 	{
 
 	}
 };
 
+/**
+ * A Structure for organizing the messages that the game will display to the player.
+ */
 USTRUCT(BlueprintType)
-struct FCGCrystallineMessageAssortment
+struct FCGGameMessageProperties
 {
 	GENERATED_USTRUCT_BODY()
 	// TODO generic messages.
 
 	/** Colleciton of Messages that are game mode specific. */
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	TArray<FCGGameModeMessageAssortment> GameModeMessages;
+	TArray<FCGGameModeMessageProperties> GameModeMessageProperties;
+	
+private:
 
-	FCGCrystallineMessageAssortment()
+	/** The Index of the current game mode in the GameModeMessageProperties array.*/
+	UPROPERTY(Transient)
+	int32 CurrentGameModeIndex;
+
+public:
+	FCGGameMessageProperties() { }
+
+
+	/**
+	 * Copies the current game mode Message Properties to the supplied reference.
+	 *
+	 * @param OutMessageProps The message being set.
+	 */
+	void AssignMessageProperties(FCGGameModeMessageProperties& OutMessageProps)
 	{
+		if (CurrentGameModeIndex != -1)
+		{
+			OutMessageProps = GameModeMessageProperties[CurrentGameModeIndex];
+		}
+	}
+	/**
+	 * Determines the game mode index for the game from the supplied game mode class.
+	 * Sets the CurrentGameModeIndex to -1 if the class was not specified.
+	 *
+	 * @param GameModeClass The Class that is being sought in the Properties.
+	 */
+	void SetCurrentGameMode(TSubclassOf<AGameMode> GameModeClass)
+	{
+		// Set the Game Mode to -1.
+		CurrentGameModeIndex = -1;
 
+		int32 Count = GameModeMessageProperties.Num();
+		for (int32 i = 0; i < Count && CurrentGameModeIndex == -1; ++i)
+		{
+			// If the GameMode matches set the index for future use.
+			if (GameModeClass == GameModeMessageProperties[i].GameModeClass)
+			{
+				CurrentGameModeIndex = i;
+			}
+		}
 	}
 };
 #pragma endregion
