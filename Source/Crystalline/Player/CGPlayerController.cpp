@@ -26,6 +26,14 @@ void ACGPlayerController::FailedToSpawnPawn()
 	Super::FailedToSpawnPawn();
 }
 
+void ACGPlayerController::PawnPendingDestroy(APawn * inPawn)
+{
+	Super::PawnPendingDestroy(inPawn);
+
+	// TODO more spectator stuff here.
+	ClientSetSpectatorCamera(inPawn->GetActorLocation(), inPawn->GetActorRotation());
+}
+
 
 void ACGPlayerController::SetupInputComponent()
 {
@@ -54,6 +62,16 @@ void ACGPlayerController::OnHideScoreboard()
 		HUD->SetScoreboardVisibility(false);
 	}
 }
+
+void ACGPlayerController::OnKillMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
+{
+	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
+	if (HUD)
+	{
+		HUD->AddDialogKillMessage(Killer, KilledPlayer, DamageType);
+	}
+}
+
 
 void ACGPlayerController::ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner)
 {
@@ -88,3 +106,10 @@ void ACGPlayerController::ClientGameStarted_Implementation()
 		HUD->SetEndGameMessage(false);
 	}
 }
+
+void ACGPlayerController::ClientSetSpectatorCamera_Implementation(const FVector & Location, const FRotator & Rotation)
+{
+	SetInitialLocationAndRotation(Location, Rotation);
+	SetViewTarget(this);
+}
+

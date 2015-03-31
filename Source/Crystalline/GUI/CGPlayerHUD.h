@@ -4,7 +4,6 @@
 
 
 #include "GameFramework/HUD.h"
-#include "GUI/Slate/ShieldWidget.h"
 #include "CGPlayerHUD.generated.h"
 
 #define TARGET_Y_RESOLUTION 1080.0f
@@ -91,6 +90,7 @@ struct FCGGameElement
 	
 	}
 };
+
 USTRUCT()
 struct FCGTextElement
 {
@@ -305,9 +305,6 @@ struct FCGButtonIcons
 	}
 };
 
-
-
-
 USTRUCT()
 struct FCGPrompt
 {
@@ -347,8 +344,93 @@ struct FCGPrompt
 		bPrompt = false;
 		Anchor = .5f;
 	}
+
 };
 
+USTRUCT()
+struct FCGDialogConfig
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
+	FCGHUDTransform BaseTransform;
+
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
+	FVector2D DisplacementVector;
+
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
+	float LifeSpan;
+
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
+	float HideTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = "HUD/")
+	float TranslationTime;
+};
+
+USTRUCT()
+struct FCGDialog
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** The position of the HUD at the present time*/
+	FCGHUDTransform CurrentPosition;
+
+	/**The time lived by the dialog so far.*/
+	float LifeLived;
+
+	/**Time remaing on a queued translation.*/
+	float TranslationTimeRemaing;
+
+	/**The time it takes for the dialog message to spawn in.*/
+	float SpawnTime;
+
+	/**The total life span of the dialog in seconds.*/
+	float LifeSpan;
+
+	/** The time at which the dialog begins to hide itself.*/
+	float HideTime;
+
+	FCGDialog() :
+		LifeLived(0.f),
+		TranslationTimeRemaing(0.f),
+		SpawnTime(0.f),
+		LifeSpan(0.f),
+		HideTime(0.f)
+	{}
+
+public:
+	/** Draws the message.*/
+	void Draw(const UCanvas* Canvas)
+	{
+
+	}
+
+	void MoveBy(float Y, float X = 0.f)
+	{
+
+	}
+};
+
+USTRUCT()
+struct FCGKillMessage : public FCGDialog
+{
+	GENERATED_USTRUCT_BODY()
+
+	/**The name of the victim*/
+	FString KillerName;
+
+	/**The name of the victim. */
+	FString VictimName;
+
+	/**The Icon of the kill.*/
+	FCanvasIcon KillIcon;
+
+	FCGKillMessage()
+	{
+
+	}
+};
 
 USTRUCT()
 struct FCGScoreboardElement
@@ -435,7 +517,6 @@ struct FCGScoreboardElement
 		DesiredScoreWidth = 25.f;
 	}
 };
-
 
 USTRUCT()
 struct FCGCrosshairElement
@@ -537,8 +618,14 @@ public:
 	/** Draws the prompt message.*/
 	void DrawPrompt();
 
+	/** Draws the dialog messages.*/
+	void DrawDialog();
+
 	UFUNCTION(BlueprintCallable, Category = "Game|HUD")
 	void SetPromptMessage(bool bSetPrompt, const FString& Message = "", int32 ButtonID = 0);
+
+	/**Append a kill message to the queue of death messages.*/
+	void AddDialogKillMessage(class ACGPlayerState* Killer, class ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
 
 	/**Sets the TimeSinceLastHit for the hit notification.*/
 	void NotifyHitTaken(const FVector& HitDirection);
@@ -562,16 +649,13 @@ private:
 	/** The vertical scale factor of the UI Relative to 1080.*/
 	float ScaleUIY;
 
-	/** The horizontal scale factor of the UI Relative to 1920.*/
-	//float ScaleUIX; Commented for potential future usage. -John
-
-
 	/** The Prompt Message, In the future this shouold be a struct.*/
 	FString PromptMessage;
 
 	/**The number of pixels per percent.*/
 	FVector2D PixelsPerCent;
 
+	/**The Crosshair element. */
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGCrosshairElement Crosshair;
 
@@ -592,6 +676,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGPrompt Prompt;
+
+	/**Defines the behavior of the "dialog" system.*/
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FCGDialogConfig DialogConfig;
 
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCGScoreboardElement Scoreboard;
@@ -629,6 +717,9 @@ private:
 	float TimeSinceLastHitConfirmed;
 
 	uint32 bScoreboardVisible : 1;
+
+	UPROPERTY(Transient)
+	TArray<FCGDialog> DialogQueue;
 
 
 };

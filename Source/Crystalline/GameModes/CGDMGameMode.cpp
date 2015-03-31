@@ -15,12 +15,10 @@ void ACGDMGameMode::CheckScore(ACGPlayerState* Player)
 	else if (Player->Score == ScoreToWin-1){
 		//One kill to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is one kill away from winning.");
-		ForceNetUpdate();
 	}
 	else if (Player->Score == ScoreToWin - 5){
 		//5 kills to win
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Player->PlayerName + " is 5 kills away from winning.");
-		ForceNetUpdate();
 	}
 }
 
@@ -60,6 +58,7 @@ void ACGDMGameMode::EndGame(ACGPlayerState* Winner)
 	Super::EndGame(Winner);
 }
 
+/*
 AActor* ACGDMGameMode::ChoosePlayerStart(AController* Player)
 {
 	TArray<APlayerStart*> PreferredSpawns;
@@ -109,7 +108,6 @@ AActor* ACGDMGameMode::ChoosePlayerStart(AController* Player)
 
 bool ACGDMGameMode::IsSpawnpointAllowed(APlayerStart* SpawnPoint, AController* Player) const
 {
-	/*is this  spawnpoint allowed for this player?*/
 	return true;
 }
 
@@ -144,3 +142,4 @@ bool ACGDMGameMode::ShouldSpawnAtStartSpot(AController* Player)
 {
 	return false;
 }
+*/

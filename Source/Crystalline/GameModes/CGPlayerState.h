@@ -5,6 +5,9 @@
 #include "GameFramework/PlayerState.h"
 #include "CGPlayerState.generated.h"
 
+#define MAX_PLAYER_NAME_SIZE 12
+#define TRUNCATION "..."
+
 /**
  * 
  */
@@ -31,6 +34,13 @@ public:
 
 	/**Only Suicides negatively impact player score.*/
 	virtual void ScoreSuicide(int32 Points);
+
+	FString GetShortenedName();
+
+	// Broadcasted across server and client reliably.
+	UFUNCTION(Reliable, NetMulticast)
+	void BroadcastDeathMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
+	void BroadcastDeathMessage_Implementation(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
 
 	UFUNCTION(BlueprintCallable, Category = "StateScore")
 	void AddScore(int32 AddToScore);
