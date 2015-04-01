@@ -49,7 +49,6 @@ ACGCrystal::ACGCrystal(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	bIsActive = true;
 	bSpawnActive = true;
 	CrystalType = ECGCrystalType::NONE;
-
 }
 
 void ACGCrystal::PostInitializeComponents()
