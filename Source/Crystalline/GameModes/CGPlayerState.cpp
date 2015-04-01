@@ -2,13 +2,13 @@
 
 #include "Crystalline.h"
 #include "Player/CGPlayerController.h"
-
 #include "CGPlayerState.h"
 
-ACGPlayerState::ACGPlayerState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-{
-	NumKills = 0;
-	NumDeaths = 0;
+ACGPlayerState::ACGPlayerState(const FObjectInitializer& ObjectInitializer) : 
+	Super(ObjectInitializer),
+	NumKills(0),
+	NumDeaths(0)
+{ 
 	Score = 0;
 }
 
@@ -19,11 +19,6 @@ void ACGPlayerState::Reset()
 	NumKills  = 0;
 	NumDeaths = 0;
 	Score     = 0;
-}
-
-void ACGPlayerState::ClientInitialize(class AController* InController)
-{
-	Super::ClientInitialize(InController);
 }
 
 void ACGPlayerState::UnregisterPlayerWithSession()
@@ -58,6 +53,11 @@ void ACGPlayerState::ScoreObjective(int32 Points)
 	ForceNetUpdate();
 }
 
+void ACGPlayerState::AddScore(int32 AddToScore)
+{
+	Score += AddToScore;
+	ForceNetUpdate();
+}
 
 FString ACGPlayerState::GetShortenedName()
 {
@@ -75,19 +75,21 @@ void ACGPlayerState::SetName(const FString& NewName)
 
 void ACGPlayerState::BroadcastDeathMessage_Implementation(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
 {
+	// Get all local controllers and invoke the dialog message.
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		ACGPlayerController * TempController = Cast<ACGPlayerController>(*It);
 		if (TempController && TempController->IsLocalController())
 		{
 			// Invoke the dialog message.
-			TempController->OnKillMessage(Killer, KilledPlayer, DamageType);
+			TempController->OnDeathMessage(Killer, KilledPlayer, DamageType);
 		}
 	}
 }
 
 void ACGPlayerState::BroadcastGameScoreMessage_Implementation(int32 MessageIndex)
 {
+	// Get all local controllers and invoke the dialog message.
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		ACGPlayerController * TempController = Cast<ACGPlayerController>(*It);
@@ -100,16 +102,12 @@ void ACGPlayerState::BroadcastGameScoreMessage_Implementation(int32 MessageIndex
 }
 
 
-void ACGPlayerState::AddScore(int32 AddToScore)
-{
-	Score += AddToScore;
-	ForceNetUpdate();
-}
 
 void ACGPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	// Kills and deaths are relevant to every player.
 	DOREPLIFETIME(ACGPlayerState, NumKills);
 	DOREPLIFETIME(ACGPlayerState, NumDeaths);
 }

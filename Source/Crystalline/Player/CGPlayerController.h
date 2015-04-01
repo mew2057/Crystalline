@@ -34,7 +34,7 @@ public:
 	void OnHideScoreboard();
 
 	/**Displays the kill message on the player HUD.*/
-	void OnKillMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
+	void OnDeathMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType);
 
 
 	/**

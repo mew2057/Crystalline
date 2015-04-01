@@ -63,7 +63,7 @@ void ACGPlayerController::OnHideScoreboard()
 	}
 }
 
-void ACGPlayerController::OnKillMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
+void ACGPlayerController::OnDeathMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
 {
 	ACGPlayerHUD* HUD = Cast<ACGPlayerHUD>(GetHUD());
 	if (HUD)
