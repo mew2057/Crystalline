@@ -69,6 +69,11 @@ enum class ECGAmmoType : uint8
 	T_ONE  UMETA(DisplayName = "Tier One"),
 	T_TWO  UMETA(DisplayName = "Tier Two")
 };
+/** Implemented for TMap.*/
+inline uint8 GetTypeHash(const ECGAmmoType A)
+{
+	return (uint8)A;
+}
 
 UENUM(BlueprintType)
 enum class ECGCrystalType : uint8

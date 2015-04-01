@@ -16,10 +16,10 @@ struct FCGAmmo
 	int32 AmmoInClip;
 	int32 Ammo;
 
-	FCGAmmo() :
-		Ammo(-1)
+	FCGAmmo()
 	{
-
+		Ammo = -1;
+		AmmoInClip = -1;
 	}
 };
 /**
@@ -85,9 +85,8 @@ public:
 	/**The Weapons the player has available to them.*/
 	UPROPERTY(Transient, Replicated)
 	TArray<class ACGWeapon*> Weapons;
-
-
-	TArray <FCGAmmo> AmmoCache;
+	
+	TMap<ECGAmmoType, FCGAmmo> AmmoCache;
 
 
 	/**The index of the crystal gun.*/
