@@ -1,13 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "GameFramework/GameMode.h"
-
 #include "CGPlayerState.h"
 #include "CGGameState.h"
 #include "CGBaseGameMode.generated.h"
-
 
 /**
  * The Base Game Mode for Crystalline. Defines Bot Spawn logic, timer, and match states.
@@ -105,6 +102,7 @@ protected:
 
 	/**
 	 * Checks the score after a scoring action for the player, implemented in the subclasses
+	 *
 	 * @param Player The player who's state is being checked to see if it has won the game.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GameMode|State")
@@ -112,11 +110,10 @@ protected:
 
 	/** TODO Tiebreakers and Timeouts.
 	 * Determines which player won the round.
+	 *
 	 * @param Winner The Winning state for easy checking in the function.
 	 */
 	virtual void EndGame(ACGPlayerState* Winner = NULL);
-
-
 
 	/**
 	 * Iterates over the controllers that exists in the game world and determines how many more 

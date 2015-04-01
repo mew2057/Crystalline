@@ -89,18 +89,6 @@
     <ClInclude Include="..\..\Source\Crystalline\GameModes\CGKotHGameMode.h">
       <Filter>Source\Crystalline\GameModes</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGPlayerStart.cpp">
-      <Filter>Source\Crystalline\GameModes</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGPlayerStart.h">
-      <Filter>Source\Crystalline\GameModes</Filter>
-    </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGPlayerState.cpp">
-      <Filter>Source\Crystalline\GameModes</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGPlayerState.h">
-      <Filter>Source\Crystalline\GameModes</Filter>
-    </ClInclude>
     <Filter Include="Source\Crystalline\GUI">
       <UniqueIdentifier>{0CC47AF5-A1BC-48CF-BF72-F64FCF50EFFD}</UniqueIdentifier>
     </Filter>
@@ -319,11 +307,23 @@
     <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogKillMessage.cpp" />
     <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogMessage.cpp" />
     <ClCompile Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.cpp" />
+    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGPlayerStart.cpp">
+      <Filter>Source\Crystalline\GameModes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGPlayerState.cpp">
+      <Filter>Source\Crystalline\GameModes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogKillMessage.h" />
     <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGDialogMessage.h" />
     <ClInclude Include="..\..\Source\Crystalline\GUI\Widgets\CGHUDWidget.h" />
+    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGPlayerStart.h">
+      <Filter>Source\Crystalline\GameModes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGPlayerState.h">
+      <Filter>Source\Crystalline\GameModes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source\Crystalline\Misc">

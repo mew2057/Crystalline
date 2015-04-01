@@ -8,20 +8,8 @@ ACGAmmoPickup::ACGAmmoPickup(const FObjectInitializer& ObjectInitializer) : Supe
 	Ammo = 0;
 	AmmoType = ECGAmmoType::NONE;
 	LifeSpan = 10.f;
-
 	bReplicates = true;
-	/*
-	OverlapVolume = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("AmmoOverlapVolume"));
-	OverlapVolume->SetCapsuleHalfHeight(20.f);
-	OverlapVolume->SetCapsuleRadius(20.f);
-	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	//OverlapVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
-	OverlapVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	OverlapVolume->SetIsReplicated(true);
-	RootComponent = OverlapVolume;
-	*/
-	// TODO this may cause mismatch.
 	AmmoMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AmmoMesh"));
 	AmmoMesh->bReceivesDecals = false;
 	AmmoMesh->CastShadow = true;
@@ -38,17 +26,6 @@ ACGAmmoPickup::ACGAmmoPickup(const FObjectInitializer& ObjectInitializer) : Supe
 	AmmoMesh->RelativeLocation = FVector(0.f, 0.f, 50.f);
 	RootComponent = AmmoMesh;
 }
-
-void ACGAmmoPickup::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	// Trace to ground, set position on the ground.
-
-	
-
-
-}
-
 
 void ACGAmmoPickup::ReceiveActorBeginOverlap(class AActor* Other)
 {
@@ -71,7 +48,7 @@ void ACGAmmoPickup::ProcessDestroy()
 
 void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType BaseAmmoType)
 {
-
+	// Trace to ground, set position on the ground.
 	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName("PickupTrace"), true, Owner);
 	TraceParams.bTraceAsyncScene = true;
 	TraceParams.AddIgnoredActor(this);
@@ -84,10 +61,11 @@ void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType 
 
 	const FVector EndTrace = StartTrace + Gravity * 10000.f;
 
+	// XXX Change Trace.
 	FHitResult Hit(ForceInit);
 	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_WEAPON, TraceParams);
 
-	// IF we hit something, move to that, since networking physics can be an issue.
+	// If we hit something, move to that, since networking physics can be an issue.
 	if (Hit.bBlockingHit)
 	{
 		Ammo = BaseAmmo;
@@ -101,9 +79,5 @@ void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType 
 	else
 	{
 		ProcessDestroy();
-	}
-
-	
+	}	
 }
-
-
