@@ -92,10 +92,11 @@ void ACGInventory::AddToWeaponMap(ACGWeapon* Weapon, ECGCrystalType Type)
 		TArray<class ACGWeapon*> NewWeapons;
 		WeaponGroups.Add(Type);
 	}
-
-	if (AmmoCache.Num() <= (uint8)Weapon->WeaponConfig.AmmoType)
+	
+	// If the ammo type is not none and doesn't exist in our cache add it to the cache map.
+	if (Weapon->WeaponConfig.AmmoType > ECGAmmoType::NONE && !AmmoCache.Contains(Weapon->WeaponConfig.AmmoType))
 	{
-		AmmoCache.AddUninitialized((uint8)Weapon->WeaponConfig.AmmoType - AmmoCache.Num() + 1);
+		AmmoCache.Add(Weapon->WeaponConfig.AmmoType);
 	}
 
 	WeaponGroups[Type].AddUnique(Weapon);
@@ -124,7 +125,6 @@ void ACGInventory::DestroyInventory()
 		CachedWeapon = Weapons[i];
 		if (CachedWeapon)
 		{
-
 			// TODO refactor, this is a quick and dirty ammo pickuip spawner.
 			if (AmmoPickupTemplate && CachedWeapon->WeaponConfig.AmmoType > ECGAmmoType::NONE)
 			{
@@ -179,14 +179,13 @@ void ACGInventory::ReconstructInventory()
 	}
 
 	// Ensure that the crystal was defined.
-	ACGCrystalGun* CurrentWeapon = Cast<ACGCrystalGun>(Weapons[CrystalGunIndex]);
+	ACGCrystalGun* CurrentCrystalWeapon = Cast<ACGCrystalGun>(Weapons[CrystalGunIndex]);
 
-	// Workaround fix.
-	uint8 CurrentWeaponAmmoIndex = CurrentWeapon ? (uint8)CurrentWeapon->WeaponConfig.AmmoType : AmmoCache.Num();
-	if (CurrentWeaponAmmoIndex < AmmoCache.Num())
+	// If the ammo type is valid set the cached ammo.
+	if (CurrentCrystalWeapon && AmmoCache.Contains(CurrentCrystalWeapon->WeaponConfig.AmmoType))
 	{
-		AmmoCache[CurrentWeaponAmmoIndex].Ammo = CurrentWeapon->GetActualAmmo();
-		AmmoCache[CurrentWeaponAmmoIndex].AmmoInClip = CurrentWeapon->GetActualAmmoInClip();
+		AmmoCache[CurrentCrystalWeapon->WeaponConfig.AmmoType].Ammo = CurrentCrystalWeapon->GetActualAmmo();
+		AmmoCache[CurrentCrystalWeapon->WeaponConfig.AmmoType].AmmoInClip = CurrentCrystalWeapon->GetActualAmmoInClip();
 	}
 
 	ACGCrystalGun* NewWeapon = WeaponGroups.Contains(TierOneCrystal) ? Cast<ACGCrystalGun>(WeaponGroups[TierOneCrystal][0]) : NULL;
@@ -194,11 +193,10 @@ void ACGInventory::ReconstructInventory()
 	// Only if the 
 	if (NewWeapon != NULL)
 	{
-		uint8 NewWeaponAmmoIndex = (uint8)NewWeapon->WeaponConfig.AmmoType;
 		// FIXME this is broken!
-		if (NewWeaponAmmoIndex < AmmoCache.Num() && AmmoCache[NewWeaponAmmoIndex].Ammo >= 0)
+		if (AmmoCache.Contains(NewWeapon->WeaponConfig.AmmoType) &&	AmmoCache[NewWeapon->WeaponConfig.AmmoType].Ammo >= 0)
 		{
-			NewWeapon->CopyAmmo(AmmoCache[NewWeaponAmmoIndex].Ammo, AmmoCache[NewWeaponAmmoIndex].AmmoInClip);
+			NewWeapon->CopyAmmo(AmmoCache[NewWeapon->WeaponConfig.AmmoType].Ammo, AmmoCache[NewWeapon->WeaponConfig.AmmoType].AmmoInClip);
 		}
 
 		Weapons[CrystalGunIndex] = NewWeapon; 
