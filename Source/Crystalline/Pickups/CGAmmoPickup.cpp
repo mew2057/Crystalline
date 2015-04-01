@@ -10,17 +10,7 @@ ACGAmmoPickup::ACGAmmoPickup(const FObjectInitializer& ObjectInitializer) : Supe
 	LifeSpan = 10.f;
 
 	bReplicates = true;
-	/*
-	OverlapVolume = ObjectInitializer.CreateDefaultSubobject<UCapsuleComponent>(this, TEXT("AmmoOverlapVolume"));
-	OverlapVolume->SetCapsuleHalfHeight(20.f);
-	OverlapVolume->SetCapsuleRadius(20.f);
-	OverlapVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	//OverlapVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
-	OverlapVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	OverlapVolume->SetIsReplicated(true);
-	RootComponent = OverlapVolume;
-	*/
 	// TODO this may cause mismatch.
 	AmmoMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("AmmoMesh"));
 	AmmoMesh->bReceivesDecals = false;
@@ -42,11 +32,6 @@ ACGAmmoPickup::ACGAmmoPickup(const FObjectInitializer& ObjectInitializer) : Supe
 void ACGAmmoPickup::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	// Trace to ground, set position on the ground.
-
-	
-
-
 }
 
 
@@ -71,7 +56,7 @@ void ACGAmmoPickup::ProcessDestroy()
 
 void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType BaseAmmoType)
 {
-
+	// Trace to ground, set position on the ground.
 	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName("PickupTrace"), true, Owner);
 	TraceParams.bTraceAsyncScene = true;
 	TraceParams.AddIgnoredActor(this);
@@ -101,9 +86,5 @@ void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType 
 	else
 	{
 		ProcessDestroy();
-	}
-
-	
+	}	
 }
-
-

@@ -337,6 +337,12 @@ void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageE
 			InstHUD->NotifyHitConfirmed();
 		}
 	}
+	
+	// Applies an impulse to the character. This was outlined in Unreal Sample Projects.
+	if (DamageTaken > 0.f)
+	{
+		ApplyDamageMomentum(DamageTaken, DamageEvent, PawnInstigator, DamageCauser);
+	}	
 }
 
 void ACGCharacter::ReplicateHit(float Damage, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser, bool bKilled)
