@@ -190,10 +190,9 @@ void ACGInventory::ReconstructInventory()
 
 	ACGCrystalGun* NewWeapon = WeaponGroups.Contains(TierOneCrystal) ? Cast<ACGCrystalGun>(WeaponGroups[TierOneCrystal][0]) : NULL;
 
-	// Only if the 
+	// If a new weapon was present attempt to copy the ammo and move the new weapon to the crystalgun index.
 	if (NewWeapon != NULL)
 	{
-		// FIXME this is broken!
 		if (AmmoCache.Contains(NewWeapon->WeaponConfig.AmmoType) &&	AmmoCache[NewWeapon->WeaponConfig.AmmoType].Ammo >= 0)
 		{
 			NewWeapon->CopyAmmo(AmmoCache[NewWeapon->WeaponConfig.AmmoType].Ammo, AmmoCache[NewWeapon->WeaponConfig.AmmoType].AmmoInClip);

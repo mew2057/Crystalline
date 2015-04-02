@@ -167,12 +167,6 @@
     <ClInclude Include="..\..\Source\Crystalline\Projectiles\CGProjectile.h">
       <Filter>Source\Crystalline\Projectiles</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\Projectiles\CGRocketProjectile.cpp">
-      <Filter>Source\Crystalline\Projectiles</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\Projectiles\CGRocketProjectile.h">
-      <Filter>Source\Crystalline\Projectiles</Filter>
-    </ClInclude>
     <ClCompile Include="..\..\Source\Crystalline\Projectiles\CGShotgunProjectile.cpp">
       <Filter>Source\Crystalline\Projectiles</Filter>
     </ClCompile>
@@ -209,22 +203,10 @@
     <ClInclude Include="..\..\Source\Crystalline\Weapons\CGMarksmanRifle.h">
       <Filter>Source\Crystalline\Weapons</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\CGRocketLauncher.cpp">
-      <Filter>Source\Crystalline\Weapons</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\Weapons\CGRocketLauncher.h">
-      <Filter>Source\Crystalline\Weapons</Filter>
-    </ClInclude>
     <ClCompile Include="..\..\Source\Crystalline\Weapons\CGShotgun.cpp">
       <Filter>Source\Crystalline\Weapons</Filter>
     </ClCompile>
     <ClInclude Include="..\..\Source\Crystalline\Weapons\CGShotgun.h">
-      <Filter>Source\Crystalline\Weapons</Filter>
-    </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\Weapons\CGSniperRifle.cpp">
-      <Filter>Source\Crystalline\Weapons</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\Weapons\CGSniperRifle.h">
       <Filter>Source\Crystalline\Weapons</Filter>
     </ClInclude>
     <ClCompile Include="..\..\Source\Crystalline\Weapons\CGWeapAssaultRifle.cpp">

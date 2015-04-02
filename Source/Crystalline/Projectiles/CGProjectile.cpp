@@ -14,6 +14,7 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	CollisionComp->AlwaysLoadOnClient = true;
 	CollisionComp->AlwaysLoadOnServer = true;
 	CollisionComp->bTraceComplexOnMove = true;
+
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComp->SetCollisionObjectType(COLLISION_PROJECTILE);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -21,7 +22,7 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
-
+	
 	RootComponent = CollisionComp;
 
 	// Use a MovementCompComponent to govern this projectile's movement
@@ -32,6 +33,7 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->ProjectileGravityScale = 0.f;
 	MovementComp->bInitialVelocityInLocalSpace = false; // If this isn't set there isn't a guarantee on certain assumptions employed by Weapons.
+	MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnStop);
 
 	// Allows for a tick to be registered.
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,64 +47,55 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 void ACGProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	//MovementComp->OnProjectileStop.AddDynamic(this, &ACGProjectile::OnImpact);
-	CollisionComp->OnComponentHit.AddDynamic(this, &ACGProjectile::OnHit);
+
+	// Ignore the weapon that fired the weapon.
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 
+	// Spawn the trail particles.
 	SpawnTrailParticleSystem();
 }
 
-void ACGProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ACGProjectile::OnStop(const FHitResult& Hit)
 {
-	ECollisionResponse temp = OtherComp->GetCollisionResponseToChannel(CollisionComp->GetCollisionObjectType());
-	
+	// Only the remote is allowed to play the impact.
 	if (Role == ROLE_Authority)
 	{
 		ProcessImpact(Hit);
 		PrepForDestroy();
 	}
 
+	// XXX Doesn't play the effect when the weapon destroys on server.
+	// Plays the impact regardless of ownership.
 	SpawnImpact();
-
-	/*
-	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
-		Destroy();
-	}*/
-}
-
-void ACGProjectile::OnImpact(const FHitResult& Hit)
-{
-	if (Role == ROLE_Authority)
-	{
-		ProcessImpact(Hit);
-		PrepForDestroy();
-	}
 }
 
 void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 {
-	if (Hit.GetActor())
+	AActor* OtherActor = Hit.GetActor();
+
+	if (OtherActor)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Other Actor Found: %s"), *OtherActor->GetName());
+
 		FPointDamageEvent PointDmg;
 		PointDmg.DamageTypeClass = DamageType;
 		PointDmg.HitInfo = Hit;
 		PointDmg.ShotDirection = Hit.ImpactNormal;
 		PointDmg.Damage = ImpactDamage; // This needs to move.
 
-		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
+		OtherActor->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
 	}
 
-	// TODO  Add Impulse!
-	// Only add impulse and destroy projectile if we hit a physics
-	/*if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+	/*
+	else
 	{
-	OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+	UPrimitiveComponent * OtherComponent = Hit.GetComponent();
+	if (OtherComponent)
+	{
+	UE_LOG(LogTemp, Warning, TEXT("Other Component Found: %s"), *OtherComponent->GetName());
 
-
+	OtherComponent->AddImpulseAtLocation(GetVelocity() * 100.0f, Hit.ImpactPoint);
+	}
 	}*/
 }
 
@@ -150,37 +143,3 @@ void ACGProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
 		MovementComp->Velocity = NewVelocity;
 	}
 }
-
-
-
-void ACGProjectile::OnRep_Impacted()
-{
-	//////////////////////////////////////////////////////////
-	// TODO make sure this works on sub instances (borrowed from the unreal example).
-	FVector ProjDirection = GetActorRotation().Vector();
-
-	const FVector StartTrace = GetActorLocation() - ProjDirection * 100;
-	const FVector EndTrace = GetActorLocation() + ProjDirection * 100;
-	FHitResult Impact;
-
-	// This ensures we get the surface data (assuming the explosion worked).
-	if (!GetWorld()->LineTraceSingle(Impact, StartTrace, EndTrace, COLLISION_PROJECTILE, FCollisionQueryParams(TEXT("ProjectileClient"), true, Instigator)))
-	{
-		// This is missing surface data which is important for things having sounds matching a particular surface tpe.
-		Impact.ImpactPoint = GetActorLocation();
-		Impact.ImpactNormal = -ProjDirection;
-	}
-
-	//////////////////////////////////////////////////////////
-
-	ProcessImpact(Impact);
-}
-
-void ACGProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	// Replicates to all.
-	DOREPLIFETIME(ACGProjectile, bImpacted);
-}
-

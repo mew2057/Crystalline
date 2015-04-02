@@ -6,39 +6,13 @@
 #include "CGProjectile.generated.h"
 
 /**
- * 
+ * Defines damage dealing and initialization for projectiles, e.g. pistol bullets, shotgun bullets, etc.
  */
 UCLASS(Abstract, config = Game)
 class CRYSTALLINE_API ACGProjectile : public AActor
 {
 	GENERATED_BODY()
 public:
-
-protected:
-	/** Sphere collision component */
-	UPROPERTY( EditDefaultsOnly, Category = Projectile)
-	USphereComponent* CollisionComp;
-
-	/** Projectile movement component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* MovementComp;
-
-	/** Set to true when the Projectile impacts something. */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_Impacted)
-	uint32 bImpacted : 1;
-
-	/** The Weapon trail for the projectile. Each projectile should do this differently. */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	UParticleSystem* ProjectileTrail;
-
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	UParticleSystem* ImpactEffect;
-
-	UPROPERTY(Transient)
-	UParticleSystemComponent* TrailPSC;
-
-public:
-
 	//TODO
 #pragma region ReplaceWithStruct
 	/**Impact damage.*/
@@ -46,22 +20,15 @@ public:
 
 	/**Type of Impact Damage*/
 	TSubclassOf<UDamageType> DamageType;
-
-	
-
 #pragma endregion
 
 	ACGProjectile(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
 
-	/** Called when projectile hits something */
 	UFUNCTION()
-	void OnImpact(const FHitResult& Hit);
-
-	UFUNCTION()
-	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
+	void OnStop(const FHitResult& Hit);
+	
 	/** Sets the velocity of the projectile*/
 	UFUNCTION()
 	void SetVelocity(FVector Direction);
@@ -88,11 +55,30 @@ public:
 	virtual void SpawnTrailParticleSystem();
 
 
+	/** 
+	 * Spawns the impact visuals for the collision. 
+	*/
 	virtual void SpawnImpact();
+	
+protected:
+	/** Sphere collision component. */
+	UPROPERTY( EditDefaultsOnly, Category = Projectile)
+	USphereComponent* CollisionComp;
 
+	/** Projectile movement component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* MovementComp;
 
-	////////////////////////////////////////////////////////
-	// Replication
-	UFUNCTION()
-	void OnRep_Impacted();	
+	/** The Weapon trail for the projectile. Each projectile should do this differently. */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UParticleSystem* ProjectileTrail;
+
+	/** The Particle system that is played when the projectile collides with another object. */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UParticleSystem* ImpactEffect;
+
+	/** The trail that the projectile leaves. This is like a tracer round. */
+	UPROPERTY(Transient)
+	UParticleSystemComponent* TrailPSC;
 };
+ 
