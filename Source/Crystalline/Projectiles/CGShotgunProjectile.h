@@ -17,10 +17,6 @@ public:
 	
 	ACGShotgunProjectile(const FObjectInitializer& ObjectInitializer);
 
-	/*
-	virtual void PostInitializeComponents() override;
-	*/
-
 	virtual void ACGShotgunProjectile::ProcessImpact(const FHitResult& Hit) override;
 
 protected:

@@ -14,7 +14,6 @@ void ACGShotgunProjectile::ProcessImpact(const FHitResult& Hit)
 {
 	if (Hit.GetActor())
 	{
-
 		FPointDamageEvent PointDmg;
 		PointDmg.DamageTypeClass = DamageType;
 		PointDmg.HitInfo = Hit;
@@ -26,13 +25,4 @@ void ACGShotgunProjectile::ProcessImpact(const FHitResult& Hit)
 
 		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
 	}
-
-	// TODO  Add Impulse!
-	// Only add impulse and destroy projectile if we hit a physics
-	/*if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-	{
-	OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-
-
-	}*/
 }

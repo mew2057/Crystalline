@@ -101,7 +101,6 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 
 void ACGProjectile::SpawnImpact()
 {
-	// TOOD Make this more than garbage.
 	if (ImpactEffect)
 	{
 		UParticleSystemComponent* ImpactPSC = UGameplayStatics::SpawnEmitterAtLocation(
@@ -110,12 +109,21 @@ void ACGProjectile::SpawnImpact()
 			GetActorLocation(),
 			GetActorRotation());
 	}
+
+	// Hide the trail if one existed.
+	if (TrailPSC)
+	{
+		//TrailPSC->Deactivate();
+		TrailPSC->DeactivateSystem();
+	}
 }
 
 void ACGProjectile::PrepForDestroy()
 {
 	MovementComp->StopMovementImmediately();
-	Destroy();
+
+	// Delays the destruction long enough that the explosion is guaranteed to show up.
+	SetLifeSpan(0.25f);
 }
 
 void ACGProjectile::SpawnTrailParticleSystem()
