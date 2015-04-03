@@ -517,6 +517,18 @@ void ACGPlayerHUD::DrawGameInfo()
 			PixelsPerHeight * RoundDataElement.TimeText.Transform.HeightPercent,
 			RoundDataElement.TimeText.Anchor);
 
+		Text = FString::Printf(TEXT("%s"), *CGGameState->GameModeClass->GetName());
+
+		// TODO write a new scaled text.
+		DrawScaledText(
+			Text,
+			RoundDataElement.TimeText.Color,
+			X,
+			Y + PixelsPerHeight * RoundDataElement.TimeText.Transform.PercentY - PixelsPerHeight * RoundDataElement.TimeText.Transform.HeightPercent,
+			Font,
+			PixelsPerHeight * RoundDataElement.TimeText.Transform.HeightPercent,
+			0.f);
+
 		//////////////////////////////////////////////////////////////////////////////////////
 		// Start Score Output.
 		/////////////////////////////////////////////////////////////////////////////////////
@@ -600,6 +612,11 @@ void ACGPlayerHUD::DrawGameInfo()
 					EBlendMode::BLEND_Translucent);
 			}
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Game State is missing!"));
+
 	}
 }
 
