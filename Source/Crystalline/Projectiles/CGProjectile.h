@@ -34,12 +34,6 @@ public:
 	UFUNCTION()
 	void SetVelocity(FVector Direction);
 
-	/** @return The Collision component of the projectile. **/
-	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
-
-	/** @return the Movement Component of the projectile. **/
-	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return MovementComp; }
-
 	/** 
 	 * Processes the impact with projectile specific implementation details. 
 	 *
@@ -76,6 +70,12 @@ public:
 	/** The Damage Type of the projectile, this is used in dealing damage. */
 	UPROPERTY(Transient)
 	TSubclassOf<UDamageType> DamageType;
+
+	/** @return The Collision component of the projectile. **/
+	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
+
+	/** @return the Movement Component of the projectile. **/
+	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return MovementComp; }
 	
 protected:
 	/** Sphere collision component. */
