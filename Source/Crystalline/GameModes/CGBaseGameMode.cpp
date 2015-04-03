@@ -158,7 +158,7 @@ void ACGBaseGameMode::PostLogin(APlayerController* NewPlayer)
 
 	UE_LOG(LogTemp, Warning, TEXT("Post Login %s."), *NewPlayer->GetName());
 
-	// Ensure that the client has the proper spectaor camera location.
+	// Ensure that the client has the proper spectator camera location.
 	ACGPlayerController* NCGPC = Cast<ACGPlayerController>(NewPlayer);
 	if (NCGPC && NCGPC->GetPawn() == NULL)
 	{
