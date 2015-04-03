@@ -17,8 +17,8 @@ public:
 	
 	ACGShotgunProjectile(const FObjectInitializer& ObjectInitializer);
 
-	virtual void ACGShotgunProjectile::ProcessImpact(const FHitResult& Hit) override;
-
+	/** Applies a falloff to the damage. */
+	virtual float GetPointDamage() override;
 protected:
 
 	/**The Effective Distance of the shotgun bullet.*/

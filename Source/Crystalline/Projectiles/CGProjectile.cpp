@@ -41,6 +41,9 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	bReplicateMovement = true;
+
+	// Spawn the trail particles.
+	SpawnTrailParticleSystem();
 }
 
 
@@ -51,8 +54,15 @@ void ACGProjectile::PostInitializeComponents()
 	// Ignore the weapon that fired the weapon.
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 
-	// Spawn the trail particles.
-	SpawnTrailParticleSystem();
+
+}
+
+void ACGProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
+{
+	if (MovementComp)
+	{
+		MovementComp->Velocity = NewVelocity;
+	}
 }
 
 void ACGProjectile::OnStop(const FHitResult& Hit)
@@ -64,7 +74,6 @@ void ACGProjectile::OnStop(const FHitResult& Hit)
 		PrepForDestroy();
 	}
 
-	// XXX Doesn't play the effect when the weapon destroys on server.
 	// Plays the impact regardless of ownership.
 	SpawnImpact();
 }
@@ -77,26 +86,28 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Other Actor Found: %s"), *OtherActor->GetName());
 
+		// Constructs a point damage event. Damage is computed in children.
 		FPointDamageEvent PointDmg;
 		PointDmg.DamageTypeClass = DamageType;
 		PointDmg.HitInfo = Hit;
 		PointDmg.ShotDirection = Hit.ImpactNormal;
-		PointDmg.Damage = ImpactDamage; // This needs to move.
+		PointDmg.Damage = GetPointDamage();
 
 		OtherActor->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
-	}
 
-	/*
-	else
-	{
-	UPrimitiveComponent * OtherComponent = Hit.GetComponent();
-	if (OtherComponent)
-	{
-	UE_LOG(LogTemp, Warning, TEXT("Other Component Found: %s"), *OtherComponent->GetName());
+		UPrimitiveComponent * OtherComponent = Hit.GetComponent();
+		if (OtherComponent)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Other Component Found: %s"), *OtherComponent->GetName());
 
-	OtherComponent->AddImpulseAtLocation(GetVelocity() * 100.0f, Hit.ImpactPoint);
+			OtherComponent->AddImpulseAtLocation(GetVelocity() * 100.0f, Hit.ImpactPoint);
+		}
 	}
-	}*/
+}
+
+float ACGProjectile::GetPointDamage()
+{
+	return ImpactDamage;
 }
 
 void ACGProjectile::SpawnImpact()
@@ -123,17 +134,15 @@ void ACGProjectile::PrepForDestroy()
 	MovementComp->StopMovementImmediately();
 
 	// Delays the destruction long enough that the explosion is guaranteed to show up.
-	SetLifeSpan(0.25f);
+	SetLifeSpan(CG_PROJECTILE_IMPACT_LIFESPAN);
 }
 
 void ACGProjectile::SpawnTrailParticleSystem()
 {
-	// TODO Move this to sub classes as needed!
 	if (ProjectileTrail)
 	{
 		TrailPSC = UGameplayStatics::SpawnEmitterAttached(ProjectileTrail, RootComponent);
 	}
-
 }
 
 void ACGProjectile::SetVelocity(FVector Direction)
@@ -144,10 +153,3 @@ void ACGProjectile::SetVelocity(FVector Direction)
 	}
 }
 
-void ACGProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
-{
-	if (MovementComp)
-	{
-		MovementComp->Velocity = NewVelocity;
-	}
-}

@@ -10,19 +10,11 @@ ACGShotgunProjectile::ACGShotgunProjectile(const FObjectInitializer& ObjectIniti
 	OutOfRangeModifier = .25f;
 }
 
-void ACGShotgunProjectile::ProcessImpact(const FHitResult& Hit)
+float ACGShotgunProjectile::GetPointDamage()
 {
-	if (Hit.GetActor())
-	{
-		FPointDamageEvent PointDmg;
-		PointDmg.DamageTypeClass = DamageType;
-		PointDmg.HitInfo = Hit;
-		PointDmg.ShotDirection = Hit.ImpactNormal;
+	// Compute the estimated distance travelled by this projectile (specifics don't matter in this case).
+	const float EstDistTravelled = MovementComp->InitialSpeed * (GetWorld()->GetTimeSeconds() - CreationTime);
 
-		// Hard drop off for damage at the extent of the effective range.
-		const float EstDistTravelled = MovementComp->InitialSpeed * (GetWorld()->GetTimeSeconds() - CreationTime);
-		PointDmg.Damage = ImpactDamage * (EstDistTravelled < EffectiveDistance ? 1 : OutOfRangeModifier);
-
-		Hit.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
-	}
+	// Adjust the damage based on whether or not the hit is out of the shotgun's range.
+	return ImpactDamage * (EstDistTravelled < EffectiveDistance ? 1 : OutOfRangeModifier);
 }
