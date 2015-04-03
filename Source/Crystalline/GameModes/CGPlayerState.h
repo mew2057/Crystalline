@@ -79,12 +79,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "State Name")
 	virtual void SetName(const FString& NewName);
-
-	UFUNCTION(BlueprintCallable, Category = "State Name")
-		virtual void SetPlayerName(const FString& NewName) override {
-		Super::SetPlayerName(NewName);
-	};
-
+	
 	// Broadcasted across server and client reliably.
 	/**
 	 * Plays the Death Message on all local human player controllers.

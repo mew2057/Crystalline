@@ -73,8 +73,12 @@ void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType 
 		AmmoMesh->IgnoreActorWhenMoving(Owner, true);
 		GetWorldTimerManager().SetTimer(TimerHandle_Destroy, this, &ACGAmmoPickup::ProcessDestroy, LifeSpan, false);
 	
+		// Get the impact normal then add a random Y rotation to the Ammo.
 		SetActorRotation((Hit.ImpactNormal * FVector::ForwardVector).Rotation());
-		SetActorLocation(Hit.ImpactPoint);
+		AddActorLocalRotation(FRotator(0.f, FMath::RandRange(0.f, 360.f),0.f), false);
+		
+		// Set the location to the "ground"
+		SetActorLocation(Hit.ImpactPoint);		
 	}
 	else
 	{
