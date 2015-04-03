@@ -6,7 +6,8 @@
 #include "CGCharacterMovementComponent.generated.h"
 
 /**
- * 
+ * XXX Currently no different from UCharacterMovementComponent!
+ * The Movement component for Crystalline Characters.
  */
 UCLASS()
 class CRYSTALLINE_API UCGCharacterMovementComponent : public UCharacterMovementComponent

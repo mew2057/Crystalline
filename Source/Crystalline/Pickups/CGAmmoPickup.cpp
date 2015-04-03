@@ -77,7 +77,7 @@ void ACGAmmoPickup::Initialize(class AActor* Owner, int32 BaseAmmo, ECGAmmoType 
 		SetActorRotation((Hit.ImpactNormal * FVector::ForwardVector).Rotation());
 		AddActorLocalRotation(FRotator(0.f, FMath::RandRange(0.f, 360.f),0.f), false);
 		
-		// Set the location to the "ground"
+		// Set the location to the "ground".
 		SetActorLocation(Hit.ImpactPoint);		
 	}
 	else

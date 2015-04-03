@@ -9,7 +9,6 @@ ACGInventory::ACGInventory(const FObjectInitializer& ObjectInitializer) : Super(
 
 	bReplicates = true;
 	bOnlyRelevantToOwner = true;
-	
 }
 
 void ACGInventory::PostInitializeComponents()
@@ -87,6 +86,7 @@ void ACGInventory::AddToWeaponMap(ACGWeapon* Weapon, ECGCrystalType Type)
 		return;
 	}
 
+	// If the weapon is not contained in the map, create an array and add it.
 	if (!WeaponGroups.Contains(Type))
 	{
 		TArray<class ACGWeapon*> NewWeapons;
@@ -99,6 +99,7 @@ void ACGInventory::AddToWeaponMap(ACGWeapon* Weapon, ECGCrystalType Type)
 		AmmoCache.Add(Weapon->WeaponConfig.AmmoType);
 	}
 
+	// Adds the weapon to the WeaponGroups.
 	WeaponGroups[Type].AddUnique(Weapon);
 
 	// Set the owner of the weapon to the Character.
@@ -125,7 +126,7 @@ void ACGInventory::DestroyInventory()
 		CachedWeapon = Weapons[i];
 		if (CachedWeapon)
 		{
-			// TODO refactor, this is a quick and dirty ammo pickuip spawner.
+			// TODO refactor, this is a quick and dirty ammo pickup spawner.
 			if (AmmoPickupTemplate && CachedWeapon->WeaponConfig.AmmoType > ECGAmmoType::NONE)
 			{
 				TempPickup = GetWorld()->SpawnActor<ACGAmmoPickup>(
@@ -245,6 +246,18 @@ void ACGInventory::PopBestCrystal()
 	}
 }
 
+
+void ACGInventory::SetCGOwner(ACGCharacter* NewOwner)
+{
+	if (CGOwner != NewOwner)
+	{
+		CGOwner = NewOwner;
+		Instigator = NewOwner;
+
+		SetOwner(CGOwner);
+	}
+}
+
 void ACGInventory::OnRep_CGOwner()
 {
 	// TODO Replicate the inventory being loaded.
@@ -274,16 +287,7 @@ void ACGInventory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutL
 	DOREPLIFETIME_CONDITION(ACGInventory, TierOneCrystal, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACGInventory, Weapons, COND_OwnerOnly);
 	
-	DOREPLIFETIME(ACGInventory, CGOwner);
+	DOREPLIFETIME(ACGInventory, CGOwner); // This may not be necessary.
 }
 
-void ACGInventory::SetCGOwner(ACGCharacter* NewOwner)
-{
-	if (CGOwner != NewOwner)
-	{
-		CGOwner = NewOwner;
-		Instigator = NewOwner;
 
-		SetOwner(CGOwner);
-	}
-}

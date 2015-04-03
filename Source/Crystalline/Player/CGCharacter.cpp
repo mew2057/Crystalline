@@ -939,7 +939,7 @@ void ACGCharacter::PickupCrystal()
 
 void ACGCharacter::OnPopCrystal()
 {
-	if (Inventory && Inventory->TierOneCrystal != ECGCrystalType::NONE)
+	if (Inventory && Inventory->GetTierOneCrystal() != ECGCrystalType::NONE)
 	{
 		// Make sure we control this player and it has an inventory.
 		if (Role < ROLE_Authority)
