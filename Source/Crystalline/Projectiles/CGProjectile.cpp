@@ -42,8 +42,6 @@ ACGProjectile::ACGProjectile(const FObjectInitializer& ObjectInitializer)
 	bReplicates = true;
 	bReplicateMovement = true;
 
-	// Spawn the trail particles.
-	SpawnTrailParticleSystem();
 }
 
 
@@ -54,7 +52,8 @@ void ACGProjectile::PostInitializeComponents()
 	// Ignore the weapon that fired the weapon.
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 
-
+	// Spawn the trail particles.
+	SpawnTrailParticleSystem();
 }
 
 void ACGProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)
