@@ -36,6 +36,12 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	bDelayedStart		  = true;
 }
 
+TSubclassOf<AGameSession> ACGBaseGameMode::GetGameSessionClass() const
+{
+	return ACGGameSession::StaticClass();
+}
+
+
 void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
 {
 	// Don't score kills if the match is over.
@@ -89,17 +95,16 @@ void ACGBaseGameMode::ObjectiveScored(AController * PlayerController)
 	}
 }
 
-
 int32 ACGBaseGameMode::GetRoundTime() const
 { 
 	return RoundTime; 
 }
 
-
 int32 ACGBaseGameMode::GetScoreToWin() const
 {
 	return ScoreToWin; 
 }
+
 
 #pragma endregion Public
 

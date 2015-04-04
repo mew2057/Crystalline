@@ -19,6 +19,15 @@ public:
 	ACGBaseGameMode(const FObjectInitializer& ObjectInitializer);
 
 	/**
+	* Retrieves the Session class for spawning new sessions.
+	* Currently only ACGGameSession.
+	* Overrides the default GetGameSessionClass function.
+	*
+	* @return The Session class for online connections.
+	*/
+	virtual TSubclassOf<AGameSession> GetGameSessionClass() const override;
+
+	/**
 	 *	Informs the game state that a kill occured. The score is updated (if appropriate) and checked to see if the game is over.
 	 *	Broadcasts the death information across the clients so appropriate messages may be passed to the player's HUD.
 	 *
@@ -55,8 +64,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GameMode|State")
 	int32 GetScoreToWin() const;
-
-
 protected:	
 
 	/**Called on the Transition to WaitingToStart, spawns bots if they are enabled for this game mode.*/

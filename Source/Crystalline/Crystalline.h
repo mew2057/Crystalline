@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
+#include "Online/CGGameSession.h"
 #include "GUI/CGPlayerHUD.h"
 #include "Player/CGCharacter.h"
 #include "Player/CGInventory.h"
