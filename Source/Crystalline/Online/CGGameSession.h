@@ -12,8 +12,6 @@ UCLASS()
 class CRYSTALLINE_API ACGGameSession : public AGameSession
 {
 	GENERATED_BODY()
-	
-	
-	
+
 	
 };

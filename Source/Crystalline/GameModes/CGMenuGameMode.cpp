@@ -6,6 +6,7 @@
 void ACGMenuGameMode::RestartPlayer(class AController* NewPlayer)
 {
 	// Intentionally Blank
+	//Super::RestartPlayer(NewPlayer);
 }
 
 TSubclassOf<AGameSession> ACGMenuGameMode::GetGameSessionClass() const
