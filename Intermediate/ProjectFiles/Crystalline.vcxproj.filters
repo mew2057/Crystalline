@@ -330,6 +330,9 @@
     <ClInclude Include="..\..\Source\Crystalline\Online\CGGameSession.h">
       <Filter>Source\Crystalline\Online</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGMenuGameMode.h">
+      <Filter>Source\Crystalline\GameModes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Crystalline\Online\CGGameInstance.cpp">
@@ -337,6 +340,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Crystalline\Online\CGGameSession.cpp">
       <Filter>Source\Crystalline\Online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGMenuGameMode.cpp">
+      <Filter>Source\Crystalline\GameModes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
