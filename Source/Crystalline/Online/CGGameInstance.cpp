@@ -20,3 +20,16 @@ ACGGameSession* UCGGameInstance::GetGameSession() const
 
 	return nullptr;
 }
+
+
+bool UCGGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& GameType, const FString& InTravelURL) const
+{
+	ACGGameSession* const GameSession = GetGameSession();
+	if (GameSession)
+	{
+
+
+	}
+	return false;
+}
+
