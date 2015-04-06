@@ -6,8 +6,7 @@
 ACGKotHGameMode::ACGKotHGameMode(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<AGameState> GameStateClassFinder(TEXT("/Game/Blueprints/States/CrystallineGameState"));
-	GameStateClass = GameStateClassFinder.Class;
+
 }
 
 bool ACGKotHGameMode::IsWinner(ACGPlayerState* Player)

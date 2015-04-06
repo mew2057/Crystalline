@@ -6,8 +6,7 @@
 ACGDMGameMode::ACGDMGameMode(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<AGameState> GameStateClassFinder(TEXT("/Game/Blueprints/States/CrystallineGameState"));
-	GameStateClass = GameStateClassFinder.Class;
+
 }
 
 bool ACGDMGameMode::IsWinner(ACGPlayerState* Player)

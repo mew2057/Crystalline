@@ -23,12 +23,20 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	PlayerStartCooldownTime(10.f),
 	PreGameTime(10.f)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Game Mode Name %s."), *GetName());
+
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CGPlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
+
+	if (DefaultPawnClass)
+		UE_LOG(LogTemp, Warning, TEXT("Default Pawn Class %s."), *DefaultPawnClass->GetName());
 
 	static ConstructorHelpers::FClassFinder<AGameState> GameStateClassFinder(TEXT("/Game/Blueprints/States/CrystallineGameState"));
 	GameStateClass = GameStateClassFinder.Class;
 
+	if (GameStateClass)
+		UE_LOG(LogTemp, Warning, TEXT("Game State Class %s."), *GameStateClass->GetName());
+	
 	PlayerControllerClass = ACGPlayerController::StaticClass();	
 	HUDClass              = ACGPlayerHUD::StaticClass();
 	PlayerStateClass      = ACGPlayerState::StaticClass();
@@ -36,11 +44,29 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	bDelayedStart		  = true;
 }
 
+void ACGBaseGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Options: %s"), *Options);
+
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	/*
+	const int32 BotsCountOptionValue = GetIntOption(Options, GetBotsCountOptionName(), 0);
+	SetAllowBots(BotsCountOptionValue > 0 ? true : false, BotsCountOptionValue);
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	const UGameInstance* GI = GetGameInstance();
+	if (GI && Cast<UShooterGameInstance>(GI)->GetIsOnline())
+	{
+		bPauseable = false;
+	}
+	*/
+}
+
 TSubclassOf<AGameSession> ACGBaseGameMode::GetGameSessionClass() const
 {
 	return ACGGameSession::StaticClass();
 }
-
 
 void ACGBaseGameMode::Killed(AController* Killer, AController* KilledPlayer, const UDamageType* DamageType)
 {

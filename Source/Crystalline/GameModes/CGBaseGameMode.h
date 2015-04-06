@@ -18,6 +18,9 @@ public:
 	/** Constructs the Game Mode. Initializes game attributes (mainly for the Editor's benefit) and defines the default classes that manage what the player sees. */
 	ACGBaseGameMode(const FObjectInitializer& ObjectInitializer);
 
+	/** Loads the options for the game mode.*/
+	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
 	/**
 	* Retrieves the Session class for spawning new sessions.
 	* Currently only ACGGameSession.
