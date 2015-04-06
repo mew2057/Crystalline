@@ -33,3 +33,9 @@ bool UCGGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& GameTyp
 	return false;
 }
 
+
+void UCGGameInstance::ServerTravel(const FString& URL) const
+{
+	GetWorld()->ServerTravel(URL);
+}
+

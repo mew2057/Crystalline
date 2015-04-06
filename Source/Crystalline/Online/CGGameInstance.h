@@ -33,5 +33,12 @@ public :
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Game Instance | Session")
 	virtual bool HostGame(ULocalPlayer* LocalPlayer, const FString& GameType, const FString& InTravelURL) const;
+
+
+	/** TODO Document
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Game Instance | Session")
+	virtual void ServerTravel(const FString& URL) const;
+
 	
 };
