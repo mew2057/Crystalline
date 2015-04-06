@@ -4,15 +4,34 @@
 #include "OnlineSessionSettings.h"
 #include "CGGameSession.h"
 
-UFUNCTION(BlueprintCallable, Category = "Session | Settings")
-void ACGGameSession::SetMapName(const FString & MapName)
+void ACGGameSession::InitializeHostSettings()
 {
-	HostSettings->Set(SETTING_MAPNAME, MapName, EOnlineDataAdvertisementType::ViaOnlineService);
-
+	HostSettings = MakeShareable(new FOnlineSessionSettings());
 }
 
-UFUNCTION(BlueprintCallable, Category = "Session | Settings")
+void ACGGameSession::SetMapName(const FString & MapName)
+{
+
+	//MakeShareable
+	if (HostSettings.IsValid())
+	{
+		HostSettings->Set(SETTING_MAPNAME, MapName, EOnlineDataAdvertisementType::ViaOnlineService);
+		UE_LOG(LogTemp, Warning, TEXT("MAP NAME SET"));
+
+	}
+}
+
 void ACGGameSession::SetGameMode(const FString & GameType)
 {
-	HostSettings->Set(SETTING_GAMEMODE, GameType, EOnlineDataAdvertisementType::ViaOnlineService);
+	if (HostSettings.IsValid())
+	{
+		HostSettings->Set(SETTING_GAMEMODE, GameType, EOnlineDataAdvertisementType::ViaOnlineService);
+		UE_LOG(LogTemp, Warning, TEXT("GAME MODE SET"));
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Host Settings was INVALID!"));
+
+	}
 }

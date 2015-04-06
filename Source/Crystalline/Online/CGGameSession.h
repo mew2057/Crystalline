@@ -19,8 +19,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Session | Settings")
 	virtual void SetGameMode(const FString & GameMode);
+
+	UFUNCTION(BlueprintCallable, Category = "Session | Settings")
+	virtual void InitializeHostSettings();
 protected:
 
-	/** */
+	/** An Aggregation of settings used by the host to configure the session.*/
 	TSharedPtr<class FOnlineSessionSettings> HostSettings;
 };
