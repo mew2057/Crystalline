@@ -64,6 +64,15 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "GameMode|State")
 	int32 GetScoreToWin() const;
+
+	/** 
+	 * Retrieves the "pretty name" for this game mode.
+	 * 
+	 * @return The Human Readble name for the game mode.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "GameMode|Score")
+	virtual FString  GetUIName() const;
+
 protected:	
 
 	/**Called on the Transition to WaitingToStart, spawns bots if they are enabled for this game mode.*/
@@ -182,4 +191,8 @@ protected:
 	/** The number of bots the game should spawn. */
 	UPROPERTY(EditDefaultsOnly, Category = BotConfig)
 	int32 BotsInRound;
+
+	/** The Name of the Game Mode for the User Interface. */
+	UPROPERTY(EditDefaultsOnly, Category = UserInterface)
+	FString UIName;
 };

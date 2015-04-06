@@ -13,6 +13,7 @@ class CRYSTALLINE_API ACGKotHGameMode : public ACGBaseGameMode
 {
 	GENERATED_BODY()
 public:
+	ACGKotHGameMode(const FObjectInitializer& ObjectInitializer);
 
 	//XXX Remove?
 	/** Check to see that the player matches the game winner.*/

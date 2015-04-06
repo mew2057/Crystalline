@@ -105,6 +105,10 @@ int32 ACGBaseGameMode::GetScoreToWin() const
 	return ScoreToWin; 
 }
 
+FString ACGBaseGameMode::GetUIName() const
+{
+	return UIName;
+}
 
 #pragma endregion Public
 

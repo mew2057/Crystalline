@@ -3,6 +3,11 @@
 #include "Crystalline.h"
 #include "CGDMGameMode.h"
 
+ACGDMGameMode::ACGDMGameMode(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+}
+
 bool ACGDMGameMode::IsWinner(ACGPlayerState* Player)
 {
 	return Player && Player == GameWinner;

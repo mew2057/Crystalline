@@ -3,11 +3,15 @@
 #include "Crystalline.h"
 #include "CGKotHGameMode.h"
 
+ACGKotHGameMode::ACGKotHGameMode(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+}
+
 bool ACGKotHGameMode::IsWinner(ACGPlayerState* Player)
 {
 	return Player && Player == GameWinner;
 }
-
 
 void ACGKotHGameMode::EndGame(ACGPlayerState* Winner)
 {

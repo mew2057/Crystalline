@@ -13,6 +13,7 @@ class CRYSTALLINE_API ACGDMGameMode : public ACGBaseGameMode
 {
 	GENERATED_BODY()
 public:
+	ACGDMGameMode(const FObjectInitializer& ObjectInitializer);
 
 	/** If the player matches the game winner, the player is considered a winner.*/
 	virtual bool IsWinner(ACGPlayerState* Player) override;
