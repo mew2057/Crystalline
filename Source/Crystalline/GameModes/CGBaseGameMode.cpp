@@ -291,11 +291,12 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 
 			return CurrentStart;
 		}
-		else if (CurrentScore > BestScore)
+		else if (CurrentScore > BestScore || CurrentScore == BestScore && FMath::RandRange(0,1) == 1 ) // Flip a coin on the spawn location.
 		{
 			BestScore = CurrentScore;
 			BestStart = CurrentStart;
 		}
+
 	}
 
 	if (BestStart)
