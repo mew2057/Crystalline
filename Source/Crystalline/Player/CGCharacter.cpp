@@ -389,16 +389,35 @@ void ACGCharacter::OnRep_LastHit()
 	}
 }
 
-
-void ACGCharacter::StopAllAnim()
+float ACGCharacter::PlayAnimMontage(class UAnimMontage * AnimMontage, float InPlayRate, FName StartSectionName)
 {
-	USkeletalMeshComponent* UsedMesh = GetMesh();
-	if (UsedMesh && UsedMesh->AnimScriptInstance)
+	USkeletalMeshComponent* SkeletalMesh = GetPawnMesh();
+	if (AnimMontage && SkeletalMesh && SkeletalMesh->AnimScriptInstance)
 	{
-		UsedMesh->AnimScriptInstance->Montage_Stop(0.f);
+		return SkeletalMesh->AnimScriptInstance->Montage_Play(AnimMontage, InPlayRate);
+	}
+	return 0.f;
+}
+
+void ACGCharacter::StopAnimMontage(class UAnimMontage* AnimMontage)
+{
+	USkeletalMeshComponent* SkeletalMesh = GetPawnMesh();
+	if (AnimMontage && SkeletalMesh && SkeletalMesh->AnimScriptInstance &&
+		SkeletalMesh->AnimScriptInstance->Montage_IsPlaying(AnimMontage))
+	{
+		SkeletalMesh->AnimScriptInstance->Montage_Stop(AnimMontage->BlendOutTime);
 	}
 }
 
+
+void ACGCharacter::StopAllAnim()
+{
+	USkeletalMeshComponent* SkeletalMesh = GetPawnMesh();
+	if (SkeletalMesh && SkeletalMesh->AnimScriptInstance)
+	{
+		SkeletalMesh->AnimScriptInstance->Montage_Stop(0.f);
+	}
+}
 
 void ACGCharacter::TornOff()
 {

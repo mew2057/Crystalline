@@ -206,6 +206,8 @@ void ACGWeapon::StopReload()
 		// Check on the clientside, because we don't know about player input.
 		ClientCheckQueuedInput();
 	}	
+
+
 }
 
 bool ACGWeapon::ServerStartReload_Validate()
@@ -366,8 +368,6 @@ void ACGWeapon::StopFiring()
 
 void ACGWeapon::StartWeaponFireSimulation()
 {
-
-
 	// Muzzle Flash
 	if (WeaponFXConfig.MuzzleFlash)
 	{
@@ -384,10 +384,7 @@ void ACGWeapon::StartWeaponFireSimulation()
 	if (CGOwner)
 	{
 		// The sound effect.
-		if (WeaponFXConfig.FireSound)
-		{
-			FireAudioComponent = UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
-		}
+		FireAudioComponent = PlayWeaponSound(FireSound);
 
 		APlayerController* CGController = Cast<APlayerController>(CGOwner->GetController());
 
@@ -932,7 +929,51 @@ FHitResult ACGWeapon::WeaponTrace(const FVector& TraceFrom, const FVector& Trace
 
 	return Hit;
 }
+
+
 #pragma endregion
+
+
+UAudioComponent* ACGWeapon::PlayWeaponSound(USoundCue* Sound)
+{
+	UAudioComponent* AudioComponent = NULL;
+
+	if (Sound)
+	{
+		AudioComponent = UGameplayStatics::PlaySoundAttached(Sound, GetRootComponent());
+	}
+
+	return AudioComponent;
+}
+
+float ACGWeapon::PlayWeaponAnimation(const FCGAnim& Animation)
+{
+	float Duration = 0.f;
+	if (CGOwner)
+	{
+		UAnimMontage* UsedAnim = CGOwner->IsFirstPerson() ? Animation.FirstPerson : Animation.ThirdPerson;
+		if (UsedAnim)
+		{
+			// Play the montage.
+			Duration = CGOwner->PlayAnimMontage(UsedAnim);
+		}
+	}
+
+	return Duration;
+}
+
+void ACGWeapon::StopWeaponAnimation(const FCGAnim& Animation)
+{
+	if (CGOwner)
+	{
+		UAnimMontage* UsedAnim = CGOwner->IsFirstPerson() ? Animation.FirstPerson : Animation.ThirdPerson;
+		if (UsedAnim)
+		{
+			// Stop the montage.
+			CGOwner->StopAnimMontage(UsedAnim);
+		}
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

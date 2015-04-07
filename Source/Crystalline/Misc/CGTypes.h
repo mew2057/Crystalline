@@ -334,6 +334,7 @@ struct FCGDefaultWeaponConfig
 
 
 #pragma region Weapon Structs
+
 USTRUCT()
 struct FCGWeaponConfig
 {
@@ -341,28 +342,31 @@ struct FCGWeaponConfig
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
-		uint32 bAutomaticFire : 1;
+	uint32 bAutomaticFire : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		uint32 bUsesProjectile : 1;
+	uint32 bUsesProjectile : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		uint32 bHasManualReload : 1;
+	uint32 bHasManualReload : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		uint32 bOverHeatWeapon : 1;
+	uint32 bOverHeatWeapon : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 	uint32 bHeadshotPossible : 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
-		float TimeBetweenShots;
+	float TimeBetweenShots;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
-		float EquipTime;
+	float EquipTime;
 
 	UPROPERTY(EditDefaultsOnly, Category = Timing)
-		float UnequipTime;
+	float CrystalSlotTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = Timing)
+	float UnequipTime;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
 	TSubclassOf<UDamageType> DamageType;
@@ -389,6 +393,7 @@ public:
 		TimeBetweenShots = .01;
 		bAutomaticFire = false;
 		EquipTime = .05f;
+		CrystalSlotTime = .05f;
 		UnequipTime = .05f;
 
 		// Attributes.
@@ -411,18 +416,18 @@ struct FCGAmmoData
 {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		int32 AmmoPerShot;
+	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
+	int32 AmmoPerShot;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		int32 AmmoCapacity;
+	int32 AmmoCapacity;
 
 	UPROPERTY(EditDefaultsOnly, Category = WeaponAttributes)
-		int32 ShotsPerClip;
+	int32 ShotsPerClip;
 
 	/** The amount of time that the weapon is in the "Reload" state. */
 	UPROPERTY(EditDefaultsOnly)
-		float ReloadTime;
+	float ReloadTime;
 
 	FCGAmmoData()
 	{
@@ -464,7 +469,6 @@ struct FCGOverheatAmmoData
 		OverheatTime = .5f;
 	}
 };
-
 
 USTRUCT()
 struct FCGProjectileData
@@ -525,6 +529,21 @@ struct FCGInstantHit
 	FVector Direction;
 };
 
+/**Collects the animations for a weapon, defining both a first person and third person animation. */
+USTRUCT()
+struct FCGAnim
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** Animation to play from the first person view. */
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* FirstPerson;
+
+	/** Animation to play from the third person view. */
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* ThirdPerson;
+};
+
 /** VFX and SFX related to the weapon.*/
 USTRUCT()
 struct FCGWeaponFXData
@@ -557,14 +576,11 @@ struct FCGWeaponFXData
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 		TSubclassOf<UCameraShake> CameraShake;
 
-
 	////////////////////////////
 	// SFX
 
 	// XXX Maybe this should be a sound cue to prevent non prepped sounds from being used?
-	/** Played on weapon fire. */
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	class USoundBase* FireSound;
+
 
 	FCGWeaponFXData()
 	{

@@ -16,9 +16,13 @@ protected:
 	/**Timer Handle for the Shield Regeneration timer.*/
 	FTimerHandle TimerHandle_Equipping;
 
+	uint32 PoppingCrystal : 1;
+
 public:
 	UCGWeaponEquippingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-	{}
+	{
+		PoppingCrystal = false;
+	}
 
 	virtual void EnterState() override
 	{
