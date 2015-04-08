@@ -8,22 +8,22 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class CRYSTALLINE_API UCGSavedPlayerData : public UCGSaveGame
 {
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(VisibleAnywhere, Category = Basic)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FString PlayerName;
 
-	UPROPERTY(VisibleAnywhere, Category = Basic)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FString SaveSlotName;
 
-	UPROPERTY(VisibleAnywhere, Category = Basic)
-		uint32 UserIndex;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int32 UserIndex;
 
-	UPROPERTY(VisibleAnywhere, Category = Basic)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		uint32 UsingIPAddress:1;
 
 	UCGSavedPlayerData(const FObjectInitializer& ObjectInitializer);
