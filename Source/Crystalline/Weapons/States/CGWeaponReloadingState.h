@@ -55,6 +55,10 @@ public:
 		GetOuterACGWeapon()->StopReload();
 	}
 
+
+	/** Prevents the reloading state from being prempted by an unequip event.*/
+	virtual void StartUnequip() override { }
+
 	virtual void EndState() override
 	{
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Reload);
