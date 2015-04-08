@@ -140,7 +140,6 @@ float ACGWeapon::GetCurrentSpread()
 	return CurrentSpread * (CGOwner->bZoomed ? WeaponConfig.ADSSpreadMod : 1);
 }
 
-
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +181,38 @@ void ACGWeapon::OnUnequip()
 	CurrentState->StartUnequip();
 }
 
+
+float ACGWeapon::PlayEquip()
+{
+	// play this sound only locally.
+	if (CGOwner && CGOwner->IsLocallyControlled())
+	{
+		PlayWeaponSound(EquipSound);
+	}
+
+	return PlayWeaponAnimation(EquipAnim);
+}
+
+void ACGWeapon::StopEquip()
+{
+	StopWeaponAnimation(EquipAnim);
+}
+
+float ACGWeapon::PlayUnequip()
+{
+	// play this sound only locally.
+	if (CGOwner && CGOwner->IsLocallyControlled())
+	{
+		PlayWeaponSound(UnequipSound);
+	}
+
+	return PlayWeaponAnimation(UnequipAnim);
+}
+
+void ACGWeapon::StopUnequip()
+{
+	StopWeaponAnimation(UnequipAnim);
+}
 
 void ACGWeapon::OnStartReload()
 {

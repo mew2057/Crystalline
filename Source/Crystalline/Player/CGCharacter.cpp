@@ -707,6 +707,7 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 		}
 		else
 		{
+			SetCurrentWeapon(Weapon);
 			ServerEquipWeapon(Weapon);
 		}
 	}
@@ -916,7 +917,7 @@ bool ACGCharacter::ServerSetZoom_Validate(bool bZoom)
 void ACGCharacter::OnActionButton()
 {
 	// FIXME Might be more actions.
-	if (PendingCrystalPickup)
+	if (PendingCrystalPickup && !CurrentWeapon->IsReloading())
 	{
 		// If we aren't the server, we better tell the server what we're doing.
 		if (Role < ROLE_Authority)
@@ -958,7 +959,8 @@ void ACGCharacter::PickupCrystal()
 
 void ACGCharacter::OnPopCrystal()
 {
-	if (Inventory && Inventory->GetTierOneCrystal() != ECGCrystalType::NONE)
+	if (Inventory && Inventory->GetTierOneCrystal() != ECGCrystalType::NONE &&
+		!CurrentWeapon->IsReloading())
 	{
 		// Make sure we control this player and it has an inventory.
 		if (Role < ROLE_Authority)

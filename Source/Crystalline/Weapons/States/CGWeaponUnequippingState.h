@@ -25,6 +25,8 @@ public:
 
 	virtual void EnterState() override
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Entering Unequipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
+
 		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime);
 	}
 	
@@ -38,6 +40,8 @@ public:
 
 	virtual void EndState() override
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Exiting Unequipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
+
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Unequip);
 	}
 };
