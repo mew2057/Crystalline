@@ -64,7 +64,7 @@ void ACGInventory::InitializeInventory(const FCGDefaultWeaponConfig& Config)
 	}
 
 	// Constructs the inventory for the player.
-	ReconstructInventory();
+	ReconstructInventory(false);
 }
 
 void ACGInventory::AddToWeapons(ACGWeapon* Weapon)
@@ -171,7 +171,7 @@ void ACGInventory::DestroyInventory()
 	}
 }
 
-void ACGInventory::ReconstructInventory()
+void ACGInventory::ReconstructInventory(bool bCrystalChanged)
 {
 	// Only server has the right to reconstruct this!
 	if (Role < ROLE_Authority)
@@ -209,7 +209,7 @@ void ACGInventory::ReconstructInventory()
 	// Equip the best possible weapon for the player.
 	if (Weapons.Num() > 0)
 	{
-		CGOwner->EquipWeapon(Weapons[Weapons.Num() - 1]);
+		CGOwner->EquipWeapon(Weapons[Weapons.Num() - 1], bCrystalChanged);
 	}
 }
 
@@ -224,6 +224,7 @@ void ACGInventory::LoadCrystal(ECGCrystalType Crystal)
 	// Tier1 crystal
 	if (Crystal > ECGCrystalType::POWER_UP && TierOneCrystal != Crystal)
 	{
+		ECGCrystalType OldCrystal = TierOneCrystal;
 		TierOneCrystal = Crystal;
 		ReconstructInventory();
 	}
@@ -241,6 +242,7 @@ void ACGInventory::PopBestCrystal()
 {
 	if (TierOneCrystal != ECGCrystalType::NONE)
 	{
+		ECGCrystalType OldCrystal = TierOneCrystal;
 		TierOneCrystal = ECGCrystalType::NONE;
 		ReconstructInventory();
 	}

@@ -69,8 +69,9 @@ public:
 
 	/**
 	 * Handles Crystal Popping/Loading, Copies ammo between Crystal Guns as appropriate.
+	 * @param bCrystalChanged Flag to notify that the crystal has changed for the inventory.
 	 */
-	void ReconstructInventory();
+	void ReconstructInventory(bool bCrystalChanged = true);
 
 	/**
 	 * Determines if the weapon may recieve a crystal of th especified type.

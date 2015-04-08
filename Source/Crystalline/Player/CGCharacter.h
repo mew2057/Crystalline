@@ -317,7 +317,8 @@ public:
 
 	/**
 	* Sets up the current weapon and triggers the OnEquip and OnUnequip calls.
-	* @param NewWeapon The Weapon that is equipped.
+	* @param NewWeapon The weapon that is equipped.
+	* @param LastWeapon The weapon that was previously equipped by the player.
 	*/
 	void SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon = NULL);
 
@@ -339,22 +340,16 @@ public:
 	/** Destroys the inventory to ensure we don't have any stragglers on death.*/
 	void DestroyInventory();
 
-	/** 
-	 * Adds the weapon to the Weapons Array. If the weapon is in the array don't add it again.
-	 * Invokes the weapon's OnEnterInventory.
-	 * @param NewWeapon the candidate weapon for addition.
-	 */
-	void AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
-
 	/**
 	 * [server,client] Equips the supplied weapon to the player.
-	 * @param The weapon to equip.
+	 * @param Weapon The weapon to equip.
+	 * @param bCrystalChange Whether or not the weapon Equip is crystal driven.
 	 */
-	void EquipWeapon(ACGWeapon* Weapon);
+	void EquipWeapon(ACGWeapon* Weapon, bool bCrystalChange = false);
 
 	/**
 	* [server]Equips the supplied weapon to the player.
-	* @param The weapon to equip.
+	* @param Weapon The weapon to equip.
 	*/
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(ACGWeapon* Weapon);

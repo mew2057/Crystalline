@@ -320,7 +320,7 @@ public:
 
 	/**
 	 * Sets the owner of the weapon. 
-	 * @param The new owner of this weapon.	
+	 * @param NewOwner The ACGCharacter that this weapon is associated with.	
 	 */
 	void SetCGOwner(ACGCharacter* NewOwner);
 
