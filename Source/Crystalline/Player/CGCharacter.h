@@ -122,6 +122,7 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	float CurrentHealth;
 	
+	/** The Last hit that the character had recieved.*/
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastHit )
 	FCGHitInfo LastHit;
 
@@ -277,9 +278,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName WeaponAttachPoint;
 	
+	/**Defines the default configurations for the weapons. Namely the weapon classes, and ammo configurations. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FCGDefaultWeaponConfig DefaultWeaponConfig;
 
+	/** The class of the inventory used by the character. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TSubclassOf<class ACGInventory> DefaultInventoryClass;
 
@@ -295,10 +298,9 @@ protected:
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
 	
+	/** A pending crystal for player pickup. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PendingCrystalPickup)
 	class ACGCrystal* PendingCrystalPickup;
-	
-
 public:
 
 
