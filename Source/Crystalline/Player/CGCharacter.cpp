@@ -707,6 +707,7 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 		}
 		else
 		{
+			SetCurrentWeapon(Weapon);
 			ServerEquipWeapon(Weapon);
 		}
 	}

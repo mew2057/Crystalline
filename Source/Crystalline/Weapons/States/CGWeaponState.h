@@ -38,11 +38,12 @@ public:
 	{}
 	
 	// Do Nothing, only inactive/Equipping should process this.
-	virtual void StartEquip() {}
+	virtual bool StartEquip() { return false; }
 
-	virtual void StartUnequip()
+	virtual bool StartUnequip()
 	{
 		GetOuterACGWeapon()->GotoState(GetOuterACGWeapon()->UnequippingState);
+		return true;
 	}
 
 

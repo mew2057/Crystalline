@@ -89,12 +89,6 @@
     <ClInclude Include="..\..\Source\Crystalline\GameModes\CGKotHGameMode.h">
       <Filter>Source\Crystalline\GameModes</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\GameModes\CGMenuGameMode.cpp">
-      <Filter>Source\Crystalline\GameModes</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\GameModes\CGMenuGameMode.h">
-      <Filter>Source\Crystalline\GameModes</Filter>
-    </ClInclude>
     <ClCompile Include="..\..\Source\Crystalline\GameModes\CGPlayerStart.cpp">
       <Filter>Source\Crystalline\GameModes</Filter>
     </ClCompile>
@@ -158,18 +152,6 @@
     <Filter Include="Source\Crystalline\Online">
       <UniqueIdentifier>{7F381136-7EAA-4CFC-8D1C-92215DD8975C}</UniqueIdentifier>
     </Filter>
-    <ClCompile Include="..\..\Source\Crystalline\Online\CGGameInstance.cpp">
-      <Filter>Source\Crystalline\Online</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\Online\CGGameInstance.h">
-      <Filter>Source\Crystalline\Online</Filter>
-    </ClInclude>
-    <ClCompile Include="..\..\Source\Crystalline\Online\CGGameSession.cpp">
-      <Filter>Source\Crystalline\Online</Filter>
-    </ClCompile>
-    <ClInclude Include="..\..\Source\Crystalline\Online\CGGameSession.h">
-      <Filter>Source\Crystalline\Online</Filter>
-    </ClInclude>
     <Filter Include="Source\Crystalline\Pickups">
       <UniqueIdentifier>{2D9CC71E-B2DD-4899-8C51-EB21AD624EAC}</UniqueIdentifier>
     </Filter>

@@ -16,22 +16,22 @@ protected:
 	/**Timer Handle for the Shield Regeneration timer.*/
 	FTimerHandle TimerHandle_Equipping;
 
-	uint32 PoppingCrystal : 1;
-
 public:
 	UCGWeaponEquippingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 	{
-		PoppingCrystal = false;
 	}
 
 	virtual void EnterState() override
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Entering Equipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
+
 		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Equipping, this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime, false);
 	}
 
-	virtual void StartEquip() override
+	virtual bool StartEquip() override
 	{
 		// TODO React to an equip in the middle of equipping.
+		return false;
 	}
 
 	virtual void EquipFinished() 
@@ -43,6 +43,8 @@ public:
 
 	virtual void EndState() override
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Exiting Equipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
+
 		if (GetCGOwner())
 		{
 			GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Equipping);
