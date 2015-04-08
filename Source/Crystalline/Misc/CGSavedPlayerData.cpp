@@ -6,7 +6,7 @@
 UCGSavedPlayerData::UCGSavedPlayerData(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	SaveSlotName = TEXT("PlayerSaveData");
+	SaveSlotName = TEXT("SavedPlayerData");
 	UserIndex = 0;
 	UsingIPAddress = 0;
 }
