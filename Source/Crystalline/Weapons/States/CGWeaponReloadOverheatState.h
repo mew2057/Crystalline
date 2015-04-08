@@ -25,6 +25,7 @@ public:
 		// Make sure the overheat guage is fully maxed.
 		GetOuterACGWeapon()->UseAmmo();
 		GetOuterACGWeapon()->StartOverheat();
+		GetOuterACGWeapon()->PlayReload();
 	}
 
 	void Tick(float DeltaSeconds)

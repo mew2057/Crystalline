@@ -24,12 +24,19 @@ public:
 		// Stop reloading if it's not possible.
 		if (!GetOuterACGWeapon()->CanReload())
 		{
-			// The owner can't fire so tell it to stop firing.
+			// The owner can't reload so tell it to stop reloading.
 			GetOuterACGWeapon()->StopReload();
 			return;
 		}
+		// XXX make me protected and add a gettor.
+		GetOuterACGWeapon()->bReloadReplicator = true;
 
-		const float ReloadTime = GetOuterACGWeapon()->GetReloadTime();
+		float ReloadTime = GetOuterACGWeapon()->PlayReload();
+
+		if (ReloadTime <= 0.f)
+		{
+			ReloadTime = GetOuterACGWeapon()->GetReloadTime();
+		}
 
 		if (ReloadTime > .0f)
 		{
@@ -47,6 +54,10 @@ public:
 		GetOuterACGWeapon()->ApplyReload();
 		GetOuterACGWeapon()->StopReload();
 	}
+
+
+	/** Prevents the reloading state from being prempted by an unequip event.*/
+	virtual void StartUnequip() override { }
 
 	virtual void EndState() override
 	{
