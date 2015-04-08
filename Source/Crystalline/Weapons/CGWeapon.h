@@ -77,7 +77,6 @@ public:
 	/**Defines the zoom factor for the weapon.*/
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FCGZoom WeaponZoomConfig;
-	
 
 	////////////////////////////
 	// Mutable weapon fields
@@ -128,8 +127,15 @@ public:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
 	ACGCharacter* CGOwner;
 
+	/**Replicates the reload animation across the clients.*/
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Reload)
+	uint32 bReloadReplicator : 1;
+
 	UFUNCTION()
 	void OnRep_CGOwner();
+
+	UFUNCTION()
+	void OnRep_Reload();
 
 
 	////////////////////////////
@@ -150,12 +156,18 @@ public:
 
 	virtual void OnStartReload();
 	
+	/** 
+	 * Plays the visual and audio components of the Reload.
+	 * @return The time of the reload animation.
+	 */
+	float ACGWeapon::PlayReload();
+
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerStartReload();
 	virtual bool ACGWeapon::ServerStartReload_Validate();
 	virtual void ACGWeapon::ServerStartReload_Implementation();
 	
-	void StopReload();
+	void StopReload(bool bReplicated = false);
 
 	// TODO find a better way?
 	/**Invoked by the server when a timer based call finishes execution.*/
@@ -322,12 +334,79 @@ public:
 	FVector GetMuzzleRotation() const;
 
 protected:
+#pragma region Fields
+	/////////////////////////////
+	// Animations
+	/**Defines the animations to be played while unequipping the weapon.*/
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FCGAnim UnequipAnim;
+
+	/**Defines the animations to be played while equipping the weapon.*/
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FCGAnim EquipAnim;
+
+	/**Defines the animations to be played while reloading the weapon..*/
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FCGAnim ReloadAnim;
+
+	/**Defines the animations to be played while Firing the weapon.*/
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FCGAnim FireAnim;
+
+	/**Defines the animations to be played while poping a crystal.*/
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FCGAnim PopCrystalAnim;
+
+	/**Defines the animations to be played while picking up a crystal.*/
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FCGAnim PushCrystalAnim;
+
+	/**Defines the animations to be played while aiming down sights.*/
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FCGAnim AimDownSightsAnim;
+
+	////////////////////////////
+	// SFX
+	/** Played on weapon fire. */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	class USoundCue* FireSound;
+
+	/** Played on weapon reload. */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundCue* ReloadSound;
+
+	/** Played on weapon unequip. */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundCue* UnequipSound;
+
+	/** Played on weapon equip. */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundCue* EquipSound;
+
+	/** Played on weapon pop. */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundCue* CrystalPopSound;
+
+	/** Played on weapon push. */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundCue* CrystalPushSound;
+#pragma endregion
+
+
 	FHitResult WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const;
 
 
-#pragma region Visuals
+#pragma region FX
 
 protected:
+	// TODO Comment
+	UAudioComponent* PlayWeaponSound(USoundCue* Sound);
+
+	float PlayWeaponAnimation(const FCGAnim& Animation);
+
+	void StopWeaponAnimation(const FCGAnim& Animation);
+
+
 	/** Adds the mesh to the owner's mesh. */
 	void AttachMeshToPawn();
 

@@ -194,18 +194,39 @@ void ACGWeapon::OnStartReload()
 	}	
 }
 
-void ACGWeapon::StopReload()
+float ACGWeapon::PlayReload()
 {
-	// Always go active first, this way the server and client start at the same place.
-	GotoState(ActiveState);
-
-	// Don't spawn unecessary RPCs.
-	if (Role == ROLE_Authority && CanFire())
+	// play this sound only locally.
+	if (CGOwner && CGOwner->IsLocallyControlled())
 	{
-		// TODO how can we speed this up?
-		// Check on the clientside, because we don't know about player input.
-		ClientCheckQueuedInput();
-	}	
+		PlayWeaponSound(ReloadSound);
+	}
+
+	return PlayWeaponAnimation(ReloadAnim);
+}
+
+void ACGWeapon::StopReload(bool bReplicated)
+{
+	// Clear out the reload animation.
+	StopWeaponAnimation(ReloadAnim); 
+
+	// If this is replicated across the server, don't bother with the state change and queued input.
+	if (!bReplicated)
+	{
+		// Set the replicator to false to end any and all reloads.
+		bReloadReplicator = false;
+
+		// Always go active first, this way the server and client start at the same place.
+		GotoState(ActiveState);
+
+		// Don't spawn unecessary RPCs.
+		if (Role == ROLE_Authority && CanFire())
+		{
+			// TODO how can we speed this up?
+			// Check on the clientside, because we don't know about player input.
+			ClientCheckQueuedInput();
+		}
+	}
 }
 
 bool ACGWeapon::ServerStartReload_Validate()
@@ -366,8 +387,6 @@ void ACGWeapon::StopFiring()
 
 void ACGWeapon::StartWeaponFireSimulation()
 {
-
-
 	// Muzzle Flash
 	if (WeaponFXConfig.MuzzleFlash)
 	{
@@ -384,10 +403,7 @@ void ACGWeapon::StartWeaponFireSimulation()
 	if (CGOwner)
 	{
 		// The sound effect.
-		if (WeaponFXConfig.FireSound)
-		{
-			FireAudioComponent = UGameplayStatics::PlaySoundAttached(WeaponFXConfig.FireSound, GetRootComponent());
-		}
+		FireAudioComponent = PlayWeaponSound(FireSound);
 
 		APlayerController* CGController = Cast<APlayerController>(CGOwner->GetController());
 
@@ -817,7 +833,7 @@ bool ACGWeapon::IsReloading()const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma region Visuals
+#pragma region Effects
 
 void ACGWeapon::AttachMeshToPawn()
 {
@@ -932,7 +948,57 @@ FHitResult ACGWeapon::WeaponTrace(const FVector& TraceFrom, const FVector& Trace
 
 	return Hit;
 }
+
+
 #pragma endregion
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+UAudioComponent* ACGWeapon::PlayWeaponSound(USoundCue* Sound)
+{
+	UAudioComponent* AudioComponent = NULL;
+
+	if (Sound)
+	{
+		AudioComponent = UGameplayStatics::PlaySoundAttached(Sound, GetRootComponent());
+	}
+
+	return AudioComponent;
+}
+
+float ACGWeapon::PlayWeaponAnimation(const FCGAnim& Animation)
+{
+	float Duration = 0.f;
+	if (CGOwner)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner Found Reload"));
+
+		UAnimMontage* UsedAnim = CGOwner->IsFirstPerson() ? Animation.FirstPerson : Animation.ThirdPerson;
+		if (UsedAnim)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Playing montage."));
+
+			// Play the montage.
+			Duration = CGOwner->PlayAnimMontage(UsedAnim);
+		}
+	}
+
+	return Duration;
+}
+
+void ACGWeapon::StopWeaponAnimation(const FCGAnim& Animation)
+{
+	if (CGOwner)
+	{
+		UAnimMontage* UsedAnim = CGOwner->IsFirstPerson() ? Animation.FirstPerson : Animation.ThirdPerson;
+		if (UsedAnim)
+		{
+			// Stop the montage.
+			CGOwner->StopAnimMontage(UsedAnim);
+		}
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -943,6 +1009,7 @@ void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ACGWeapon, BurstCount, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(ACGWeapon, HitNotify,  COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ACGWeapon, bReloadReplicator, COND_SkipOwner);
 
 	
 	DOREPLIFETIME(ACGWeapon, CGOwner);
@@ -957,6 +1024,20 @@ void ACGWeapon::OnRep_CGOwner()
 	else
 	{
 		OnExitInventory();
+	}
+}
+
+void ACGWeapon::OnRep_Reload()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Reload Replication"));
+
+	if (bReloadReplicator)
+	{
+		PlayReload();
+	}
+	else
+	{
+		StopReload(true);
 	}
 }
 

@@ -93,14 +93,14 @@ void ACGProjectile::ProcessImpact(const FHitResult& Hit)
 		PointDmg.Damage = GetPointDamage();
 
 		OtherActor->TakeDamage(PointDmg.Damage, PointDmg, GetInstigatorController(), this);
-
+		/*
 		UPrimitiveComponent * OtherComponent = Hit.GetComponent();
 		if (OtherComponent)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Other Component Found: %s"), *OtherComponent->GetName());
 
 			OtherComponent->AddImpulseAtLocation(GetVelocity() * 100.0f, Hit.ImpactPoint);
-		}
+		}*/
 	}
 }
 

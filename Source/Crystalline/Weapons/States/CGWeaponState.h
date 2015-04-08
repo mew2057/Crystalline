@@ -38,10 +38,7 @@ public:
 	{}
 	
 	// Do Nothing, only inactive/Equipping should process this.
-	virtual void StartEquip() 
-	{
-		
-	}
+	virtual void StartEquip() {}
 
 	virtual void StartUnequip()
 	{

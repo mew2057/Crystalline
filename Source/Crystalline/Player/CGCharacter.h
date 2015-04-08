@@ -51,6 +51,8 @@ public:
 	UFUNCTION()
 	void OnRep_LastHit();
 
+	virtual float PlayAnimMontage(class UAnimMontage* AnimMontage, float InPlayRate = 1.f, FName StartSectionName = NAME_None) override;
+	virtual void StopAnimMontage(class UAnimMontage* AnimMontage) override;
 	void StopAllAnim();
 
 	/**Invoked on player death.*/
@@ -133,7 +135,6 @@ protected:
 
 	/** Begin the shield regeneration and set the player's CurrentHealth to max.*/
 	void StartShieldRegen();
-
 
 public:
 
