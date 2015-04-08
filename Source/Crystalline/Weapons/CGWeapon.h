@@ -127,8 +127,15 @@ public:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CGOwner)
 	ACGCharacter* CGOwner;
 
+	/**Replicates the reload animation across the clients.*/
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Reload)
+	uint32 bReloadReplicator : 1;
+
 	UFUNCTION()
 	void OnRep_CGOwner();
+
+	UFUNCTION()
+	void OnRep_Reload();
 
 
 	////////////////////////////
@@ -149,12 +156,18 @@ public:
 
 	virtual void OnStartReload();
 	
+	/** 
+	 * Plays the visual and audio components of the Reload.
+	 * @return The time of the reload animation.
+	 */
+	float ACGWeapon::PlayReload();
+
 	UFUNCTION(server, reliable, WithValidation)
 	void ServerStartReload();
 	virtual bool ACGWeapon::ServerStartReload_Validate();
 	virtual void ACGWeapon::ServerStartReload_Implementation();
 	
-	void StopReload();
+	void StopReload(bool bReplicated = false);
 
 	// TODO find a better way?
 	/**Invoked by the server when a timer based call finishes execution.*/

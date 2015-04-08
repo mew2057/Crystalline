@@ -28,8 +28,15 @@ public:
 			GetOuterACGWeapon()->StopReload();
 			return;
 		}
+		// XXX make me protected and add a gettor.
+		GetOuterACGWeapon()->bReloadReplicator = true;
 
-		const float ReloadTime = GetOuterACGWeapon()->GetReloadTime();
+		float ReloadTime = GetOuterACGWeapon()->PlayReload();
+
+		if (ReloadTime <= 0.f)
+		{
+			ReloadTime = GetOuterACGWeapon()->GetReloadTime();
+		}
 
 		if (ReloadTime > .0f)
 		{
