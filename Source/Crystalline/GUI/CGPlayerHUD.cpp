@@ -718,8 +718,11 @@ void ACGPlayerHUD::SetPromptMessage(bool bSetPrompt, const FString& Message, int
 void ACGPlayerHUD::AddDialogKillMessage(ACGPlayerState* Killer, ACGPlayerState* KilledPlayer, const UDamageType* DamageType)
 {
 	FCGKillMessage NewKillMessage;
-	NewKillMessage.KillerName = Killer->GetShortenedName();
-	NewKillMessage.VictimName = KilledPlayer->GetShortenedName();
+	if (Killer)
+		NewKillMessage.KillerName = Killer->GetShortenedName();
+	if (KilledPlayer)
+		NewKillMessage.VictimName = KilledPlayer->GetShortenedName();
+
 
 	DialogQueue.Add(NewKillMessage);
 
