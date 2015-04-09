@@ -2,6 +2,7 @@
 
 #include "Crystalline.h"
 #include "CGPlayerController.h"
+#include "Misc/CGSavedPlayerData.h"
 
 void ACGPlayerController::UnFreeze()
 {
@@ -115,6 +116,25 @@ void ACGPlayerController::ClientGameStarted_Implementation()
 		HUD->SetScoreboardVisibility(false);
 		HUD->SetEndGameMessage(false);
 	}
+
+	/*
+	AGameMode* gameMode= GetWorld()->GetAuthGameMode();
+	FString gameModeName = gameMode->GetName();
+	
+	if (gameModeName.StartsWith("KotH") || gameModeName.StartsWith("DM")){
+		
+		UCGSavedPlayerData* LoadGameInstance = Cast<UCGSavedPlayerData>(UGameplayStatics::CreateSaveGameObject(UCGSavedPlayerData::StaticClass()));
+		LoadGameInstance = Cast<UCGSavedPlayerData>(UGameplayStatics::LoadGameFromSlot("SavedPlayerData", 0));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, LoadGameInstance->PlayerName);
+		if (LoadGameInstance->UsingIPAddress == true){
+			FString PlayerNameToDisplay = LoadGameInstance->PlayerName;
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, PlayerNameToDisplay);
+			if (GetWorld()->IsServer()){
+				SetName(PlayerNameToDisplay);
+			}
+		}
+	}
+	*/
 }
 
 void ACGPlayerController::ClientSetSpectatorCamera_Implementation(const FVector & Location, const FRotator & Rotation)

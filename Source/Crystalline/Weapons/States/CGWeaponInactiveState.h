@@ -18,9 +18,10 @@ public:
 	{}
 	
 
-	virtual void StartEquip() override
+	virtual bool StartEquip() override
 	{
 		GetOuterACGWeapon()->GotoEquippingState();
+		return true;
 	}
 	virtual void StartReload() final { }
 

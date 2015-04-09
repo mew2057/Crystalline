@@ -25,7 +25,25 @@ public:
 
 	virtual void EnterState() override
 	{
-		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime);
+		// play this sound only locally.
+		if (GetCGOwner() && GetCGOwner()->IsLocallyControlled())
+		{
+			GetOuterACGWeapon()->PlayWeaponSound(GetOuterACGWeapon()->UnequipSound);
+		}
+		
+		// XXX This might be better to use the animation time 
+		// Determine the length of the animation.
+		/*
+		float UnequipTime = GetOuterACGWeapon()->PlayWeaponAnimation(GetOuterACGWeapon()->UnequipAnim);
+		UE_LOG(LogTemp, Warning, TEXT("UnEquip Time %f"), UnequipTime);
+
+		if (UnequipTime <= 0.f)
+		{
+			UnequipTime = GetOuterACGWeapon()->WeaponConfig.UnequipTime;
+		}
+		*/
+
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime, false);
 	}
 	
 	void UnequipFinished()
@@ -38,6 +56,7 @@ public:
 
 	virtual void EndState() override
 	{
+	//	GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->UnequipAnim);
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Unequip);
 	}
 };

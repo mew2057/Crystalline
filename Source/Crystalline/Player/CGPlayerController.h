@@ -39,14 +39,16 @@ public:
 
 	/**
 	 * Displays GameMode Messages to the player.
-	 * @param Message The message the player is to see, e.g. kills to win.
+	 * @param MessageIndex The index of the game mode message in the message list.
 	 */
 	void OnGameScoreMessage(int32 MessageIndex);
 
 	/**Notifies the player that the round is over.*/
 	virtual void ClientGameEnded_Implementation(AActor* EndGameFocus, bool bIsWinner) override;
 
-	/** notify player about started match */
+	/** 
+	 * Informs the client that the game has started.
+	 */
 	UFUNCTION(reliable, client)
 	void ClientGameStarted();
 	virtual void ClientGameStarted_Implementation();

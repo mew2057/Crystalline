@@ -16,22 +16,39 @@ protected:
 	/**Timer Handle for the Shield Regeneration timer.*/
 	FTimerHandle TimerHandle_Equipping;
 
-	uint32 PoppingCrystal : 1;
-
 public:
 	UCGWeaponEquippingState(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 	{
-		PoppingCrystal = false;
 	}
 
 	virtual void EnterState() override
 	{
+		// play this sound only locally.
+		if (GetCGOwner() && GetCGOwner()->IsLocallyControlled())
+		{
+			GetOuterACGWeapon()->PlayWeaponSound(GetOuterACGWeapon()->EquipSound);
+		}
+
+		// XXX This might be better to use the animation time 
+		// Determine the length of the animation.
+		/*
+		float EquipTime = GetOuterACGWeapon()->PlayWeaponAnimation(GetOuterACGWeapon()->EquipAnim);
+		UE_LOG(LogTemp, Warning, TEXT("Equip Time %f"), EquipTime);
+		
+
+		if (EquipTime <= 0.f)
+		{
+			EquipTime = GetOuterACGWeapon()->WeaponConfig.EquipTime;
+		} 
+		*/
+
 		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Equipping, this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime, false);
 	}
 
-	virtual void StartEquip() override
+	virtual bool StartEquip() override
 	{
 		// TODO React to an equip in the middle of equipping.
+		return false;
 	}
 
 	virtual void EquipFinished() 
@@ -43,6 +60,8 @@ public:
 
 	virtual void EndState() override
 	{
+	//	GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->EquipAnim);
+
 		if (GetCGOwner())
 		{
 			GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Equipping);

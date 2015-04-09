@@ -122,6 +122,7 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	float CurrentHealth;
 	
+	/** The Last hit that the character had recieved.*/
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastHit )
 	FCGHitInfo LastHit;
 
@@ -277,9 +278,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName WeaponAttachPoint;
 	
+	/**Defines the default configurations for the weapons. Namely the weapon classes, and ammo configurations. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FCGDefaultWeaponConfig DefaultWeaponConfig;
 
+	/** The class of the inventory used by the character. */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TSubclassOf<class ACGInventory> DefaultInventoryClass;
 
@@ -295,10 +298,9 @@ protected:
 	UPROPERTY(Transient)
 	ACGWeapon* PendingWeapon;
 	
+	/** A pending crystal for player pickup. */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PendingCrystalPickup)
 	class ACGCrystal* PendingCrystalPickup;
-	
-
 public:
 
 
@@ -317,7 +319,8 @@ public:
 
 	/**
 	* Sets up the current weapon and triggers the OnEquip and OnUnequip calls.
-	* @param NewWeapon The Weapon that is equipped.
+	* @param NewWeapon The weapon that is equipped.
+	* @param LastWeapon The weapon that was previously equipped by the player.
 	*/
 	void SetCurrentWeapon(ACGWeapon* NewWeapon, ACGWeapon* LastWeapon = NULL);
 
@@ -339,22 +342,16 @@ public:
 	/** Destroys the inventory to ensure we don't have any stragglers on death.*/
 	void DestroyInventory();
 
-	/** 
-	 * Adds the weapon to the Weapons Array. If the weapon is in the array don't add it again.
-	 * Invokes the weapon's OnEnterInventory.
-	 * @param NewWeapon the candidate weapon for addition.
-	 */
-	void AddWeapon(ACGWeapon* Weapon, ECGCrystalType Type = ECGCrystalType::NONE);
-
 	/**
 	 * [server,client] Equips the supplied weapon to the player.
-	 * @param The weapon to equip.
+	 * @param Weapon The weapon to equip.
+	 * @param bCrystalChange Whether or not the weapon Equip is crystal driven.
 	 */
-	void EquipWeapon(ACGWeapon* Weapon);
+	void EquipWeapon(ACGWeapon* Weapon, bool bCrystalChange = false);
 
 	/**
 	* [server]Equips the supplied weapon to the player.
-	* @param The weapon to equip.
+	* @param Weapon The weapon to equip.
 	*/
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(ACGWeapon* Weapon);
@@ -369,10 +366,6 @@ public:
 
 	UFUNCTION()
 	void OnRep_PendingCrystalPickup();
-
-	UFUNCTION()
-	void OnRep_CrystalChanged();
-
 
 	bool GiveAmmo(ECGAmmoType AmmoType, int32 Ammo);
 

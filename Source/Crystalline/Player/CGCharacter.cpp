@@ -644,21 +644,6 @@ void ACGCharacter::WeaponChanged()
 		CurrentWeapon->OnEquip();
 		CurrentZoom = CurrentWeapon->WeaponZoomConfig; // Change the zoom on weapon change.
 	}
-
-	// Set the offhand weapon for the character, IFF we have a weapon.
-	// TODO check to see if There is a better way of doing this for the HUD.
-	// FIXME!
-	/*if (Inventory != NULL && CurrentWeapon != NULL)
-	{
-		const int32 NumberOfWeapons = Inventory->GetWeaponCount();
-		int32 WeaponIndex = Inventory->GetWeaponIndex(CurrentWeapon);
-
-		if (NumberOfWeapons > 1)
-		{
-			WeaponIndex = (WeaponIndex + 1) % NumberOfWeapons;
-			OffHandWeapon = Inventory->GetWeapon(WeaponIndex);
-		}
-	}*/
 }
 
 void ACGCharacter::SpawnBaseInventory()
@@ -696,7 +681,7 @@ void ACGCharacter::DestroyInventory()
 
 
 
-void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
+void ACGCharacter::EquipWeapon(ACGWeapon* Weapon, bool bCrystalChange)
 {
 	if (Weapon)
 	{
@@ -707,6 +692,7 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon)
 		}
 		else
 		{
+			SetCurrentWeapon(Weapon);
 			ServerEquipWeapon(Weapon);
 		}
 	}
@@ -776,12 +762,6 @@ void ACGCharacter::OnRep_PendingCrystalPickup()
 			HUD->SetPromptMessage(true, TEXT("to pickup crystal " + FString::FromInt((int8)(PendingCrystalPickup->GetCrystalType()))), ACTION_BUTTON);
 		}
 	}
-}
-
-
-void ACGCharacter::OnRep_CrystalChanged()
-{
-	// TODO.
 }
 
 bool ACGCharacter::GiveAmmo(ECGAmmoType AmmoType, int32 Ammo)
@@ -916,7 +896,7 @@ bool ACGCharacter::ServerSetZoom_Validate(bool bZoom)
 void ACGCharacter::OnActionButton()
 {
 	// FIXME Might be more actions.
-	if (PendingCrystalPickup)
+	if (PendingCrystalPickup && !CurrentWeapon->IsReloading())
 	{
 		// If we aren't the server, we better tell the server what we're doing.
 		if (Role < ROLE_Authority)
@@ -958,7 +938,8 @@ void ACGCharacter::PickupCrystal()
 
 void ACGCharacter::OnPopCrystal()
 {
-	if (Inventory && Inventory->GetTierOneCrystal() != ECGCrystalType::NONE)
+	if (Inventory && Inventory->GetTierOneCrystal() != ECGCrystalType::NONE &&
+		!CurrentWeapon->IsReloading())
 	{
 		// Make sure we control this player and it has an inventory.
 		if (Role < ROLE_Authority)

@@ -5,10 +5,11 @@
 #include "Misc/CGSaveGame.h"
 #include "CGSavedPlayerData.generated.h"
 
+
 /**
  * 
  */
-UCLASS(Blueprintable, BlueprintType)
+UCLASS(Blueprintable)
 class CRYSTALLINE_API UCGSavedPlayerData : public UCGSaveGame
 {
 	GENERATED_BODY()
@@ -19,6 +20,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FString SaveSlotName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FString LastUsedIPAddress;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		int32 UserIndex;
