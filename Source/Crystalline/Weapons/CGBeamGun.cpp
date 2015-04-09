@@ -31,6 +31,7 @@ void ACGBeamGun::FireHitScan()
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 	
+	/*
 	ACGCharacter* TempTarget = Cast<ACGCharacter>(Impact.GetActor());
 
 	// If a new pawn has come "closer" change our target.
@@ -48,16 +49,92 @@ void ACGBeamGun::FireHitScan()
 
 		Impact = WeaponTrace(StartTrace, EndTrace);
 	}	
-
+	
 	ProcessHitScan(Impact, StartTrace, ShootDir, 0, CurrentSpread);
+	*/
+
+	// If we're the client notify the Beam that we've fired the beam gun.
+	if (CGOwner && CGOwner->IsLocallyControlled() && GetNetMode() == NM_Client)
+	{
+		ServerNotifyBeamFire(Impact, ShootDir);
+	}
+
+	// Process the beam and play any beam effects.
+	ProcessBeam(Impact, ShootDir);
+}
+
+bool ACGBeamGun::ServerNotifyBeamFire_Validate(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir)
+{
+	return true;
+}
+
+void ACGBeamGun::ServerNotifyBeamFire_Implementation(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir)
+{
+	if (Instigator)
+	{
+		// TODO Cheat Checking
+		ProcessBeam(Impact, ShootDir);
+	}
 }
 
 
-void ACGBeamGun::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector& Origin, const FVector& ShootDir, int32 RandSeed, float Spread)
+void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir)
 {
-	//Target = Cast<APawn>(Impact.GetActor());
+	AActor* TempTarget = Impact.GetActor();
 
-	Super::ProcessHitScanConfirmed(Impact, Origin, ShootDir, RandSeed, Spread);	
+	// Flag to prevent an unecessary trace.
+	//bool bTargetHitInImpact = Cast<APawn>(TempTarget);
+
+	// If the sighted target is alive, assume they're a better candidate than whoever we're attached to.
+	if (TempTarget != Target && TempTarget != NULL)
+	{
+		Target = TempTarget;
+	}
+
+	FHitResult NewImpact = Impact;
+	FVector TargetDir = ShootDir;
+	const FVector StartTrace = GetCameraLocation();
+
+	// If the target wasn't found and we have a target, check to see if we're within the radius.
+	if (TempTarget == NULL && Target != NULL)
+	{		
+		TargetDir = Target->GetActorLocation() - StartTrace;
+		TargetDir = ShootDir.CosineAngle2D(TargetDir) >= MaxAngle ? TargetDir : ShootDir;
+
+		FVector EndTrace = StartTrace + TargetDir * WeaponConfig.WeaponRange;
+
+		NewImpact = WeaponTrace(StartTrace, EndTrace);
+
+		Target = NewImpact.GetActor();
+	}
+
+	// TODO Damage based on range.
+	// TODO "Sticky" Damage points, e.g. adjust position of hit to where the beam hits.
+	// TODO Blow back damage.
+	// TODO Adjusted noise.
+	// TODO Fix weapon FX stay alive. (Maybe a timer?)
+
+	if (ShouldDealDamage_Instant(Target))
+	{
+		// TODO add a distance modifier to this damage.
+		DealDamage_Instant(NewImpact, TargetDir);
+	}
+
+	// This will trigger an OnRep that will prop to remote clients
+	if (Role == ROLE_Authority)
+	{
+		HitNotify.Origin = StartTrace;
+		HitNotify.Direction = TargetDir;
+	}
+
+	// Plays the local FX.
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		FVector EndPoint = NewImpact.bBlockingHit ? NewImpact.ImpactPoint : StartTrace + TargetDir * WeaponConfig.WeaponRange;
+		// Do spawning here.
+		SpawnTrailEffect(EndPoint);
+		SpawnHitEffect(NewImpact);
+	}
 }
 
 void ACGBeamGun::StopWeaponFireSimulation()
@@ -71,10 +148,8 @@ void ACGBeamGun::StopWeaponFireSimulation()
 	}
 }
 
-
 void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 {
-
 	if (WeaponFXConfig.WeaponTrail && TrailPSC == NULL)
 	{
 		USkeletalMeshComponent* Mesh = GetWeaponMesh();
@@ -101,7 +176,7 @@ void ACGBeamGun::StopFire()
 }
 
 
-/*
+
 void ACGBeamGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -109,4 +184,3 @@ void ACGBeamGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	DOREPLIFETIME_CONDITION(ACGBeamGun, Target, COND_OwnerOnly);
 
 }
-*/

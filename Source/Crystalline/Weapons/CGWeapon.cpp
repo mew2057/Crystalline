@@ -609,12 +609,12 @@ void ACGWeapon::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector&
 }
 
 
-bool ACGWeapon::ServerNotifyHit_Validate(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+bool ACGWeapon::ServerNotifyHit_Validate(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
 {
 	return true;
 }
 
-void ACGWeapon::ServerNotifyHit_Implementation(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+void ACGWeapon::ServerNotifyHit_Implementation(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
 {
 	// If the weapon has an instigator and we hit.
 	if (Instigator && Impact.bBlockingHit)
@@ -975,8 +975,6 @@ float ACGWeapon::PlayWeaponAnimation(const FCGAnim& Animation)
 		{
 			// Play the montage.
 			Duration = CGOwner->PlayAnimMontage(UsedAnim);
-			UE_LOG(LogTemp, Warning, TEXT("Sequence Length %f %s"), UsedAnim->SequenceLength, *UsedAnim->GetFullName());
-
 		}
 	}
 
