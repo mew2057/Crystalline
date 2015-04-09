@@ -22,6 +22,9 @@ public:
 		FString SaveSlotName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FString LastUsedIPAddress;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		int32 UserIndex;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
