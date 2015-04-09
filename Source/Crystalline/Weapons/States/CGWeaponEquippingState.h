@@ -59,7 +59,7 @@ public:
 
 	virtual void EndState() override
 	{
-		GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->EquipAnim);
+	//	GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->EquipAnim);
 
 		if (GetCGOwner())
 		{

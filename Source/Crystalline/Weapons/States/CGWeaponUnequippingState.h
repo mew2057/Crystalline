@@ -54,7 +54,7 @@ public:
 
 	virtual void EndState() override
 	{
-		GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->UnequipAnim);
+	//	GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->UnequipAnim);
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Unequip);
 	}
 };
