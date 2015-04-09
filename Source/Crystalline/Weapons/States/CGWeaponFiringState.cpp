@@ -16,16 +16,16 @@ void UCGWeaponFiringState::EnterState()
 	if (TimeRemaining > 0 && GetOuterACGWeapon()->LastFireTime > 0.f)
 	{
 		// TODO check if this timer is active, if it is just return.
-		UE_LOG(LogTemp, Warning, TEXT("FIREDELAY %s"), GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"));
+		//UE_LOG(LogTemp, Warning, TEXT("FIREDELAY %s"), GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"));
 		if (!GetCGOwner()->GetWorldTimerManager().IsTimerActive(TimerHandle_Refire))
 		{
 			GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Refire, this, &UCGWeaponFiringState::FireShot, TimeRemaining, false);	// Time for the first iteration.
-			UE_LOG(LogTemp, Warning, TEXT("%f"), TimeRemaining);
+		//	UE_LOG(LogTemp, Warning, TEXT("%f"), TimeRemaining);
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("FIRENOW %s"), GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"));
+	//	UE_LOG(LogTemp, Warning, TEXT("FIRENOW %s"), GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"));
  
 		FireShot();
 	}
@@ -34,8 +34,8 @@ void UCGWeaponFiringState::EnterState()
 
 void UCGWeaponFiringState::EndState() 
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s END STATE : %s"), GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"),
-		GetCGOwner()->GetWorldTimerManager().IsTimerActive(TimerHandle_Refire) ? TEXT("Timer Active") : TEXT("Timer InActive"));
+	//UE_LOG(LogTemp, Warning, TEXT("%s END STATE : %s"), GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"),
+	//	GetCGOwner()->GetWorldTimerManager().IsTimerActive(TimerHandle_Refire) ? TEXT("Timer Active") : TEXT("Timer InActive"));
 
 
 	// This occasionally crashes.
@@ -69,9 +69,10 @@ void UCGWeaponFiringState::FireShot()
 				false);
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s :  %s"), 
+	
+	/*UE_LOG(LogTemp, Warning, TEXT("%s :  %s"), 
 		GetCGOwner()->GetWorldTimerManager().IsTimerActive(TimerHandle_Refire) ? TEXT("Timer Active") : TEXT("Timer InActive"),
-		GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"));
+		GetCGOwner()->Role < ROLE_Authority ? TEXT("LOCAL") : TEXT("REMOTE"));*/
 	
 
 

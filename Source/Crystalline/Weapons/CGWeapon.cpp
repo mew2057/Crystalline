@@ -297,7 +297,7 @@ void ACGWeapon::StartFire()
 		OnStartReload();
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("LOCAL %d %s"), GetAmmoInClip(), *CurrentState->GetName());
+//	UE_LOG(LogTemp, Warning, TEXT("LOCAL %d %s"), GetAmmoInClip(), *CurrentState->GetName());
 
 	// Tell the server to start firing, Only if we can fire locally.
 	if (CurrentState->StartFire() && Role < ROLE_Authority)
@@ -313,13 +313,17 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("REMOTE %d %s"), GetAmmoInClip(), *CurrentState->GetName() );
+	//UE_LOG(LogTemp, Warning, TEXT("REMOTE %d %s"), GetAmmoInClip(), *CurrentState->GetName() );
 
 	CurrentState->StartFire();
 }
 
 void ACGWeapon::StopFire()
 {
+	// TEST FOR BEAM GUN!
+	// Ensure that the burst count Cleared. XXX sometimes the state might screw up?
+	BurstCount = 0;
+
 	if (Role < ROLE_Authority)
 	{
 		ServerStopFire();
@@ -419,6 +423,7 @@ void ACGWeapon::StartWeaponFireSimulation()
 void ACGWeapon::StopWeaponFireSimulation()
 { 
 	BurstCount = 0;
+
 	/*
 	// Clean up the components.
 	if (MuzzleFlashComp != NULL)
@@ -1023,8 +1028,6 @@ void ACGWeapon::OnRep_CGOwner()
 
 void ACGWeapon::OnRep_Reload()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Reload Replication"));
-
 	if (bReloadReplicator)
 	{
 		PlayReload();

@@ -30,28 +30,6 @@ void ACGBeamGun::FireHitScan()
 
 	// Get the Impact for the weapon trace then confirm whether or not it hit a player.
 	FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
-	
-	/*
-	ACGCharacter* TempTarget = Cast<ACGCharacter>(Impact.GetActor());
-
-	// If a new pawn has come "closer" change our target.
-	if (TempTarget && TempTarget->IsAlive())
-	{
-		Target = TempTarget;
-	}
-
-	// TODO move this to the server.
-	if (Target)
-	{
-		FVector TargetDir = Target->GetActorLocation() - StartTrace;
-		ShootDir = ShootDir.CosineAngle2D(TargetDir) >= MaxAngle ? TargetDir : ShootDir;
-		EndTrace = StartTrace + ShootDir * WeaponConfig.WeaponRange;
-
-		Impact = WeaponTrace(StartTrace, EndTrace);
-	}	
-	
-	ProcessHitScan(Impact, StartTrace, ShootDir, 0, CurrentSpread);
-	*/
 
 	// If we're the client notify the Beam that we've fired the beam gun.
 	if (CGOwner && CGOwner->IsLocallyControlled() && GetNetMode() == NM_Client)
@@ -140,9 +118,11 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 void ACGBeamGun::StopWeaponFireSimulation()
 {
 	Super::StopWeaponFireSimulation();
+	UE_LOG(LogTemp, Warning, TEXT("%s StopWeaponFireSimulation"), *GetCGOwner()->GetName());
 
 	if (TrailPSC)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("%s Trail Found!"), *GetCGOwner()->GetName());
 		TrailPSC->DeactivateSystem();
 		TrailPSC = NULL;
 	}
@@ -150,6 +130,9 @@ void ACGBeamGun::StopWeaponFireSimulation()
 
 void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 {
+	// TODO This gets called AFTER Deactivation, this is naturally a bad thing.
+	UE_LOG(LogTemp, Warning, TEXT("%s SpawnTrailEffect"), *GetCGOwner()->GetName());
+
 	if (WeaponFXConfig.WeaponTrail && TrailPSC == NULL)
 	{
 		USkeletalMeshComponent* Mesh = GetWeaponMesh();
