@@ -181,39 +181,6 @@ void ACGWeapon::OnUnequip()
 	CurrentState->StartUnequip();
 }
 
-
-float ACGWeapon::PlayEquip()
-{
-	// play this sound only locally.
-	if (CGOwner && CGOwner->IsLocallyControlled())
-	{
-		PlayWeaponSound(EquipSound);
-	}
-
-	return PlayWeaponAnimation(EquipAnim);
-}
-
-void ACGWeapon::StopEquip()
-{
-	StopWeaponAnimation(EquipAnim);
-}
-
-float ACGWeapon::PlayUnequip()
-{
-	// play this sound only locally.
-	if (CGOwner && CGOwner->IsLocallyControlled())
-	{
-		PlayWeaponSound(UnequipSound);
-	}
-
-	return PlayWeaponAnimation(UnequipAnim);
-}
-
-void ACGWeapon::StopUnequip()
-{
-	StopWeaponAnimation(UnequipAnim);
-}
-
 void ACGWeapon::OnStartReload()
 {
 	// Reload locally.
@@ -330,7 +297,7 @@ void ACGWeapon::StartFire()
 		OnStartReload();
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("LOCAL %d %s"), GetAmmoInClip(), *CurrentState->GetName());
+//	UE_LOG(LogTemp, Warning, TEXT("LOCAL %d %s"), GetAmmoInClip(), *CurrentState->GetName());
 
 	// Tell the server to start firing, Only if we can fire locally.
 	if (CurrentState->StartFire() && Role < ROLE_Authority)
@@ -346,13 +313,17 @@ bool ACGWeapon::ServerStartFire_Validate()
 
 void ACGWeapon::ServerStartFire_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("REMOTE %d %s"), GetAmmoInClip(), *CurrentState->GetName() );
+	//UE_LOG(LogTemp, Warning, TEXT("REMOTE %d %s"), GetAmmoInClip(), *CurrentState->GetName() );
 
 	CurrentState->StartFire();
 }
 
 void ACGWeapon::StopFire()
 {
+	// TEST FOR BEAM GUN!
+	// Ensure that the burst count Cleared. XXX sometimes the state might screw up?
+	BurstCount = 0;
+
 	if (Role < ROLE_Authority)
 	{
 		ServerStopFire();
@@ -452,6 +423,7 @@ void ACGWeapon::StartWeaponFireSimulation()
 void ACGWeapon::StopWeaponFireSimulation()
 { 
 	BurstCount = 0;
+
 	/*
 	// Clean up the components.
 	if (MuzzleFlashComp != NULL)
@@ -642,12 +614,12 @@ void ACGWeapon::ProcessHitScanConfirmed(const FHitResult& Impact, const FVector&
 }
 
 
-bool ACGWeapon::ServerNotifyHit_Validate(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+bool ACGWeapon::ServerNotifyHit_Validate(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
 {
 	return true;
 }
 
-void ACGWeapon::ServerNotifyHit_Implementation(const FHitResult Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
+void ACGWeapon::ServerNotifyHit_Implementation(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float Spread)
 {
 	// If the weapon has an instigator and we hit.
 	if (Instigator && Impact.bBlockingHit)
@@ -1003,13 +975,9 @@ float ACGWeapon::PlayWeaponAnimation(const FCGAnim& Animation)
 	float Duration = 0.f;
 	if (CGOwner)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Owner Found Reload"));
-
 		UAnimMontage* UsedAnim = CGOwner->IsFirstPerson() ? Animation.FirstPerson : Animation.ThirdPerson;
 		if (UsedAnim)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Playing montage."));
-
 			// Play the montage.
 			Duration = CGOwner->PlayAnimMontage(UsedAnim);
 		}
@@ -1060,8 +1028,6 @@ void ACGWeapon::OnRep_CGOwner()
 
 void ACGWeapon::OnRep_Reload()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Reload Replication"));
-
 	if (bReloadReplicator)
 	{
 		PlayReload();

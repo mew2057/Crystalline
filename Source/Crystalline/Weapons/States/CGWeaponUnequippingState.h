@@ -25,9 +25,25 @@ public:
 
 	virtual void EnterState() override
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Entering Unequipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
+		// play this sound only locally.
+		if (GetCGOwner() && GetCGOwner()->IsLocallyControlled())
+		{
+			GetOuterACGWeapon()->PlayWeaponSound(GetOuterACGWeapon()->UnequipSound);
+		}
+		
+		// XXX This might be better to use the animation time 
+		// Determine the length of the animation.
+		/*
+		float UnequipTime = GetOuterACGWeapon()->PlayWeaponAnimation(GetOuterACGWeapon()->UnequipAnim);
+		UE_LOG(LogTemp, Warning, TEXT("UnEquip Time %f"), UnequipTime);
 
-		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime);
+		if (UnequipTime <= 0.f)
+		{
+			UnequipTime = GetOuterACGWeapon()->WeaponConfig.UnequipTime;
+		}
+		*/
+
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime, false);
 	}
 	
 	void UnequipFinished()
@@ -40,8 +56,7 @@ public:
 
 	virtual void EndState() override
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Exiting Unequipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
-
+	//	GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->UnequipAnim);
 		GetCGOwner()->GetWorldTimerManager().ClearTimer(TimerHandle_Unequip);
 	}
 };
