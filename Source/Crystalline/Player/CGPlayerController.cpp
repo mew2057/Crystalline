@@ -117,6 +117,7 @@ void ACGPlayerController::ClientGameStarted_Implementation()
 		HUD->SetEndGameMessage(false);
 	}
 
+	/*
 	AGameMode* gameMode= GetWorld()->GetAuthGameMode();
 	FString gameModeName = gameMode->GetName();
 	
@@ -132,9 +133,8 @@ void ACGPlayerController::ClientGameStarted_Implementation()
 				SetName(PlayerNameToDisplay);
 			}
 		}
-		
-
 	}
+	*/
 }
 
 void ACGPlayerController::ClientSetSpectatorCamera_Implementation(const FVector & Location, const FRotator & Rotation)
