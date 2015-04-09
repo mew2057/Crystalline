@@ -18,8 +18,6 @@ void ACGBeamGun::PostInitializeComponents()
 
 void ACGBeamGun::FireHitScan()
 {
-	//Super::FireHitScan();
-	
 	// Perform a raycast from the crosshair in to the world space.
 	// Get the starting location and rotation for the player.
 	const FVector StartTrace = GetCameraLocation();
@@ -59,10 +57,7 @@ void ACGBeamGun::ServerNotifyBeamFire_Implementation(const FHitResult& Impact, F
 void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal ShootDir)
 {
 	AActor* TempTarget = Impact.GetActor();
-
-	// Flag to prevent an unecessary trace.
-	//bool bTargetHitInImpact = Cast<APawn>(TempTarget);
-
+	
 	// If the sighted target is alive, assume they're a better candidate than whoever we're attached to.
 	if (TempTarget != Target && TempTarget != NULL)
 	{
@@ -118,11 +113,9 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 void ACGBeamGun::StopWeaponFireSimulation()
 {
 	Super::StopWeaponFireSimulation();
-	UE_LOG(LogTemp, Warning, TEXT("%s StopWeaponFireSimulation"), *GetCGOwner()->GetName());
 
 	if (TrailPSC)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s Trail Found!"), *GetCGOwner()->GetName());
 		TrailPSC->DeactivateSystem();
 		TrailPSC = NULL;
 	}
@@ -130,8 +123,11 @@ void ACGBeamGun::StopWeaponFireSimulation()
 
 void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 {
-	// TODO This gets called AFTER Deactivation, this is naturally a bad thing.
-	UE_LOG(LogTemp, Warning, TEXT("%s SpawnTrailEffect"), *GetCGOwner()->GetName());
+	// EARLY RETURN If the burst count is zero or less, the counter got mixed up.
+	if (BurstCount <= 0)
+	{
+		return;
+	}
 
 	if (WeaponFXConfig.WeaponTrail && TrailPSC == NULL)
 	{
