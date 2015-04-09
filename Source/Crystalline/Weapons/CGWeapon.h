@@ -155,12 +155,6 @@ public:
 
 	/** Invoked when the weapon is unequipped by a player or bot. */
 	virtual void OnUnequip();
-
-	// TODO COMMMENT
-	float PlayEquip();
-	void StopEquip();
-	float PlayUnequip();
-	void StopUnequip();
 	
 
 	virtual void OnStartReload();

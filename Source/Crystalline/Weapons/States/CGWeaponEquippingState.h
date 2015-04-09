@@ -24,8 +24,24 @@ public:
 	virtual void EnterState() override
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Entering Equipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
+		// play this sound only locally.
+		if (GetCGOwner() && GetCGOwner()->IsLocallyControlled())
+		{
+			GetOuterACGWeapon()->PlayWeaponSound(GetOuterACGWeapon()->EquipSound);
+		}
 
-		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Equipping, this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime, false);
+		// XXX This might be better to use the animation time 
+		// Determine the length of the animation.
+		float EquipTime = GetOuterACGWeapon()->PlayWeaponAnimation(GetOuterACGWeapon()->EquipAnim);
+		UE_LOG(LogTemp, Warning, TEXT("Equip Time %f"), EquipTime);
+		
+
+		if (EquipTime <= 0.f)
+		{
+			EquipTime = GetOuterACGWeapon()->WeaponConfig.EquipTime;
+		}
+
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Equipping, this, &UCGWeaponEquippingState::EquipFinished, EquipTime, false);
 	}
 
 	virtual bool StartEquip() override
@@ -43,7 +59,7 @@ public:
 
 	virtual void EndState() override
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Exiting Equipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
+		GetOuterACGWeapon()->StopWeaponAnimation(GetOuterACGWeapon()->EquipAnim);
 
 		if (GetCGOwner())
 		{

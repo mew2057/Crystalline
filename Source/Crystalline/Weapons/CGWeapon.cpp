@@ -181,39 +181,6 @@ void ACGWeapon::OnUnequip()
 	CurrentState->StartUnequip();
 }
 
-
-float ACGWeapon::PlayEquip()
-{
-	// play this sound only locally.
-	if (CGOwner && CGOwner->IsLocallyControlled())
-	{
-		PlayWeaponSound(EquipSound);
-	}
-
-	return PlayWeaponAnimation(EquipAnim);
-}
-
-void ACGWeapon::StopEquip()
-{
-	StopWeaponAnimation(EquipAnim);
-}
-
-float ACGWeapon::PlayUnequip()
-{
-	// play this sound only locally.
-	if (CGOwner && CGOwner->IsLocallyControlled())
-	{
-		PlayWeaponSound(UnequipSound);
-	}
-
-	return PlayWeaponAnimation(UnequipAnim);
-}
-
-void ACGWeapon::StopUnequip()
-{
-	StopWeaponAnimation(UnequipAnim);
-}
-
 void ACGWeapon::OnStartReload()
 {
 	// Reload locally.
@@ -1003,15 +970,13 @@ float ACGWeapon::PlayWeaponAnimation(const FCGAnim& Animation)
 	float Duration = 0.f;
 	if (CGOwner)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Owner Found Reload"));
-
 		UAnimMontage* UsedAnim = CGOwner->IsFirstPerson() ? Animation.FirstPerson : Animation.ThirdPerson;
 		if (UsedAnim)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Playing montage."));
-
 			// Play the montage.
 			Duration = CGOwner->PlayAnimMontage(UsedAnim);
+			UE_LOG(LogTemp, Warning, TEXT("Sequence Length %f %s"), UsedAnim->SequenceLength, *UsedAnim->GetFullName());
+
 		}
 	}
 
