@@ -367,10 +367,6 @@ public:
 	UFUNCTION()
 	void OnRep_PendingCrystalPickup();
 
-	UFUNCTION()
-	void OnRep_CrystalChanged();
-
-
 	bool GiveAmmo(ECGAmmoType AmmoType, int32 Ammo);
 
 	/** Retrieves the Weapon attach point's name. TODO make this return the actual appropriate point.*/

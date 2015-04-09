@@ -33,6 +33,7 @@ public:
 		
 		// XXX This might be better to use the animation time 
 		// Determine the length of the animation.
+		/*
 		float UnequipTime = GetOuterACGWeapon()->PlayWeaponAnimation(GetOuterACGWeapon()->UnequipAnim);
 		UE_LOG(LogTemp, Warning, TEXT("UnEquip Time %f"), UnequipTime);
 
@@ -40,8 +41,9 @@ public:
 		{
 			UnequipTime = GetOuterACGWeapon()->WeaponConfig.UnequipTime;
 		}
+		*/
 
-		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, UnequipTime, false);
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Unequip, this, &UCGWeaponUnequippingState::UnequipFinished, GetOuterACGWeapon()->WeaponConfig.UnequipTime, false);
 	}
 	
 	void UnequipFinished()

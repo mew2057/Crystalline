@@ -23,7 +23,6 @@ public:
 
 	virtual void EnterState() override
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Entering Equipping state %s"), GetCGOwner()->Role == ROLE_Authority ? TEXT("SERVER") : TEXT("CLIENT"));
 		// play this sound only locally.
 		if (GetCGOwner() && GetCGOwner()->IsLocallyControlled())
 		{
@@ -32,6 +31,7 @@ public:
 
 		// XXX This might be better to use the animation time 
 		// Determine the length of the animation.
+		/*
 		float EquipTime = GetOuterACGWeapon()->PlayWeaponAnimation(GetOuterACGWeapon()->EquipAnim);
 		UE_LOG(LogTemp, Warning, TEXT("Equip Time %f"), EquipTime);
 		
@@ -39,9 +39,10 @@ public:
 		if (EquipTime <= 0.f)
 		{
 			EquipTime = GetOuterACGWeapon()->WeaponConfig.EquipTime;
-		}
+		} 
+		*/
 
-		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Equipping, this, &UCGWeaponEquippingState::EquipFinished, EquipTime, false);
+		GetCGOwner()->GetWorldTimerManager().SetTimer(TimerHandle_Equipping, this, &UCGWeaponEquippingState::EquipFinished, GetOuterACGWeapon()->WeaponConfig.EquipTime, false);
 	}
 
 	virtual bool StartEquip() override
