@@ -62,9 +62,14 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 	AActor* TempTarget = Impact.GetActor();
 	
 	// If the sighted target is alive, assume they're a better candidate than whoever we're attached to.
-	if (TempTarget != Target && TempTarget != NULL)
+	if (TempTarget != NULL)
 	{
-		Target = TempTarget;
+		if (TempTarget != Target)
+		{
+			Target = TempTarget;
+		}
+
+		TargetLocation = Impact.ImpactPoint - Target->GetActorLocation();
 	}
 
 	FHitResult NewImpact = Impact;
@@ -75,7 +80,7 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 	// If the target wasn't found and we have a target, check to see if we're within the radius.
 	if (TempTarget == NULL && Target != NULL)
 	{		
-		TargetDir = Target->GetActorLocation() - StartTrace;
+		TargetDir = (TargetLocation + Target->GetActorLocation()) - StartTrace;
 		TargetDir.Normalize();
 		Angle = 1 - FVector::DotProduct(TargetDir, ShootDir);
 
@@ -90,11 +95,7 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 	
 
 	// TODO Damage based on range.
-	// TODO "Sticky" Damage points, e.g. adjust position of hit to where the beam hits.
 	// TODO Blow back damage.
-	// TODO Adjusted noise.
-	// TODO Fix weapon FX stay alive. (Maybe a timer?)
-	// TODO FIX LockStrength
 
 	LockStrength = Target != NULL ? Angle / MaxAngle : 1.f;
 
@@ -102,7 +103,7 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 	if (ShouldDealDamage_Instant(Target))
 	{		
 		// Perform the Dist check for computing the damage.
-		const float DistToTarget = FVector::Dist(Target->GetActorLocation(), StartTrace);
+		const float DistToTarget = FVector::Dist((TargetLocation + Target->GetActorLocation()), StartTrace);
 
 		// TODO add a distance modifier to this damage.
 		DealDamageBeam(NewImpact, TargetDir, DistToTarget);
@@ -165,7 +166,7 @@ void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 		return;
 	}
 
-	if (WeaponFXConfig.WeaponTrail )
+	if (WeaponFXConfig.WeaponTrail)
 	{
 		USkeletalMeshComponent* Mesh = GetWeaponMesh();
 		TrailPSC = UGameplayStatics::SpawnEmitterAttached(LockStrength < 1.f ? ConnectedBeam : WeaponFXConfig.WeaponTrail, Mesh, WeaponFXConfig.MuzzleSocket);
@@ -174,9 +175,9 @@ void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 		{
 			// Set the vector for the particle.
 			TrailPSC->SetVectorParameter(WeaponFXConfig.TrailTargetParam, EndPoint);
-
-		//	FLinearColor NewColor = FMath::Lerp(NoHitColor, HitColor, LockStrength);
-			//TrailPSC->SetColorParameter(BEAM_COLOR_OVER_LIFE, NewColor);
+			
+			FVector NewColor = FMath::Lerp(HitColor, NoHitColor, LockStrength);
+			TrailPSC->SetVectorParameter(BEAM_COLOR_OVER_LIFE, NewColor);	
 		}
 	}
 }
@@ -194,5 +195,6 @@ void ACGBeamGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ACGBeamGun, Target, COND_OwnerOnly);
+
 	DOREPLIFETIME(ACGBeamGun, LockStrength);
 }
