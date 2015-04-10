@@ -1008,9 +1008,7 @@ void ACGWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ACGWeapon, BurstCount, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(ACGWeapon, HitNotify,  COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(ACGWeapon, bReloadReplicator, COND_SkipOwner);
-
-	
+	DOREPLIFETIME_CONDITION(ACGWeapon, bReloadReplicator, COND_SkipOwner);	
 	DOREPLIFETIME(ACGWeapon, CGOwner);
 }
 

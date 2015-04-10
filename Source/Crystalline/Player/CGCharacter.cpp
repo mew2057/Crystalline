@@ -685,16 +685,11 @@ void ACGCharacter::EquipWeapon(ACGWeapon* Weapon, bool bCrystalChange)
 {
 	if (Weapon)
 	{
-		// Only the authority should change the current weapon.
-		if (Role == ROLE_Authority)
+		if (Role < ROLE_Authority)
 		{
-			SetCurrentWeapon(Weapon);
-		}
-		else
-		{
-			SetCurrentWeapon(Weapon);
 			ServerEquipWeapon(Weapon);
 		}
+		SetCurrentWeapon(Weapon);
 	}
 }
 
@@ -901,12 +896,10 @@ void ACGCharacter::OnActionButton()
 		// If we aren't the server, we better tell the server what we're doing.
 		if (Role < ROLE_Authority)
 		{
-			ServerPickUpCrystal();
+			ServerPickUpCrystal(); 
 		}
-		else
-		{
-			PickupCrystal();
-		}
+
+		PickupCrystal();
 	}
 }
 
@@ -946,10 +939,8 @@ void ACGCharacter::OnPopCrystal()
 		{
 			ServerPopCrystal();
 		}
-		else
-		{
-			PopCrystal();
-		}
+		
+		PopCrystal();		
 	}
 }
 

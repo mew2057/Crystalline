@@ -151,14 +151,15 @@ public:
 	/** Invoked when the weapon is equipped by a player or bot. */
 	virtual void OnEquip();
 
-
-
 	/** Invoked when the weapon is unequipped by a player or bot. */
 	virtual void OnUnequip();
 	
+	void PlayLocalCrystalPop();
+	void PlayLocalCrystalPush();
 
 	virtual void OnStartReload();
 	
+
 	/** 
 	 * Plays the visual and audio components of the Reload.
 	 * @return The time of the reload animation.

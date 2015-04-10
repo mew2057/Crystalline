@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Crystalline.h"
+#include "ParticleEmitterInstances.h"
 #include "CGBeamGun.h"
+
 
 ACGBeamGun::ACGBeamGun(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -12,7 +14,8 @@ void ACGBeamGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	
-	MaxAngle = FMath::Cos(FMath::DegreesToRadians(MaxAngle));
+	MaxAngle = 1 - FMath::Cos(FMath::DegreesToRadians(MaxAngle));
+	LockStrength = 2.f;
 }
 
 
@@ -67,12 +70,16 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 	FHitResult NewImpact = Impact;
 	FVector TargetDir = ShootDir;
 	const FVector StartTrace = GetCameraLocation();
+	float Angle = 0.f;
 
 	// If the target wasn't found and we have a target, check to see if we're within the radius.
 	if (TempTarget == NULL && Target != NULL)
 	{		
 		TargetDir = Target->GetActorLocation() - StartTrace;
-		TargetDir = ShootDir.CosineAngle2D(TargetDir) >= MaxAngle ? TargetDir : ShootDir;
+		TargetDir.Normalize();
+		Angle = 1 - FVector::DotProduct(TargetDir, ShootDir);
+
+		TargetDir = Angle <= MaxAngle ? TargetDir : ShootDir;
 
 		FVector EndTrace = StartTrace + TargetDir * WeaponConfig.WeaponRange;
 
@@ -80,17 +87,25 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 
 		Target = NewImpact.GetActor();
 	}
+	
 
 	// TODO Damage based on range.
 	// TODO "Sticky" Damage points, e.g. adjust position of hit to where the beam hits.
 	// TODO Blow back damage.
 	// TODO Adjusted noise.
 	// TODO Fix weapon FX stay alive. (Maybe a timer?)
+	// TODO FIX LockStrength
+
+	LockStrength = Target != NULL ? Angle / MaxAngle : 1.f;
+
 
 	if (ShouldDealDamage_Instant(Target))
-	{
+	{		
+		// Perform the Dist check for computing the damage.
+		const float DistToTarget = FVector::Dist(Target->GetActorLocation(), StartTrace);
+
 		// TODO add a distance modifier to this damage.
-		DealDamage_Instant(NewImpact, TargetDir);
+		DealDamageBeam(NewImpact, TargetDir, DistToTarget);
 	}
 
 	// This will trigger an OnRep that will prop to remote clients
@@ -107,6 +122,27 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 		// Do spawning here.
 		SpawnTrailEffect(EndPoint);
 		SpawnHitEffect(NewImpact);
+	}
+}
+
+void ACGBeamGun::DealDamageBeam(const FHitResult& Impact, const FVector& ShootDir, float Dist)
+{
+	// The value of the damage curve at this distance.
+	//const float CurveValue = DamageCurve != NULL ? DamageCurve->GetValue(Dist / WeaponConfig.WeaponRange) : 1.f;
+
+	FPointDamageEvent PointDmg;
+	PointDmg.DamageTypeClass = WeaponConfig.DamageType;
+	PointDmg.HitInfo = Impact;
+	PointDmg.ShotDirection = ShootDir;
+	PointDmg.Damage = WeaponConfig.BaseDamage;
+
+	if (PointDmg.Damage > 0.f)
+	{
+		Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, CGOwner->Controller, this);
+	}
+	else if (PointDmg.Damage < 0.f)
+	{
+		CGOwner->TakeDamage(-PointDmg.Damage, PointDmg, CGOwner->Controller, this);
 	}
 }
 
@@ -129,22 +165,19 @@ void ACGBeamGun::SpawnTrailEffect(const FVector& EndPoint)
 		return;
 	}
 
-	if (WeaponFXConfig.WeaponTrail && TrailPSC == NULL)
+	if (WeaponFXConfig.WeaponTrail )
 	{
 		USkeletalMeshComponent* Mesh = GetWeaponMesh();
-
-		TrailPSC = UGameplayStatics::SpawnEmitterAttached(WeaponFXConfig.WeaponTrail, Mesh, WeaponFXConfig.MuzzleSocket);
+		TrailPSC = UGameplayStatics::SpawnEmitterAttached(LockStrength < 1.f ? ConnectedBeam : WeaponFXConfig.WeaponTrail, Mesh, WeaponFXConfig.MuzzleSocket);
 
 		if (TrailPSC)
 		{
 			// Set the vector for the particle.
 			TrailPSC->SetVectorParameter(WeaponFXConfig.TrailTargetParam, EndPoint);
-		}
-	}
-	else if (TrailPSC)
-	{
 
-		TrailPSC->SetVectorParameter(WeaponFXConfig.TrailTargetParam, EndPoint);
+		//	FLinearColor NewColor = FMath::Lerp(NoHitColor, HitColor, LockStrength);
+			//TrailPSC->SetColorParameter(BEAM_COLOR_OVER_LIFE, NewColor);
+		}
 	}
 }
 
@@ -161,5 +194,5 @@ void ACGBeamGun::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ACGBeamGun, Target, COND_OwnerOnly);
-
+	DOREPLIFETIME(ACGBeamGun, LockStrength);
 }

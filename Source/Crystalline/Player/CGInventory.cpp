@@ -191,7 +191,7 @@ void ACGInventory::ReconstructInventory(bool bCrystalChanged)
 
 	ACGCrystalGun* NewWeapon = WeaponGroups.Contains(TierOneCrystal) ? Cast<ACGCrystalGun>(WeaponGroups[TierOneCrystal][0]) : NULL;
 
-	// If a new weapon was present attempt to copy the ammo and move the new weapon to the crystalgun index.
+	// If a new weapon was present attempt to copy the ammo and move the new weapon to the crystal gun index.
 	if (NewWeapon != NULL)
 	{
 		if (AmmoCache.Contains(NewWeapon->WeaponConfig.AmmoType) &&	AmmoCache[NewWeapon->WeaponConfig.AmmoType].Ammo >= 0)
@@ -224,6 +224,12 @@ void ACGInventory::LoadCrystal(ECGCrystalType Crystal)
 	// Tier1 crystal
 	if (Crystal > ECGCrystalType::POWER_UP && TierOneCrystal != Crystal)
 	{
+		// TODO play local anim.
+		if (CGOwner && CGOwner->GetCurrentWeapon())
+		{
+//			CGOwner->GetCurrentWeapon()->PlayLocalCrystalPop(TierOneCrystal);
+		}
+
 		ECGCrystalType OldCrystal = TierOneCrystal;
 		TierOneCrystal = Crystal;
 		ReconstructInventory();
