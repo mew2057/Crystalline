@@ -613,11 +613,6 @@ void ACGPlayerHUD::DrawGameInfo()
 			}
 		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Game State is missing!"));
-
-	}
 }
 
 float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight, float Anchor)
