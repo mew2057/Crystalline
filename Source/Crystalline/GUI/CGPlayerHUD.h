@@ -15,6 +15,27 @@
 #pragma region Structs
 
 USTRUCT()
+struct FCGDamageIndicator
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** Governs how long the indicator will be visible on the screen.*/
+	float FadeTime;
+
+	/** The rotation of the indicator.*/
+	float Rotation;
+
+	/** The Damage causer, generally another player.*/
+	AActor* DamageCauser;
+
+	FCGDamageIndicator()
+	{
+		FadeTime = 0.f;
+		Rotation = 0.f;
+	}
+};
+
+USTRUCT()
 struct FCGHUDTransform
 {
 	GENERATED_USTRUCT_BODY()
@@ -608,6 +629,10 @@ public:
 	/** Draws the player's current shield on the screen.*/
 	void DrawShield();
 
+
+	/**Draws the damage Indicators/arrows.*/
+	void DrawDamageIndicators();
+
 	/** Draws Information regarding the current game type.*/
 	void DrawGameInfo();
 
@@ -632,8 +657,11 @@ public:
 	/**Append a GameMode Message to the queue of dialog messages.*/
 	void AddDialogGameScoreMessage(int32 MessageIndex);
 
-	/**Sets the TimeSinceLastHit for the hit notification.*/
-	void NotifyHitTaken(const FVector& HitDirection);
+	/**
+	* Sets the TimeSinceLastHit for the hit notification for the marquee texture.
+	* @param HitSource.
+	*/
+	void NotifyHitTaken(const AActor* HitSource);
 
 	/**Lets the player know that they hit an opponent.*/
 	void NotifyHitConfirmed();
@@ -694,19 +722,34 @@ private:
 	FCGEndGameMessage EndGameMessage;
 
 	/** Expanded to fit across the player's FOV. */
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
 	UTexture2D* HitTakenOverlay;
 
 	/**The color for the hit taken texture.*/
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
 	FLinearColor HitTakenColor;
 
-	/**Time to display the hit taken texture.*/
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	/**Time to display the overall hit taken texture.*/
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
 	float TimeToDisplayHitTaken;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
+	UTexture2D* HTIndicatorIcon;
+
+	/**Time to fade the hit taken indicator arrow.*/
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
+	float HitTakenFadeTime;
+
+	/**The Maximum number of hit taken indcators allowed on screen at one time.*/
+	UPROPERTY(EditDefaultsOnly, Config = "Damage Visualization")
+	int32 MaxDamageIndicatorCount;
+
+	/**A collection of Damage indicators, ensures the player screen is not flooded.*/
+	UPROPERTY(Transient)
+	TArray<FCGDamageIndicator> DamageIndicators;
+
 	/**Time to display the hit confirmation.*/
-	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	UPROPERTY(EditDefaultsOnly, Config = "Damage Visualization")
 	float TimeToDisplayHitConfirmed;
 
 	/**The Font for the HUD.*/
@@ -725,6 +768,9 @@ private:
 
 	UPROPERTY(Transient)
 	TArray<FCGDialog> DialogQueue;
+
+
+	
 
 
 };

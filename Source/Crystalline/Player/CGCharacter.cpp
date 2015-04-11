@@ -326,7 +326,7 @@ void ACGCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& DamageE
 	if (HUD)
 	{
 		//(DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal2D()
-		HUD->NotifyHitTaken(FVector::ZeroVector);
+		HUD->NotifyHitTaken(DamageCauser);
 	}
 
 	if (PawnInstigator && PawnInstigator != this && PawnInstigator->IsLocallyControlled())
