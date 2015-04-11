@@ -817,6 +817,12 @@ void ACGPlayerHUD::DrawScoreboard()
 
 		CurrentY += RowSpacing;
 
+		// Rank of the current player
+		int32 Rank = 1;
+
+		// Last player score.
+		float PrevScore = FLT_MAX;
+
 		for (int32 i = 0; i < NumPlayers; ++i)
 		{
 			TempPlayerState = Cast<ACGPlayerState>(CGGameState->PlayerArray[i]);
@@ -830,8 +836,17 @@ void ACGPlayerHUD::DrawScoreboard()
 			// Fudge factor to make sure the column is not reight on the edge.
 			CurrentX += ColOffset;
 
+			// If our rank is less than the previous score, set the rank to the current index + 1 
+			if (TempPlayerState->Score  < PrevScore)
+			{
+				Rank = i + 1;
+			}
+
+			// Cache the score.
+			PrevScore = TempPlayerState->Score;
+
 			DrawScaledText(
-				FString::Printf(TEXT("%d"), i + 1),
+				FString::Printf(TEXT("%d"), Rank),
 				Scoreboard.TextColor,
 				CurrentX + RankWidth*Scoreboard.RankAlignment, CurrentY, Font,
 				RowHeight,
