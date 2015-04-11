@@ -119,13 +119,18 @@ void ACGPlayerController::ClientGameStarted_Implementation()
 
 	UCGSavedPlayerData* LoadGameInstance = Cast<UCGSavedPlayerData>(UGameplayStatics::CreateSaveGameObject(UCGSavedPlayerData::StaticClass()));
 	LoadGameInstance = Cast<UCGSavedPlayerData>(UGameplayStatics::LoadGameFromSlot("SavedPlayerData", 0));
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, LoadGameInstance->PlayerName);
-	if (LoadGameInstance->UsingIPAddress == true){
-		FString PlayerNameToDisplay = LoadGameInstance->PlayerName;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, PlayerNameToDisplay);
-		//if (GetWorld()->IsServer()){
+
+	// This needs to be vetted, there is NO GUARANTEE that either GEngine OR LoadGameInstance will have a value.
+	if (LoadGameInstance && GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, LoadGameInstance->PlayerName);
+		if (LoadGameInstance->UsingIPAddress == true){
+			FString PlayerNameToDisplay = LoadGameInstance->PlayerName;
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, PlayerNameToDisplay);
+			//if (GetWorld()->IsServer()){
 			SetName(PlayerNameToDisplay);
-		//}
+			//}
+		}
 	}
 }
 
