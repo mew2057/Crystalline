@@ -10,6 +10,7 @@ UCGSavedPlayerData::UCGSavedPlayerData(const FObjectInitializer& ObjectInitializ
 	LastUsedIPAddress = TEXT("127.0.0.1");
 	UserIndex = 0;
 	UsingIPAddress = 0;
+	CameraTime = 0;
 }
 
 

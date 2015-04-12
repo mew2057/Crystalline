@@ -30,6 +30,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		uint32 UsingIPAddress:1;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float CameraTime;
+
 	UCGSavedPlayerData(const FObjectInitializer& ObjectInitializer);
 	
 	
