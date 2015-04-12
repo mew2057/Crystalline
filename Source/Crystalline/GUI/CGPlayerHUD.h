@@ -25,9 +25,6 @@ struct FCGDamageIndicator
 	/** The rotation of the indicator.*/
 	float Rotation;
 
-	/** The Damage causer, generally another player.*/
-	AActor* DamageCauser;
-
 	FCGDamageIndicator()
 	{
 		FadeTime = 0.f;
@@ -630,7 +627,9 @@ public:
 	void DrawShield();
 
 
-	/**Draws the damage Indicators/arrows.*/
+	/**
+	 * Draws the damage Indicators/arrows.
+	*/
 	void DrawDamageIndicators();
 
 	/** Draws Information regarding the current game type.*/
@@ -661,7 +660,7 @@ public:
 	* Sets the TimeSinceLastHit for the hit notification for the marquee texture.
 	* @param HitSource.
 	*/
-	void NotifyHitTaken(const AActor* HitSource);
+	void NotifyHitTaken(APawn* HitSource);
 
 	/**Lets the player know that they hit an opponent.*/
 	void NotifyHitConfirmed();
@@ -734,11 +733,17 @@ private:
 	float TimeToDisplayHitTaken;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
+	FVector2D  HTIndicatorSize;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
 	UTexture2D* HTIndicatorIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
+	FLinearColor HTIndicatorColor;
 
 	/**Time to fade the hit taken indicator arrow.*/
 	UPROPERTY(EditDefaultsOnly, Category = "Damage Visualization")
-	float HitTakenFadeTime;
+	float HTIndicatorFadeTime;
 
 	/**The Maximum number of hit taken indcators allowed on screen at one time.*/
 	UPROPERTY(EditDefaultsOnly, Config = "Damage Visualization")

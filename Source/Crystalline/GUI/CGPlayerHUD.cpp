@@ -490,23 +490,28 @@ void ACGPlayerHUD::DrawShield()
 	//
 	
 }
-
+// TODO make this code cleaner.
 void ACGPlayerHUD::DrawDamageIndicators()
 {
-	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
-
+	const float ScaleY = Canvas->ClipY / TARGET_Y_RESOLUTION;
+	const FVector2D Size(ScaleY * HTIndicatorSize.X, ScaleY * HTIndicatorSize.Y);
+	const FVector2D Position(0.5f * (Canvas->ClipX - Size.X), .5f*(Canvas->ClipY - Size.Y));
+	const float DeltaTime = GetWorld()->GetTimeSeconds() - TimeSinceLastHitTaken;
 
 	for (int32 i = 0; i < DamageIndicators.Num(); ++i)
 	{
 		// If the indicator exists, draw it.
 		if (DamageIndicators[i].FadeTime > 0.f)
 		{
-			// XXX replace this with actual stuff.
-			FCanvasTileItem TileItem(Center, HTIndicatorIcon->Resource, FVector2D(Canvas->ClipX, Canvas->ClipY), HitTakenColor);
-			FRotator Rotation(0, DamageIndicators[i].Rotation, 0);
-			TileItem.Rotation = Rotation;
-			TileItem.BlendMode = SE_BLEND_Translucent;
+			DamageIndicators[i].FadeTime -= DeltaTime;
 
+			FLinearColor Color = HTIndicatorColor;
+			Color.A = DamageIndicators[i].FadeTime / HTIndicatorFadeTime;
+
+			FCanvasTileItem TileItem(Position, HTIndicatorIcon->Resource, Size, Color);
+			TileItem.PivotPoint = FVector2D(0.5, 0.5);
+			TileItem.Rotation = FRotator(0, DamageIndicators[i].Rotation, 0);
+			TileItem.BlendMode = ESimpleElementBlendMode::SE_BLEND_Translucent;
 			Canvas->DrawItem(TileItem);
 		}
 	}
@@ -762,7 +767,7 @@ void ACGPlayerHUD::AddDialogGameScoreMessage(int32 MessageIndex)
 	}
 }
 
-void ACGPlayerHUD::NotifyHitTaken(const AActor* DamageCauser)
+void ACGPlayerHUD::NotifyHitTaken(APawn* DamageCauser)
 {
 	float TempTime = GetWorld()->GetTimeSeconds();
 	TimeSinceLastHitTaken = TempTime - TimeSinceLastHitTaken > TimeToDisplayHitTaken ? TempTime : TimeSinceLastHitTaken;
@@ -772,28 +777,34 @@ void ACGPlayerHUD::NotifyHitTaken(const AActor* DamageCauser)
 	// If the source exists add an indicator.
 	if (Controller && DamageCauser && DamageIndicators.Num() > 0)
 	{
+		//  Get the player location and look direction.
 		FVector  ControllerOrigin;
 		FRotator ControllerLookRotation;
 		Controller->GetPlayerViewPoint(ControllerOrigin, ControllerLookRotation);
 
 		// Find the source of the hit and normalize it.
-		FVector SourceDir = ControllerOrigin - DamageCauser->GetActorLocation();
-		SourceDir.Normalize();
+		FVector SourceDir = (DamageCauser->GetActorLocation() - ControllerOrigin).GetSafeNormal2D();
 
 		// The direction the player is looking.
-		FVector LookDir = ControllerLookRotation.Vector();
-	
+		FVector LookDir = ControllerLookRotation.Vector().GetSafeNormal2D();
+		
+		// Copute the right vector for the LookDir
+		FVector Right = LookDir ^ FVector::UpVector;
 
-		// Perform the dot product. XXX Wrong!s
+		// Perform the dot product.
 		float Rotation = FMath::Acos(SourceDir | LookDir);
+
+		// Determine if left or right.
+		Rotation *= ((SourceDir | Right) < 0 ? -1 : 1);
 		
 		// Prep the indicator.
 		float ShortestRemainingTime = DamageIndicators[0].FadeTime;
 		int32 BestIndicator = 0;
+
 		// Iterate over the indicators.
 		for (int32 i = 0; i < DamageIndicators.Num(); ++i)
 		{
-			if (DamageIndicators[i].DamageCauser == DamageCauser)
+			if ( DamageIndicators[i].FadeTime <= 0)
 			{
 				BestIndicator = i;
 				break;
@@ -806,12 +817,8 @@ void ACGPlayerHUD::NotifyHitTaken(const AActor* DamageCauser)
 		}
 
 		// Set Up the indicator for drawing.
-		DamageIndicators[BestIndicator].FadeTime = HitTakenFadeTime;
-		DamageIndicators[BestIndicator].Rotation = Rotation;
-
-		UE_LOG(LogTemp, Warning, TEXT("Rotation : %f Fade Time: %f"), HitTakenFadeTime,Rotation);
-
-	//	DamageIndicators[BestIndicator].DamageCauser = DamageCauser;
+		DamageIndicators[BestIndicator].FadeTime = HTIndicatorFadeTime;
+		DamageIndicators[BestIndicator].Rotation = Rotation * (180 / PI);
 	}
 }
 
