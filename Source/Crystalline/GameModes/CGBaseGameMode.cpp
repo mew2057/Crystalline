@@ -23,20 +23,12 @@ ACGBaseGameMode::ACGBaseGameMode(const FObjectInitializer& ObjectInitializer) :
 	PlayerStartCooldownTime(10.f),
 	PreGameTime(10.f)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Game Mode Name %s."), *GetName());
-
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/Player/CGPlayer"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
-	if (DefaultPawnClass)
-		UE_LOG(LogTemp, Warning, TEXT("Default Pawn Class %s."), *DefaultPawnClass->GetName());
-
 	static ConstructorHelpers::FClassFinder<AGameState> GameStateClassFinder(TEXT("/Game/Blueprints/States/CrystallineGameState"));
 	GameStateClass = GameStateClassFinder.Class;
-
-	if (GameStateClass)
-		UE_LOG(LogTemp, Warning, TEXT("Game State Class %s."), *GameStateClass->GetName());
-	
+		
 	PlayerControllerClass = ACGPlayerController::StaticClass();	
 	HUDClass              = ACGPlayerHUD::StaticClass();
 	PlayerStateClass      = ACGPlayerState::StaticClass();
@@ -191,8 +183,6 @@ void ACGBaseGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	UE_LOG(LogTemp, Warning, TEXT("Post Login %s."), *NewPlayer->GetName());
-
 	// Ensure that the client has the proper spectator camera location.
 	ACGPlayerController* NCGPC = Cast<ACGPlayerController>(NewPlayer);
 	if (NCGPC && NCGPC->GetPawn() == NULL)
@@ -277,18 +267,14 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 	ACGPlayerStart* BestStart    = NULL;
 	ACGPlayerStart* CurrentStart = NULL;
 
-	UE_LOG(LogTemp, Warning, TEXT("Spawning Player %s."), *Player->GetName());	
 
 	for (int32 i = 0; i < StartCount; ++i)
 	{
 		CurrentStart = Cast<ACGPlayerStart>(PlayerStarts[(i + RandomStart) % StartCount]);
 		CurrentScore = CurrentStart ? RatePlayerStart(CurrentStart, PlayerController, bIsBot) : -100.f;
-		UE_LOG(LogTemp, Warning, TEXT("Start %d Score %f"), i, CurrentScore);
 		// If the rating is perfect return the current state.
 		if (CurrentScore >= 100.f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Spawn At %s (Perfect rating)."), *CurrentStart->GetName());
-
 			return CurrentStart;
 		}
 		else if (CurrentScore > BestScore || CurrentScore == BestScore && FMath::RandRange(0,1) == 1 ) // Flip a coin on the spawn location.
@@ -298,16 +284,6 @@ AActor* ACGBaseGameMode::ChoosePlayerStart(AController* Player)
 		}
 
 	}
-
-	if (BestStart)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawn At %s %f"), *BestStart->GetName(), BestScore);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawn At fallback!"));
-	}
-
 
 	return BestStart != NULL ? BestStart : Super::ChoosePlayerStart(Player);
 }
