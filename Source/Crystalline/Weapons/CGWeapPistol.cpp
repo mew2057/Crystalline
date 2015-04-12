@@ -26,7 +26,9 @@ void ACGWeapPistol::PostInitializeComponents()
 void ACGWeapPistol::Tick(float DeltaSeconds)
 {
 	if (!bIsOverheated)
+	{
 		WeaponHeat = FMath::Max(0.f, WeaponHeat - (OverheatConfig.CooldownPerSecond * DeltaSeconds));
+	}
 
 	Super::Tick(DeltaSeconds);
 

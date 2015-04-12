@@ -28,6 +28,8 @@ public:
 		GetOuterACGWeapon()->PlayReload();
 	}
 
+	virtual bool StartUnequip() override { return false; }
+
 	void Tick(float DeltaSeconds)
 	{
 		// If the player should be able to fire, then allow them to fire.
