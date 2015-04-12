@@ -15,6 +15,7 @@ void ACGCrystalGun::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	ClipPercentPerShot = 1.f / (float)AmmoConfig.ShotsPerClip;
+	FlashLevel = FMath::Floor(AmmoConfig.ShotsPerClip * AmmoConfig.AmmoPerShot * CG_PERCENT_FLASH);
 }
 
 #pragma region Ammo
@@ -89,7 +90,6 @@ void ACGCrystalGun::InitializeAmmo(const FCGCrystalAmmo& AmmoStruct)
 	Ammo = AmmoStruct.AmmoCarried;
 	AmmoConfig.AmmoCapacity = AmmoStruct.MaxAmmoCarried;
 	UE_LOG(LogTemp, Warning, TEXT("AMMO INITIAL %d %d"), Ammo, AmmoInClip);
-
 	ApplyReload();
 
 };

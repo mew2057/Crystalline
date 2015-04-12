@@ -5,6 +5,7 @@
 #include "Weapons/CGWeapon.h"
 #include "CGCrystalGun.generated.h"
 
+#define CG_PERCENT_FLASH .1f
 /**
  * 
  */
@@ -33,7 +34,7 @@ public:
 
 	virtual float GetReloadTime() const override;
 
-	virtual bool ShouldDisplayAmmoWarning() const override { return AmmoInClip == 0.f; };
+	virtual bool ShouldDisplayAmmoWarning() const override { return AmmoInClip <= FlashLevel; };
 
 	virtual bool CanReload() const override;
 
@@ -66,4 +67,7 @@ protected:
 	
 	UPROPERTY(Transient, Replicated)
 	int32 AmmoInClip; 
+
+	/** Ammo Count at which the gun should flash.*/
+	int32 FlashLevel;
 };
