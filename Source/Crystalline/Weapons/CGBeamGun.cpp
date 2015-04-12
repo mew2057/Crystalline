@@ -62,14 +62,21 @@ void ACGBeamGun::ProcessBeam(const FHitResult& Impact, FVector_NetQuantizeNormal
 	AActor* TempTarget = Impact.GetActor();
 	
 	// If the sighted target is alive, assume they're a better candidate than whoever we're attached to.
-	if (TempTarget != NULL)
+	if (TempTarget != NULL )
 	{
-		if (TempTarget != Target)
+		if (TempTarget->bCanBeDamaged)
 		{
-			Target = TempTarget;
-		}
+			if (TempTarget != Target)
+			{
+				Target = TempTarget;
+			}
 
-		TargetLocation = Impact.ImpactPoint - Target->GetActorLocation();
+			TargetLocation = Impact.ImpactPoint - Target->GetActorLocation();
+		}
+		else
+		{
+			TempTarget = NULL;
+		}
 	}
 
 	FHitResult NewImpact = Impact;
