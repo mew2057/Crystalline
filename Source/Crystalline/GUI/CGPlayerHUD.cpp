@@ -35,6 +35,9 @@ void ACGPlayerHUD::PostInitializeComponents()
 	// FIXME This crashes the editor!
 	DetermineKeyCodeForAction("ActionButton", ACTION_BUTTON, GamepadConnected);
 	DetermineKeyCodeForAction("PopCrystalButton", POP_BUTTON, GamepadConnected);
+
+	// Initialize the damage indicators
+	DamageIndicators.AddZeroed(MaxDamageIndicatorCount);
 }
 
 //XXX This is Janky code.
@@ -176,6 +179,8 @@ void ACGPlayerHUD::DrawHUD()
 		Canvas->ApplySafeZoneTransform();
 	}
 
+	DrawDamageIndicators();
+
 	DrawGameInfo();
 
 	// XXX a hack, shows the scoreboard when the player is detached.
@@ -189,7 +194,6 @@ void ACGPlayerHUD::DrawHUD()
 		DrawEndGameMessage();
 	}
 }
-
 
 void ACGPlayerHUD::DrawCrosshair()
 {
@@ -486,6 +490,33 @@ void ACGPlayerHUD::DrawShield()
 	//
 	
 }
+// TODO make this code cleaner.
+void ACGPlayerHUD::DrawDamageIndicators()
+{
+	const float ScaleY = Canvas->ClipY / TARGET_Y_RESOLUTION;
+	const FVector2D Size(ScaleY * HTIndicatorSize.X, ScaleY * HTIndicatorSize.Y);
+	const FVector2D Position(0.5f * (Canvas->ClipX - Size.X), .5f*(Canvas->ClipY - Size.Y));
+	const float DeltaTime = GetWorld()->GetTimeSeconds() - TimeSinceLastHitTaken;
+
+	for (int32 i = 0; i < DamageIndicators.Num(); ++i)
+	{
+		// If the indicator exists, draw it.
+		if (DamageIndicators[i].FadeTime > 0.f)
+		{
+			DamageIndicators[i].FadeTime -= DeltaTime;
+
+			FLinearColor Color = HTIndicatorColor;
+			Color.A = DamageIndicators[i].FadeTime / HTIndicatorFadeTime;
+
+			FCanvasTileItem TileItem(Position, HTIndicatorIcon->Resource, Size, Color);
+			TileItem.PivotPoint = FVector2D(0.5, 0.5);
+			TileItem.Rotation = FRotator(0, DamageIndicators[i].Rotation, 0);
+			TileItem.BlendMode = ESimpleElementBlendMode::SE_BLEND_Translucent;
+			Canvas->DrawItem(TileItem);
+		}
+	}
+
+}
 
 void ACGPlayerHUD::DrawGameInfo()
 {
@@ -613,11 +644,6 @@ void ACGPlayerHUD::DrawGameInfo()
 			}
 		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Game State is missing!"));
-
-	}
 }
 
 float ACGPlayerHUD::DrawScaledText(const FString & Text, FLinearColor TextColor, float ScreenX, float ScreenY, UFont * Font, float TextHeight, float Anchor)
@@ -741,11 +767,59 @@ void ACGPlayerHUD::AddDialogGameScoreMessage(int32 MessageIndex)
 	}
 }
 
-
-void ACGPlayerHUD::NotifyHitTaken(const FVector& HitDirection )
+void ACGPlayerHUD::NotifyHitTaken(APawn* DamageCauser)
 {
 	float TempTime = GetWorld()->GetTimeSeconds();
 	TimeSinceLastHitTaken = TempTime - TimeSinceLastHitTaken > TimeToDisplayHitTaken ? TempTime : TimeSinceLastHitTaken;
+
+	AController* const Controller = GetOwningPlayerController();
+
+	// If the source exists add an indicator.
+	if (Controller && DamageCauser && DamageIndicators.Num() > 0)
+	{
+		//  Get the player location and look direction.
+		FVector  ControllerOrigin;
+		FRotator ControllerLookRotation;
+		Controller->GetPlayerViewPoint(ControllerOrigin, ControllerLookRotation);
+
+		// Find the source of the hit and normalize it.
+		FVector SourceDir = (DamageCauser->GetActorLocation() - ControllerOrigin).GetSafeNormal2D();
+
+		// The direction the player is looking.
+		FVector LookDir = ControllerLookRotation.Vector().GetSafeNormal2D();
+		
+		// Copute the right vector for the LookDir
+		FVector Right = LookDir ^ FVector::UpVector;
+
+		// Perform the dot product.
+		float Rotation = FMath::Acos(SourceDir | LookDir);
+
+		// Determine if left or right.
+		Rotation *= ((SourceDir | Right) < 0 ? -1 : 1);
+		
+		// Prep the indicator.
+		float ShortestRemainingTime = DamageIndicators[0].FadeTime;
+		int32 BestIndicator = 0;
+
+		// Iterate over the indicators.
+		for (int32 i = 0; i < DamageIndicators.Num(); ++i)
+		{
+			if ( DamageIndicators[i].FadeTime <= 0)
+			{
+				BestIndicator = i;
+				break;
+			}
+			else if (DamageIndicators[i].FadeTime < ShortestRemainingTime)
+			{
+				ShortestRemainingTime = DamageIndicators[i].FadeTime;
+				BestIndicator = i;
+			}			
+		}
+
+		// Set Up the indicator for drawing.
+		DamageIndicators[BestIndicator].FadeTime = HTIndicatorFadeTime;
+		DamageIndicators[BestIndicator].Rotation = Rotation * (180 / PI);
+	}
 }
 
 void ACGPlayerHUD::NotifyHitConfirmed()
@@ -817,6 +891,12 @@ void ACGPlayerHUD::DrawScoreboard()
 
 		CurrentY += RowSpacing;
 
+		// Rank of the current player
+		int32 Rank = 1;
+
+		// Last player score.
+		float PrevScore = FLT_MAX;
+
 		for (int32 i = 0; i < NumPlayers; ++i)
 		{
 			TempPlayerState = Cast<ACGPlayerState>(CGGameState->PlayerArray[i]);
@@ -830,8 +910,17 @@ void ACGPlayerHUD::DrawScoreboard()
 			// Fudge factor to make sure the column is not reight on the edge.
 			CurrentX += ColOffset;
 
+			// If our rank is less than the previous score, set the rank to the current index + 1 
+			if (TempPlayerState->Score  < PrevScore)
+			{
+				Rank = i + 1;
+			}
+
+			// Cache the score.
+			PrevScore = TempPlayerState->Score;
+
 			DrawScaledText(
-				FString::Printf(TEXT("%d"), i + 1),
+				FString::Printf(TEXT("%d"), Rank),
 				Scoreboard.TextColor,
 				CurrentX + RankWidth*Scoreboard.RankAlignment, CurrentY, Font,
 				RowHeight,
