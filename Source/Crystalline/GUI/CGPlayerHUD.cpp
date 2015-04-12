@@ -208,8 +208,8 @@ void ACGPlayerHUD::DrawCrosshair()
 	bool bIsHitting = GetWorld()->GetTimeSeconds() - TimeSinceLastHitConfirmed < TimeToDisplayHitConfirmed;	
 	bool bCanHit = false;
 	bool bHeadShot = false;
-	Weapon->CheckCanHit(bCanHit, bHeadShot);
-	
+	ACGCharacter* Target = Weapon->CheckCanHit(bCanHit, bHeadShot);
+		
 	Canvas->SetDrawColor(bIsHitting || bCanHit ? FColor::Red : FColor::White);
 
 	// ScaleUI is 1 at 1080, .5 at 540 and 2 at 2160.
@@ -233,7 +233,19 @@ void ACGPlayerHUD::DrawCrosshair()
 			(Center.Y - (Crosshair.HeadShotIcon.VL * ScaleUIY * 0.5f)), ScaleUIY);
 	}
 
-
+	// Draw the player name if present.
+	if (Target && Target->PlayerState)
+	{
+		ACGPlayerState* State = Cast<ACGPlayerState>(Target->PlayerState);
+		DrawScaledText(
+			State->GetShortenedName(),
+			Crosshair.EnemyNameColor,
+			Center.X,
+			Center.Y + Crosshair.EnemyNameOffset * ScaleUIY,
+			Font,
+			Crosshair.EnemyNameHeight *ScaleUIY,
+			.5f);
+	}
 }
 
 void ACGPlayerHUD::DrawWeaponHUD()
@@ -795,7 +807,7 @@ void ACGPlayerHUD::NotifyHitTaken(APawn* DamageCauser)
 		float Rotation = FMath::Acos(SourceDir | LookDir);
 
 		// Determine if left or right.
-		Rotation *= ((SourceDir | Right) < 0 ? -1 : 1);
+		Rotation *= ((SourceDir | Right) > 0 ? -1 : 1);
 		
 		// Prep the indicator.
 		float ShortestRemainingTime = DamageIndicators[0].FadeTime;

@@ -549,9 +549,23 @@ struct FCGCrosshairElement
 	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
 	FCanvasIcon HeadShotIcon;
 
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		float EnemyNameHeight;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+		float EnemyNameOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = HUDElements)
+	FLinearColor EnemyNameColor;
+
 	FCGCrosshairElement()
 	{
 		YScale = 1.5f;
+		EnemyNameHeight = 42.f;
+		EnemyNameOffset = 42.f;
+		EnemyNameColor = FLinearColor::White;
+
+
 	}
 };
 

@@ -200,7 +200,7 @@ public:
 	FORCEINLINE bool CanZoom() { return CurrentState != EquippingState && CurrentState != UnequippingState;  }
 
 	/***/
-	void CheckCanHit(bool & OutbCanHit, bool & OutbHeadShot);
+	ACGCharacter* CheckCanHit(bool & OutbCanHit, bool & OutbHeadShot);
 
 #pragma endregion
 
